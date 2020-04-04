@@ -5,7 +5,7 @@
 
     <groupId>net.irext.server</groupId>
     <artifactId>private-server</artifactId>
-    <version>0.2.2</version>
+    <version>0.2.5</version>
     <packaging>jar</packaging>
 
     <name>IRext Private Server</name>

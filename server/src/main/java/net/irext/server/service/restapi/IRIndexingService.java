@@ -196,9 +196,9 @@ public class IRIndexingService extends AbstractBaseService {
     }
 
     @PostMapping("/list_indexes")
-    public IndexesResponse listOperators(HttpServletRequest request,
-                                         @HeaderParam("user-lang") String userLang,
-                                         @RequestBody ListIndexesRequest listIndexesRequest) {
+    public IndexesResponse listRemoteIndexes(HttpServletRequest request,
+                                       @HeaderParam("user-lang") String userLang,
+                                       @RequestBody ListIndexesRequest listIndexesRequest) {
         try {
             int id = listIndexesRequest.getId();
             String token = listIndexesRequest.getToken();
