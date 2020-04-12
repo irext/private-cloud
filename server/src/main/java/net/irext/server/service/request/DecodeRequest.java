@@ -7,36 +7,40 @@ import net.irext.server.sdk.bean.ACStatus;
  * Revised:        Date: 2017-05-16
  * Revision:       Revision: 1.0
  * <p>
- * Description:    HTTP server online
+ * Description:    HTTP decode online
  * <p>
  * Revision log:
  * 2017-05-16: created by strawmanbobi
  */
-public class DecodeRequest extends BaseRequest{
+public class DecodeRequest extends BaseRequest {
 
-    private int remoteIndexId;
+    private int indexId;
     private ACStatus acStatus;
     private int keyCode;
     private int changeWindDir;
-    private String sessionId;
+    private Integer directDecode;
+    private Integer paraData;
 
-    public DecodeRequest(int remoteIndexId, ACStatus acStatus, int keyCode, int changeWindDir) {
-        this.remoteIndexId = remoteIndexId;
+    public DecodeRequest(int indexId, ACStatus acStatus, int keyCode, int changeWindDir,
+                         Integer directDecode, Integer paraData) {
+        this.indexId = indexId;
         this.acStatus = acStatus;
         this.keyCode = keyCode;
         this.changeWindDir = changeWindDir;
+        this.directDecode = directDecode;
+        this.paraData = paraData;
     }
 
     public DecodeRequest() {
 
     }
 
-    public int getRemoteIndexId() {
-        return remoteIndexId;
+    public int getIndexId() {
+        return indexId;
     }
 
-    public void setRemoteIndexId(int remoteIndexId) {
-        this.remoteIndexId = remoteIndexId;
+    public void setIndexId(int indexId) {
+        this.indexId = indexId;
     }
 
     public ACStatus getAcStatus() {
@@ -63,11 +67,19 @@ public class DecodeRequest extends BaseRequest{
         this.changeWindDir = changeWindDir;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public Integer getDirectDecode() {
+        return directDecode;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setDirectDecode(Integer directDecode) {
+        this.directDecode = directDecode;
+    }
+
+    public Integer getParaData() {
+        return paraData;
+    }
+
+    public void setParaData(Integer paraData) {
+        this.paraData = paraData;
     }
 }

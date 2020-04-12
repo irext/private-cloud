@@ -11,14 +11,11 @@ package net.irext.server.service.request;
  * 2019-02-14: created by strawmanbobi
  */
 public class GetACParametersRequest extends BaseRequest {
-
-    private int remoteIndexId;
-    private String sessionId;
+    private int indexId;
     private int mode;
 
-    public GetACParametersRequest(int remoteIndexId, String sessionId, int mode) {
-        this.remoteIndexId = remoteIndexId;
-        this.sessionId = sessionId;
+    public GetACParametersRequest(int indexId, int mode) {
+        this.indexId = indexId;
         this.mode = mode;
     }
 
@@ -26,20 +23,12 @@ public class GetACParametersRequest extends BaseRequest {
 
     }
 
-    public int getRemoteIndexId() {
-        return remoteIndexId;
+    public int getIndexId() {
+        return indexId;
     }
 
-    public void setRemoteIndexId(int remoteIndexId) {
-        this.remoteIndexId = remoteIndexId;
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public void setIndexId(int indexId) {
+        this.indexId = indexId;
     }
 
     public int getMode() {

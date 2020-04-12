@@ -23,6 +23,10 @@ public class Constants {
     public static final int LANG_EN = 1;
     public static final int LANG_TW_CN = 2;
 
+    public static final int STATUS_VALID = 1;
+    public static final int STATUS_INVALID = 0;
+    public static final int STATUS_PARA_DATA = 15;
+
     public enum CategoryID {
         AIR_CONDITIONER(1),
         TV(2),
@@ -52,7 +56,8 @@ public class Constants {
 
     public enum BinaryType {
         TYPE_BINARY(0),
-        TYPE_HEXDECIMAL(1);
+        TYPE_HEXDECIMAL(1),
+        TYPE_PARA_DATA(15);
 
         private final int type;
 

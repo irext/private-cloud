@@ -4,6 +4,7 @@ import net.irext.server.service.model.Category;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import java.util.List;
  * 2019-06-12: created by strawmanbobi
  */
 @Mapper
+@Controller
 public interface CategoryMapper {
     @Select("SELECT * FROM category WHERE status = 1 ORDER BY id LIMIT #{from}, #{count}")
     @ResultMap("BaseResultMap")

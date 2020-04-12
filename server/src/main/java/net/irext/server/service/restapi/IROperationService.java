@@ -1,15 +1,14 @@
 package net.irext.server.service.restapi;
 
+import com.google.gson.Gson;
 import net.irext.server.service.businesslogic.OperationLogic;
 import net.irext.server.service.cache.IDecodeSessionRepository;
 import net.irext.server.service.cache.IIRBinaryRepository;
 import net.irext.server.service.model.ACParameters;
-import net.irext.server.service.model.DecodeSession;
 import net.irext.server.service.model.RemoteIndex;
 import net.irext.server.service.request.*;
 import net.irext.server.service.response.*;
 import net.irext.server.service.utils.LoggerUtil;
-import net.irext.server.service.utils.MD5Util;
 import net.irext.server.service.businesslogic.IndexingLogic;
 import net.irext.server.service.restapi.base.AbstractBaseService;
 import net.irext.server.sdk.bean.ACStatus;
@@ -24,12 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 
 /**
  * Filename:       IRDecodeService.java
@@ -88,9 +85,15 @@ public class IROperationService extends AbstractBaseService {
     @PostMapping("/download_bin")
     public ResponseEntity<InputStreamResource> downloadBin(
             @RequestBody DownloadBinaryRequest downloadBinaryRequest) throws IOException {
+        int id = downloadBinaryRequest.getId();
+        String token = downloadBinaryRequest.getToken();
+        int indexId = downloadBinaryRequest.getIndexId();
+        File downloadFile = operationLogic.getDownloadFile(context, indexId);
 
-        File downloadFile = operationLogic.getDownloadFile(context, downloadBinaryRequest.getIndexId());
-
+        ServiceResponse response = validateToken(id, token, ServiceResponse.class);
+        if (response.getStatus().getCode() == net.irext.server.service.Constants.ERROR_CODE_AUTH_FAILURE) {
+            return null;
+        }
         if (null == downloadFile) {
             return ResponseEntity.ok().body(null);
         }
@@ -98,7 +101,7 @@ public class IROperationService extends AbstractBaseService {
         InputStreamResource resource = new InputStreamResource(new FileInputStream(downloadFile));
         String fileName = downloadFile.getName();
         long fileLength = downloadFile.length();
-
+        indexingLogic.statRemoteRef(indexId);
         return ResponseEntity.ok()
                 // Content-Disposition
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + fileName)
@@ -107,74 +110,20 @@ public class IROperationService extends AbstractBaseService {
                 .body(resource);
     }
 
-    @PostMapping("/open")
-    public StringResponse irOpen(HttpServletRequest request, @RequestBody OpenRequest openRequest) {
-        try {
-            int remoteIndexId = openRequest.getRemoteIndexId();
-
-            LoggerUtil.getInstance().trace(TAG, "irOpen API called : " + remoteIndexId);
-
-            StringResponse response = new StringResponse();
-            RemoteIndex remoteIndex = indexingLogic.getRemoteIndex(remoteIndexId);
-            if (null == remoteIndex) {
-                response.setStatus(new Status(Constants.ERROR_CODE_NETWORK_ERROR,
-                        Constants.ERROR_CODE_NETWORK_ERROR_TEXT));
-                response.setEntity(null);
-                return response;
-            } else {
-                LoggerUtil.getInstance().trace(TAG, "remoteIndex get : " + remoteIndex.getId() + ", " +
-                        remoteIndex.getRemoteMap());
-            }
-            RemoteIndex cachedRemoteIndex =
-                    OperationLogic.getInstance().openIRBinary(context, irBinaryRepository, remoteIndex);
-
-            if (null != cachedRemoteIndex) {
-                LoggerUtil.getInstance().trace(TAG, "binary content fetched : " +
-                        cachedRemoteIndex.getRemoteMap());
-                remoteIndex.setBinaries(cachedRemoteIndex.getBinaries());
-                // construct a session with this binary
-                String address = request.getRemoteAddr();
-                LoggerUtil.getInstance().trace(TAG, "request Address = " + address);
-                String timeStamp =
-                        new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new java.util.Date());
-                String sessionId = MD5Util.MD5Encode(address + timeStamp, null);
-                DecodeSession decodeSession = new DecodeSession(sessionId, remoteIndex.getId());
-                decodeSessionRepository.add(decodeSession.getSessionId(), decodeSession.getBinaryId());
-                response.setEntity(decodeSession.getSessionId());
-            }
-            response.setStatus(new Status(Constants.ERROR_CODE_SUCCESS, Constants.ERROR_CODE_SUCESS_TEXT));
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return getExceptionResponse(StringResponse.class);
-        }
-    }
-
     @PostMapping("/get_ac_parameters")
     public ACParametersResponse getACParameters(@RequestBody GetACParametersRequest getACParametersRequest) {
+        int id = getACParametersRequest.getId();
+        String token = getACParametersRequest.getToken();
+        ACParametersResponse response = validateToken(id, token, ACParametersResponse.class);
+        if (response.getStatus().getCode() == net.irext.server.service.Constants.ERROR_CODE_AUTH_FAILURE) {
+            return response;
+        }
+
         try {
-            int remoteIndexId = getACParametersRequest.getRemoteIndexId();
-            String sessionId = getACParametersRequest.getSessionId();
+            int remoteIndexId = getACParametersRequest.getIndexId();
             int mode = getACParametersRequest.getMode();
-
-            RemoteIndex cachedRemoteIndex = getCachedRemoteIndex(sessionId, remoteIndexId);
-            ACParametersResponse response = new ACParametersResponse();
-
-            if (null == cachedRemoteIndex) {
-                response.setEntity(null);
-                response.setStatus(new Status(Constants.ERROR_CODE_INVALID_SESSION,
-                        Constants.ERROR_CODE_INVALID_SESSION_TEXT));
-                return response;
-            }
-
-            if (cachedRemoteIndex.getCategoryId() != Constants.CategoryID.AIR_CONDITIONER.getValue()) {
-                response.setEntity(null);
-                response.setStatus(new Status(Constants.ERROR_CODE_INVALID_CATEGORY,
-                        Constants.ERROR_CODE_INVALID_CATEGORY_TEXT));
-                return response;
-            }
-
-            ACParameters acParameters = OperationLogic.getInstance().getACParameters(cachedRemoteIndex, mode);
+            RemoteIndex remoteIndex = operationLogic.prepareBinary(remoteIndexId);
+            ACParameters acParameters = OperationLogic.getInstance().getACParameters(remoteIndex, mode);
 
             response.setStatus(new Status(Constants.ERROR_CODE_SUCCESS, Constants.ERROR_CODE_SUCESS_TEXT));
             response.setEntity(acParameters);
@@ -187,45 +136,64 @@ public class IROperationService extends AbstractBaseService {
     }
 
     @PostMapping("/decode")
-    public DecodeResponse irDecode(@RequestBody DecodeRequest decodeRequest) {
+    public DecodeResponse decodeIR(@RequestBody DecodeRequest decodeRequest) {
+        int id = decodeRequest.getId();
+        String token = decodeRequest.getToken();
+        DecodeResponse response = validateToken(id, token, DecodeResponse.class);
+        if (response.getStatus().getCode() == net.irext.server.service.Constants.ERROR_CODE_AUTH_FAILURE) {
+            return response;
+        }
         try {
-            int remoteIndexId = decodeRequest.getRemoteIndexId();
+            int indexId = decodeRequest.getIndexId();
             ACStatus acStatus = decodeRequest.getAcStatus();
             int keyCode = decodeRequest.getKeyCode();
             int changeWindDir = decodeRequest.getChangeWindDir();
-            String sessionId = decodeRequest.getSessionId();
+            Integer directDecode = decodeRequest.getDirectDecode();
+            Integer paraData = decodeRequest.getParaData();
+            RemoteIndex remoteIndex = null;
+            int[] decoded = null;
+            LoggerUtil.getInstance().trace(TAG, "decodeIR entry, keyCode = " + keyCode + ", acStatus = " +
+                    new Gson().toJson(acStatus));
 
-            RemoteIndex cachedRemoteIndex = getCachedRemoteIndex(sessionId, remoteIndexId);
-            DecodeResponse response = new DecodeResponse();
-
-            if (null == cachedRemoteIndex) {
-                response.setEntity(null);
-                response.setStatus(new Status(Constants.ERROR_CODE_INVALID_SESSION,
-                        Constants.ERROR_CODE_INVALID_SESSION_TEXT));
-                return response;
+            // handle default value of arguments
+            if (null == directDecode) {
+                directDecode = 0;
+            }
+            if (null == paraData || 0 == paraData) {
+                paraData = 0;
+                // validate remote remoteIndex
+                remoteIndex = indexingLogic.getRemoteIndex(indexId);
+                if (null == remoteIndex) {
+                    response.setEntity(null);
+                    response.setStatus(new Status(Constants.ERROR_CODE_NETWORK_ERROR,
+                            Constants.ERROR_CODE_NETWORK_ERROR_TEXT));
+                    return response;
+                }
             }
 
-            int[] irArray = OperationLogic.getInstance().decode(
-                    cachedRemoteIndex,
-                    acStatus,
-                    keyCode,
-                    changeWindDir);
-
-            response.setStatus(new Status(Constants.ERROR_CODE_SUCCESS, Constants.ERROR_CODE_SUCESS_TEXT));
-            response.setEntity(irArray);
-            return response;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return getExceptionResponse(DecodeResponse.class);
-        }
-    }
-
-    @PostMapping("/close")
-    public ServiceResponse irClose(@RequestBody CloseRequest closeRequest) {
-        try {
-            String sessionId = closeRequest.getSessionId();
-            ServiceResponse response = new ServiceResponse();
-            OperationLogic.getInstance().close(decodeSessionRepository, sessionId);
+            if (1 == directDecode) {
+                decoded = operationLogic.decodeIRDirect(indexId, keyCode, paraData);
+            } else {
+                if (1 == paraData) {
+                    response.setEntity(null);
+                    response.setStatus(new Status(Constants.ERROR_CODE_INVALID_PARAMETER,
+                            Constants.ERROR_CODE_INVALID_PARAMETER_TEXT));
+                } else {
+                    if (null == remoteIndex) {
+                        response.setEntity(null);
+                        response.setStatus(new Status(Constants.ERROR_CODE_NETWORK_ERROR,
+                                Constants.ERROR_CODE_NETWORK_ERROR_TEXT));
+                        return response;
+                    }
+                    // NOTE: here remoteIndex instances changes
+                    remoteIndex = operationLogic.prepareBinary(remoteIndex.getId());
+                    decoded = operationLogic.decodeIR(remoteIndex, acStatus, keyCode, changeWindDir);
+                }
+            }
+            response.setEntity(decoded);
+            if (null != remoteIndex) {
+                indexingLogic.statRemoteRef(remoteIndex);
+            }
             return response;
         } catch (Exception e) {
             e.printStackTrace();

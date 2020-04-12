@@ -4,9 +4,6 @@ import net.irext.server.sdk.bean.ACStatus;
 import net.irext.server.sdk.bean.TemperatureRange;
 import net.irext.server.sdk.utils.Constants;
 import net.irext.server.service.utils.LoggerUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.servlet.ServletContext;
 
 /**
  * Filename:       IRDecode.java
@@ -22,10 +19,9 @@ public class IRDecode {
 
     private static final String TAG = IRDecode.class.getSimpleName();
 
-    @Autowired
-    private static ServletContext context;
+    private static final Object mSync = new Object();
 
-    private static Object mSync = new Object();
+    private native String irGetVersion();
 
     private native int irOpen(int category, int subCate, String fileName);
 
@@ -57,8 +53,12 @@ public class IRDecode {
         return mInstance;
     }
 
+    private String getVersion() {
+        return irGetVersion();
+    }
+
     private IRDecode() {
-        String libPath = "/data/irext/libirda_decoder.so";
+        String libPath = "/data/irext/libir_decoder.so";
         LoggerUtil.getInstance().trace(TAG, "loading server library " + libPath);
         System.load(libPath);
     }
@@ -74,15 +74,7 @@ public class IRDecode {
     public int[] decodeBinary(int keyCode, ACStatus acStatus, int changeWindDir) {
         int[] decoded;
         synchronized (mSync) {
-            if (null == acStatus) {
-                LoggerUtil.getInstance().trace(TAG, "AC Status is null, create a default one");
-                acStatus = new ACStatus();
-            } else {
-                LoggerUtil.getInstance().trace(TAG, "AC Status = " +
-                        acStatus.getAcPower() + ", " + acStatus.getAcMode() +
-                        ", " + acStatus.getAcTemp() + ", " + acStatus.getAcWindSpeed() +
-                        ", " + acStatus.getAcWindDir() + ", keyCode = " + keyCode);
-            }
+            acStatus = ensureACStatus(acStatus, keyCode);
             decoded = irDecode(keyCode, acStatus, changeWindDir);
         }
         return decoded;
@@ -92,15 +84,7 @@ public class IRDecode {
             int keyCode, ACStatus acStatus, int changeWindDir) {
         int[] decoded;
         synchronized (mSync) {
-            if (null == acStatus) {
-                LoggerUtil.getInstance().trace(TAG, "AC Status is null, create a default one");
-                acStatus = new ACStatus();
-            } else {
-                LoggerUtil.getInstance().trace(TAG, "AC Status = " +
-                        acStatus.getAcPower() + ", " + acStatus.getAcMode() +
-                        ", " + acStatus.getAcTemp() + ", " + acStatus.getAcWindSpeed() +
-                        ", " + acStatus.getAcWindDir() + ", keyCode = " + keyCode);
-            }
+            acStatus = ensureACStatus(acStatus, keyCode);
             decoded = irDecodeCombo(category, subCate, binaries, binLength,
                     keyCode, acStatus, changeWindDir);
         }
@@ -153,5 +137,18 @@ public class IRDecode {
     public int getACSupportedWindDirection(int acMode) {
         // how many directions supported by specific AC
         return irACGetSupportedWindDirection(acMode);
+    }
+
+    private ACStatus ensureACStatus(ACStatus acStatus, int keyCode) {
+        if (null == acStatus) {
+            LoggerUtil.getInstance().trace(TAG, "AC Status is null, create a default one");
+            acStatus = new ACStatus();
+        } else {
+            LoggerUtil.getInstance().trace(TAG, "AC Status = " +
+                    acStatus.getAcPower() + ", " + acStatus.getAcMode() +
+                    ", " + acStatus.getAcTemp() + ", " + acStatus.getAcWindSpeed() +
+                    ", " + acStatus.getAcWindDir() + ", keyCode = " + keyCode);
+        }
+        return acStatus;
     }
 }

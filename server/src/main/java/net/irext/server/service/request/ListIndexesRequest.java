@@ -19,14 +19,18 @@ public class ListIndexesRequest extends BaseRequest {
     private String cityCode;
     private String operatorId;
 
+    // try index in IRIS with this flag set to 1
+    private int withParaData;
+
     public ListIndexesRequest(int from, int count, int categoryId, int brandId,
-                              String cityCode, String operatorId) {
+                              String cityCode, String operatorId, int withParaData) {
         this.from = from;
         this.count = count;
         this.categoryId = categoryId;
         this.brandId = brandId;
         this.cityCode = cityCode;
         this.operatorId = operatorId;
+        this.withParaData = withParaData;
     }
 
     public ListIndexesRequest() {
@@ -79,5 +83,13 @@ public class ListIndexesRequest extends BaseRequest {
 
     public void setOperatorId(String operatorId) {
         this.operatorId = operatorId;
+    }
+
+    public int getWithParaData() {
+        return withParaData;
+    }
+
+    public void setWithParaData(int withParaData) {
+        this.withParaData = withParaData;
     }
 }

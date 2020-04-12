@@ -4,6 +4,7 @@ import net.irext.server.service.model.RemoteIndex;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.ResultMap;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Controller;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ import java.util.List;
  * 2018-12-08: created by strawmanbobi
  */
 @Mapper
+@Controller
 public interface RemoteIndexMapper {
     @Select("SELECT * FROM remote_index WHERE id = #{id}")
     @ResultMap("BaseResultMap")

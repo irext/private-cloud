@@ -2,10 +2,12 @@ package net.irext.server.service.businesslogic;
 
 import com.squareup.okhttp.*;
 import net.irext.server.sdk.bean.TemperatureRange;
-import net.irext.server.service.cache.IDecodeSessionRepository;
-import net.irext.server.service.cache.IIRBinaryRepository;
+import net.irext.server.service.mapper.CollectKeyMapper;
+import net.irext.server.service.mapper.DecodeRemoteMapper;
 import net.irext.server.service.mapper.RemoteIndexMapper;
 import net.irext.server.service.model.ACParameters;
+import net.irext.server.service.model.CollectKey;
+import net.irext.server.service.model.DecodeRemote;
 import net.irext.server.service.model.RemoteIndex;
 import net.irext.server.service.utils.FileUtil;
 import net.irext.server.service.utils.LoggerUtil;
@@ -57,62 +59,64 @@ public class OperationLogic {
 
     private RemoteIndexMapper remoteIndexMapper;
 
+    private DecodeRemoteMapper decodeRemoteMapper;
+
+    private CollectKeyMapper collectKeyMapper;
+
     @Autowired
     public void setRemoteIndexMapper(RemoteIndexMapper remoteIndexMapper) {
         this.remoteIndexMapper = remoteIndexMapper;
     }
 
-    public RemoteIndex openIRBinary(ServletContext context, IIRBinaryRepository irBinaryRepository,
-                               RemoteIndex remoteIndex) {
-        if (null == remoteIndex) {
-            return null;
-        }
+    @Autowired
+    public void setDecodeRemoteMapper(DecodeRemoteMapper decodeRemoteMapper) {
+        this.decodeRemoteMapper = decodeRemoteMapper;
+    }
+
+    @Autowired
+    public void setCollectKeyMapper(CollectKeyMapper collectKeyMapper) {
+        this.collectKeyMapper = collectKeyMapper;
+    }
+
+    public RemoteIndex prepareBinary(int remoteIndexId) {
+        RemoteIndex remoteIndex = null;
         try {
-            String checksum = remoteIndex.getBinaryMd5().toUpperCase();
-            String remoteMap = remoteIndex.getRemoteMap();
+            List<RemoteIndex> remoteIndexList = remoteIndexMapper.getRemoteIndexById(remoteIndexId);
+            if (null != remoteIndexList && remoteIndexList.size() > 0) {
+                remoteIndex = remoteIndexList.get(0);
+                String checksum = remoteIndex.getBinaryMd5().toUpperCase();
+                String remoteMap = remoteIndex.getRemoteMap();
 
-            LoggerUtil.getInstance().trace(TAG, "checksum for remoteIndex " +
-                    remoteIndex.getId() + " = " + checksum);
+                LoggerUtil.getInstance().trace(TAG, "checksum for remoteIndex " +
+                        remoteIndex.getId() + " = " + checksum);
 
-            RemoteIndex cachedRemoteIndex = irBinaryRepository.find(remoteIndex.getId());
-            if (null != cachedRemoteIndex) {
-                LoggerUtil.getInstance().trace(TAG, "binary content fetched from redis : " +
-                        cachedRemoteIndex.getRemoteMap());
-                // validate binary content
-                String cachedChecksum =
-                        MD5Util.byteArrayToHexString(MessageDigest.getInstance("MD5")
-                                .digest(cachedRemoteIndex.getBinaries())).toUpperCase();
-                if (cachedChecksum.equals(checksum)) {
-                    return cachedRemoteIndex;
+                // read from file or OSS
+                String projectPath = System.getProperty("user.dir");
+                if (null != projectPath) {
+                    String downloadPath = projectPath + File.separator + "bin_cache" + File.separator;
+                    String fileName = IR_BIN_FILE_PREFIX + remoteMap + IR_BIN_FILE_SUFFIX;
+                    String localFilePath = downloadPath + fileName;
+
+                    File binFile = new File(localFilePath);
+                    FileInputStream fin = getFile(binFile, downloadPath, fileName, checksum);
+                    if (null != fin) {
+                        byte[] newBinaries = IOUtils.toByteArray(fin);
+                        LoggerUtil.getInstance().trace(TAG, "binary content get, save it to redis");
+                        remoteIndex.setBinaries(newBinaries);
+                    }
+                } else {
+                    LoggerUtil.getInstance().trace(TAG, "project root is null");
                 }
-            }
-
-            // otherwise, read from file or OSS
-            if (null != context) {
-                String downloadPath = context.getRealPath("") + "bin_cache" + File.separator;
-                String fileName = IR_BIN_FILE_PREFIX + remoteMap + IR_BIN_FILE_SUFFIX;
-                String localFilePath = downloadPath + fileName;
-
-                File binFile = new File(localFilePath);
-                FileInputStream fin = getFile(binFile, downloadPath, fileName, checksum);
-                if (null != fin) {
-                    byte[] newBinaries = IOUtils.toByteArray(fin);
-                    LoggerUtil.getInstance().trace(TAG, "binary content get, save it to redis");
-                    remoteIndex.setBinaries(newBinaries);
-                    irBinaryRepository.add(remoteIndex.getId(), remoteIndex);
-                    return remoteIndex;
-                }
-            } else {
-                LoggerUtil.getInstance().trace(TAG, "servlet context is null");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
+        } finally {
+            LoggerUtil.getInstance().trace(TAG, "return remote index");
         }
-        return null;
+        return remoteIndex;
     }
 
-    public int[] decode(RemoteIndex remoteIndex, ACStatus acStatus,
+    public int[] decodeIR(RemoteIndex remoteIndex, ACStatus acStatus,
                         int keyCode, int changeWindDirection) {
         try {
             int[] decoded = null;
@@ -127,10 +131,6 @@ public class OperationLogic {
                         decoded = irDecode.decodeBinary(keyCode, acStatus, changeWindDirection);
                     }
                     irDecode.closeBinary();
-                    /*
-                    decoded = irDecode.decodeBinary(categoryId, subCate, binaryContent, binaryContent.length,
-                            keyCode, acStatus, changeWindDirection);
-                    */
                     return decoded;
                 }
             }
@@ -140,72 +140,90 @@ public class OperationLogic {
         return null;
     }
 
-    public ACParameters getACParameters(RemoteIndex remoteIndex, int mode) {
-        if (null != remoteIndex) {
-            try {
-                ACParameters acParameters = new ACParameters();
-                int categoryId = remoteIndex.getCategoryId();
-                int subCate = remoteIndex.getSubCate();
-                byte[] binaryContent = remoteIndex.getBinaries();
-                IRDecode irDecode = IRDecode.getInstance();
-                int ret = irDecode.openBinary(categoryId, subCate, binaryContent, binaryContent.length);
-                if (0 == ret) {
-                    int[] supportedModes = irDecode.getACSupportedMode();
+    public int[] decodeIRDirect(Integer indexId, int keyCode, int paraData) {
+        String keyValueString = null;
+        String[] keyValues;
+        int[] keyValue = null;
 
-                    if (DEBUG) {
-                        LoggerUtil.getInstance().trace(TAG, "supported modes got : ");
-                        for (int i = 0; i < supportedModes.length; i++) {
-                            LoggerUtil.getInstance().trace(TAG, "supported mode [" + i + "] = " + supportedModes[i]);
-                        }
-                    }
-
-                    acParameters.setSupportedModes(supportedModes);
-                    if (1 == supportedModes[mode]) {
-                        // if this mode is really supported by this AC, get other parameters
-                        TemperatureRange temperatureRange = irDecode.getTemperatureRange(mode);
-                        int[] supportedWindSpeed = irDecode.getACSupportedWindSpeed(mode);
-
-                        if (DEBUG) {
-                            LoggerUtil.getInstance().trace(TAG, "supported wind speed got for mode : " + mode);
-                            for (int i = 0; i < supportedWindSpeed.length; i++) {
-                                LoggerUtil.getInstance().trace(TAG, "supported wind speed [" + i + "] = " + supportedWindSpeed[i]);
-                            }
-                        }
-                        int[] supportedSwing = irDecode.getACSupportedSwing(mode);
-
-                        if (DEBUG) {
-                            LoggerUtil.getInstance().trace(TAG, "supported swing got for mode : " + mode);
-                            for (int i = 0; i < supportedSwing.length; i++) {
-                                LoggerUtil.getInstance().trace(TAG, "supported swing [" + i + "] = " + supportedSwing[i]);
-                            }
-                        }
-
-                        int supportedWindDirection = irDecode.getACSupportedWindDirection(mode);
-
-                        if (DEBUG) {
-                            LoggerUtil.getInstance().trace(TAG,
-                                    "supported wind directions for mode : " + mode +
-                                            " = " + supportedWindDirection);
-                        }
-
-                        acParameters.setTempMax(temperatureRange.getTempMax());
-                        acParameters.setTempMin(temperatureRange.getTempMin());
-                        acParameters.setSupportedWindSpeed(supportedWindSpeed);
-                        acParameters.setSupportedSwing(supportedSwing);
-                        acParameters.setSupportedWindSpeed(supportedWindSpeed);
-                    }
-                }
-                irDecode.closeBinary();
-                return acParameters;
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        if (0 == paraData) {
+            List<DecodeRemote> decodeRemoteList = decodeRemoteMapper.directDecode(indexId, keyCode);
+            if (null != decodeRemoteList && decodeRemoteList.size() > 0) {
+                keyValueString = decodeRemoteList.get(0).getKeyValue();
+            }
+        } else {
+            List<CollectKey> collectKeyList = collectKeyMapper.directDecode(indexId, keyCode);
+            if (null != collectKeyList && collectKeyList.size() > 0) {
+                keyValueString = collectKeyList.get(0).getKeyValue();
             }
         }
-        return null;
+        if (null != keyValueString && keyValueString.length() > 0) {
+            keyValues = keyValueString.split(",");
+            keyValue = new int[keyValues.length];
+            for (int i = 0; i < keyValues.length; i++) {
+                keyValue[i] = Integer.parseInt(keyValues[i]);
+            }
+        }
+        return keyValue;
     }
 
-    public void close(IDecodeSessionRepository decodeSessionRepository, String sessionId) {
-        decodeSessionRepository.delete(sessionId);
+    public ACParameters getACParameters(RemoteIndex remoteIndex, Integer mode) {
+        ACParameters acParameters = null;
+        try {
+            int categoryId = remoteIndex.getCategoryId();
+            int subCate = remoteIndex.getSubCate();
+            byte[] binaryContent = remoteIndex.getBinaries();
+            IRDecode irDecode = IRDecode.getInstance();
+            int ret = irDecode.openBinary(categoryId, subCate, binaryContent, binaryContent.length);
+            if (0 == ret) {
+                acParameters = new ACParameters();
+                int[] supportedModes = irDecode.getACSupportedMode();
+                if (DEBUG) {
+                    LoggerUtil.getInstance().trace(TAG, "supported modes got : ");
+                    for (int i = 0; i < supportedModes.length; i++) {
+                        LoggerUtil.getInstance().trace(TAG, "supported mode [" + i + "] = " + supportedModes[i]);
+                    }
+                }
+                acParameters.setSupportedModes(supportedModes);
+                if (1 == supportedModes[mode]) {
+                    // if this mode is really supported by this AC, get other parameters
+                    TemperatureRange temperatureRange = irDecode.getTemperatureRange(mode);
+                    int[] supportedWindSpeed = irDecode.getACSupportedWindSpeed(mode);
+
+                    if (DEBUG) {
+                        LoggerUtil.getInstance().trace(TAG, "supported wind speed got for mode : " + mode);
+                        for (int i = 0; i < supportedWindSpeed.length; i++) {
+                            LoggerUtil.getInstance().trace(TAG, "supported wind speed [" + i + "] = " + supportedWindSpeed[i]);
+                        }
+                    }
+                    int[] supportedSwing = irDecode.getACSupportedSwing(mode);
+
+                    if (DEBUG) {
+                        LoggerUtil.getInstance().trace(TAG, "supported swing got for mode : " + mode);
+                        for (int i = 0; i < supportedSwing.length; i++) {
+                            LoggerUtil.getInstance().trace(TAG, "supported swing [" + i + "] = " + supportedSwing[i]);
+                        }
+                    }
+
+                    int supportedWindDirection = irDecode.getACSupportedWindDirection(mode);
+
+                    if (DEBUG) {
+                        LoggerUtil.getInstance().trace(TAG,
+                                "supported wind directions for mode : " + mode +
+                                        " = " + supportedWindDirection);
+                    }
+
+                    acParameters.setTempMax(temperatureRange.getTempMax());
+                    acParameters.setTempMin(temperatureRange.getTempMin());
+                    acParameters.setSupportedWindSpeed(supportedWindSpeed);
+                    acParameters.setSupportedSwing(supportedSwing);
+                    acParameters.setSupportedWindSpeed(supportedWindSpeed);
+                }
+                irDecode.closeBinary();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return acParameters;
     }
 
     // helper methods
@@ -232,14 +250,16 @@ public class OperationLogic {
                 if (ossChecksum.equals(checksum)) {
                     FileUtil.createDirs(downloadPath);
                     if (FileUtil.write(binFile, binaries)) {
-                        LoggerUtil.getInstance().trace(TAG,"fatal : download file successfully");
+                        LoggerUtil.getInstance().trace(TAG,"download file successfully");
                         return new FileInputStream(binFile);
                     } else {
                         LoggerUtil.getInstance().trace(TAG,"fatal : write file to local path failed");
+                        return null;
                     }
                 } else {
                     LoggerUtil.getInstance().trace(TAG,"fatal : checksum does not match even downloaded from OSS, " +
                             " please contact the admin");
+                    return null;
                 }
             } else{
                 LoggerUtil.getInstance().trace(TAG,"fatal : download file failed");
@@ -247,8 +267,8 @@ public class OperationLogic {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     private InputStream getBinInputStream(String fileName) {

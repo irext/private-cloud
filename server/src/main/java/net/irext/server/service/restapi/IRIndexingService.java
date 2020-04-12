@@ -207,6 +207,7 @@ public class IRIndexingService extends AbstractBaseService {
             String cityCode = listIndexesRequest.getCityCode();
             int from = listIndexesRequest.getFrom();
             int count = listIndexesRequest.getCount();
+            int withParaData = listIndexesRequest.getWithParaData();
 
             IndexesResponse response = validateToken(id, token, IndexesResponse.class);
             if (response.getStatus().getCode() == Constants.ERROR_CODE_AUTH_FAILURE) {
@@ -214,7 +215,7 @@ public class IRIndexingService extends AbstractBaseService {
             }
 
             List<RemoteIndex> remoteIndexList =
-                    indexingLogic.listRemoteIndexes(categoryId, brandId, cityCode, from, count);
+                    indexingLogic.listRemoteIndexes(categoryId, brandId, cityCode, from, count, withParaData);
             if (remoteIndexList != null) {
                 response.getStatus().setCode(Constants.ERROR_CODE_SUCCESS);
                 response.setEntity(remoteIndexList);
