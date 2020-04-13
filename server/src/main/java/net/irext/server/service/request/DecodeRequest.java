@@ -1,6 +1,6 @@
 package net.irext.server.service.request;
 
-import net.irext.server.sdk.bean.ACStatus;
+import net.irext.decode.sdk.bean.ACStatus;
 
 /**
  * Filename:       DecodeRequest.java

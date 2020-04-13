@@ -1,4 +1,4 @@
-package net.irext.server.sdk.utils;
+package net.irext.decode.sdk.utils;
 
 /**
  * Filename:       Constants.java

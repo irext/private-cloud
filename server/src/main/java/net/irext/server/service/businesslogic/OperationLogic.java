@@ -1,7 +1,7 @@
 package net.irext.server.service.businesslogic;
 
 import com.squareup.okhttp.*;
-import net.irext.server.sdk.bean.TemperatureRange;
+import net.irext.decode.sdk.bean.TemperatureRange;
 import net.irext.server.service.mapper.CollectKeyMapper;
 import net.irext.server.service.mapper.DecodeRemoteMapper;
 import net.irext.server.service.mapper.RemoteIndexMapper;
@@ -13,7 +13,7 @@ import net.irext.server.service.utils.FileUtil;
 import net.irext.server.service.utils.LoggerUtil;
 import net.irext.server.service.utils.MD5Util;
 import net.irext.decode.sdk.IRDecode;
-import net.irext.server.sdk.bean.ACStatus;
+import net.irext.decode.sdk.bean.ACStatus;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -41,7 +41,7 @@ import java.util.List;
 public class OperationLogic {
 
     private static final String TAG = OperationLogic.class.getSimpleName();
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final String IR_BIN_FILE_PREFIX = "irda_";
     private static final String IR_BIN_FILE_SUFFIX = ".bin";

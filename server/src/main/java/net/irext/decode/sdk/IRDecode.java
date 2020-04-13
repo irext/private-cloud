@@ -1,8 +1,8 @@
 package net.irext.decode.sdk;
 
-import net.irext.server.sdk.bean.ACStatus;
-import net.irext.server.sdk.bean.TemperatureRange;
-import net.irext.server.sdk.utils.Constants;
+import net.irext.decode.sdk.bean.ACStatus;
+import net.irext.decode.sdk.bean.TemperatureRange;
+import net.irext.decode.sdk.utils.Constants;
 import net.irext.server.service.utils.LoggerUtil;
 
 /**
@@ -96,13 +96,24 @@ public class IRDecode {
     }
 
     public TemperatureRange getTemperatureRange(int acMode) {
-        return irACGetTemperatureRange(acMode);
+        LoggerUtil.getInstance().trace(TAG, "getTemperatureRange");
+
+        TemperatureRange temperatureRange = irACGetTemperatureRange(acMode);
+
+        LoggerUtil.getInstance().trace(TAG, "getTemperatureRange DONE " +
+                temperatureRange.getTempMin() + ", " + temperatureRange.getTempMax());
+
+        return temperatureRange;
     }
 
     public int[] getACSupportedMode() {
         // cool, heat, auto, fan, de-humidification
         int[] retSupportedMode = {0, 0, 0, 0, 0};
+
+        LoggerUtil.getInstance().trace(TAG, "getACSupportedMode");
         int supportedMode = irACGetSupportedMode();
+        LoggerUtil.getInstance().trace(TAG, "getACSupportedMode DONE " + supportedMode);
+
         for (int i = Constants.ACMode.MODE_COOL.getValue(); i <=
                 Constants.ACMode.MODE_DEHUMIDITY.getValue(); i++) {
             retSupportedMode[i] = (supportedMode >>> 1) & 1;
