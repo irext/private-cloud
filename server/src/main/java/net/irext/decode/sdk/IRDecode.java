@@ -53,14 +53,14 @@ public class IRDecode {
         return mInstance;
     }
 
-    private String getVersion() {
-        return irGetVersion();
-    }
-
     private IRDecode() {
         String libPath = "/data/irext/libir_decoder.so";
         LoggerUtil.getInstance().trace(TAG, "loading server library " + libPath);
         System.load(libPath);
+    }
+
+    public String getVersion() {
+        return irGetVersion();
     }
 
     public int openFile(int category, int subCate, String fileName) {
