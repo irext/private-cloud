@@ -3,6 +3,8 @@
  * 2017-03-27
  */
 
+var CODE_TABLE_PADDING = 320;
+
 var id = "";
 var token = "";
 var client = null;
@@ -124,7 +126,7 @@ function loadRemoteList(isSearch, remoteMap) {
         method: 'get',
         url: url,
         cache: false,
-        height: 600,
+        height: getViewPortHeight() - CODE_TABLE_PADDING,
         pagination: true,
         pageSize: 50,
         pageList: [10, 25, 50, 100, 200],

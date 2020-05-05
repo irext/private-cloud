@@ -49,7 +49,7 @@ function downloadBin() {
     }
     downloadURL = '/irext/int/download_remote_index?remote_index_id='+selectedRemote.id+'&admin_id='+id+'&token='+token;
 
-    if (null != client && client == 'console') {
+    if (null != client && client === 'console') {
         // directly download binary to remote via serial port
     } else {
         window.open(
