@@ -19,6 +19,7 @@ var IRProtocol = require('../model/ir_protocol_dao.js');
 var City = require('../model/city_dao.js');
 var RemoteIndex = require('../model/remote_index_dao.js');
 var StbOperator = require('../model/stb_operator_dao.js');
+var CollectRemote = require('../model/collect_remote_dao.js');
 
 var RequestSender = require('../mini_poem/http/request.js');
 var Map = require('../mini_poem/mem/map.js');
@@ -95,8 +96,9 @@ exports.listOperatorsWorkUnit = function (cityCode, from, count, callback) {
 
 exports.listRemoteIndexesWorkUnit = function (categoryID, brandID, cityCode, operatorID, from, count, callback) {
     var conditions;
+    var listCollectRemotesConditions;
 
-    if (categoryID == enums.CATEGORY_STB) {
+    if (parseInt(categoryID) === enums.CATEGORY_STB) {
         if (null == operatorID) {
             conditions = {
                 category_id: categoryID,
@@ -111,33 +113,80 @@ exports.listRemoteIndexesWorkUnit = function (categoryID, brandID, cityCode, ope
                 status: orm.gt(enums.ITEM_INVALID)
             };
         }
-
-    } else if (categoryID == enums.CATEGORY_AC ||
-        categoryID == enums.CATEGORY_TV ||
-        categoryID == enums.CATEGORY_NW ||
-        categoryID == enums.CATEGORY_IPTV ||
-        categoryID == enums.CATEGORY_DVD ||
-        categoryID == enums.CATEGORY_FAN ||
-        categoryID == enums.CATEGORY_PROJECTOR ||
-        categoryID == enums.CATEGORY_STEREO ||
-        categoryID == enums.CATEGORY_LIGHT_BULB ||
-        categoryID == enums.CATEGORY_BSTB ||
-        categoryID == enums.CATEGORY_CLEANING_ROBOT ||
-        categoryID == enums.CATEGORY_AIR_CLEANER ||
-        categoryID == enums.CATEGORY_DYSON) {
+        RemoteIndex.listRemoteIndexes(conditions, from, count, "priority",
+            function(listRemoteIndexesErr, remoteIndexes) {
+            for (var i = 0; i < remoteIndexes.length; i++) {
+                remoteIndexes[i].para = 0;
+            }
+            if (!operatorID) {
+                listCollectRemotesConditions = {
+                    category_id: parseInt(categoryID),
+                    city_code: cityCode,
+                    status: parseInt(enums.COLLECT_REMOTE_STATUS_CONFIRMED)
+                };
+            } else {
+                listCollectRemotesConditions = {
+                    category_id: parseInt(categoryID),
+                    city_code: cityCode,
+                    operator_id: operatorID,
+                    status: parseInt(enums.COLLECT_REMOTE_STATUS_CONFIRMED)
+                };
+            }
+            CollectRemote.listCollectRemotes(listCollectRemotesConditions,
+                from, count, "update_time", function(listCollectRemotesErr, collectRemotes) {
+                if (null != collectRemotes && collectRemotes.length > 0) {
+                    for (var i = 0; i < collectRemotes.length; i++) {
+                        collectRemotes[i].para = 0;
+                    }
+                }
+                remoteIndexes.push.apply(remoteIndexes, collectRemotes);
+                callback(listRemoteIndexesErr, remoteIndexes);
+            });
+        });
+    } else if (parseInt(categoryID) === enums.CATEGORY_AC ||
+        parseInt(categoryID) === enums.CATEGORY_TV ||
+        parseInt(categoryID) === enums.CATEGORY_NW ||
+        parseInt(categoryID) === enums.CATEGORY_IPTV ||
+        parseInt(categoryID) === enums.CATEGORY_DVD ||
+        parseInt(categoryID) === enums.CATEGORY_FAN ||
+        parseInt(categoryID) === enums.CATEGORY_PROJECTOR ||
+        parseInt(categoryID) === enums.CATEGORY_STEREO ||
+        parseInt(categoryID) === enums.CATEGORY_LIGHT_BULB ||
+        parseInt(categoryID) === enums.CATEGORY_BSTB ||
+        parseInt(categoryID) === enums.CATEGORY_CLEANING_ROBOT ||
+        parseInt(categoryID) === enums.CATEGORY_AIR_CLEANER ||
+        parseInt(categoryID) === enums.CATEGORY_DYSON) {
         conditions = {
             category_id: categoryID,
             brand_id: brandID,
             status: orm.gt(enums.ITEM_INVALID)
         };
+        RemoteIndex.listRemoteIndexes(conditions, from, count, "priority",
+            function(listRemoteIndexesErr, remoteIndexes) {
+            for (var i = 0; i < remoteIndexes.length; i++) {
+                remoteIndexes[i].para = 0;
+            }
+            // append IRIS indexes
+            listCollectRemotesConditions = {
+                category_id: parseInt(categoryID),
+                brand_id: parseInt(brandID),
+                status: parseInt(enums.COLLECT_REMOTE_STATUS_CONFIRMED)
+            }
+            CollectRemote.listCollectRemotes(listCollectRemotesConditions,
+                from, count, "update_time",
+                function(listCollectRemotesErr, collectRemotes) {
+                if (null != collectRemotes && collectRemotes.length > 0) {
+                    for (var i = 0; i < collectRemotes.length; i++) {
+                        collectRemotes[i].para = 1;
+                    }
+                }
+                remoteIndexes.push.apply(remoteIndexes, collectRemotes);
+                callback(listRemoteIndexesErr, remoteIndexes);
+            });
+        });
     } else {
         callback(errorCode.INVALID_CATEGORY, null);
-        return;
     }
-
-    RemoteIndex.listRemoteIndexes(conditions, from, count, "priority", function(listRemoteIndexesErr, remoteIndexes) {
-        callback(listRemoteIndexesErr, remoteIndexes);
-    });
 };
 
 exports.searchRemoteIndexesWorkUnit = function (remoteMap, from, count, callback) {

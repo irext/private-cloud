@@ -70,7 +70,6 @@ $(document).ready(function() {
     token = localStorage.getItem(LS_KEY_TOKEN);
     client = getParameter('client');
 
-    // showMenu(id, token, 'remote');
     initializeSelectors();
 
     $('#remote_file').change(function() {
@@ -192,38 +191,35 @@ function loadRemoteList(isSearch, remoteMap) {
             valign: 'middle',
             sortable: true,
             clickToSelect: true
-        }, {
-            field: 'contributor',
-            title: '贡献者',
-            align: 'left',
-            valign: 'middle',
-            sortable: true,
-            clickToSelect: true,
-            visible: false
         }]
     }).on('check.bs.table', function (e, row) {
         onSelectRemote(row);
     }).on('uncheck.bs.table', function (e, row) {
         selectedRemote = null;
     }).on('load-success.bs.table', function (e, data) {
-        var i = 0;
+        var i;
         for (i = 0; i < data.length; i++) {
-            if(data[i].status == '1') {
-                data[i].status = '已发布';
-            } else if(data[i].status == '2') {
-                data[i].status = '待验证';
-            } else if(data[i].status == '3') {
-                data[i].status = '通过';
-            } else if(data[i].status == '4') {
-                data[i].status = '未通过';
-            } else if(data[i].status == '5') {
-                data[i].status = '重复'
+            if (data[i].para === 0) {
+                if (data[i].status == '1') {
+                    data[i].status = '已发布';
+                } else if (data[i].status == '2') {
+                    data[i].status = '待验证';
+                } else if (data[i].status == '3') {
+                    data[i].status = '通过';
+                } else if (data[i].status == '4') {
+                    data[i].status = '未通过';
+                } else if (data[i].status == '5') {
+                    data[i].status = '重复'
+                }
+            } else {
+                data[i].status = 'From IRIS';
             }
 
             $('#remote_table').bootstrapTable('updateRow', {
                 index: i,
                 row: {
-                    status: data[i].status
+                    status: data[i].status,
+                    para: data[i].para,
                 }
             });
         }
@@ -233,30 +229,36 @@ function loadRemoteList(isSearch, remoteMap) {
 
 function rowStyle(row, index) {
     var style = null;
-    if (row.status == '已发布') {
-        style = {
-            classes: 'default'
-        };
-    } else if (row.status == '待验证') {
+    if (row.para === 0) {
+        if (row.status == '已发布') {
+            style = {
+                classes: 'default'
+            };
+        } else if (row.status == '待验证') {
+            style = {
+                classes: 'info'
+            };
+        } else if (row.status == '通过') {
+            style = {
+                classes: 'success'
+            };
+        } else if (row.status == '未通过') {
+            style = {
+                classes: 'danger'
+            };
+        } else if (row.status == '重复') {
+            style = {
+                classes: 'warning'
+            };
+        } else {
+            style = {
+                classes: ''
+            }
+        }
+    } else {
         style = {
             classes: 'info'
         };
-    } else if (row.status == '通过') {
-        style = {
-            classes: 'success'
-        };
-    } else if (row.status == '未通过') {
-        style = {
-            classes: 'danger'
-        };
-    } else if (row.status == '重复') {
-        style = {
-            classes: 'warning'
-        };
-    } else {
-        style = {
-            classes: ''
-        }
     }
     return style;
 }
