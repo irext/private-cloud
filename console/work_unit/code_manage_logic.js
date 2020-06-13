@@ -597,16 +597,13 @@ exports.deleteRemoteIndexWorkUnit = function (remoteIndex, adminID, callback) {
             if(remoteIndex.contributor.indexOf(result) == -1) {
                 logger.info("the admin " + result + " could not change this remote index");
                 callback(errorCode.FAILED);
-                return;
+            } else {
+                remoteIndex.status = enums.ITEM_INVALID;
+                RemoteIndex.updateRemoteIndex(remoteIndex.id, remoteIndex,
+                    function(deleteRemoteIndexErr, updatedRemoteIndex) {
+                    callback(deleteRemoteIndexErr);
+                });
             }
-            key = "admin_" + adminID;
-            adminAuth.getAuthInfo(key, function(getAdminAuthErr, result) {
-                if (errorCode.SUCCESS.code == getAdminAuthErr.code && null != result) {
-                    callback(errorCode.SUCCESS);
-                } else {
-                    callback(errorCode.FAILED);
-                }
-            });
         } else {
             callback(errorCode.FAILED);
         }

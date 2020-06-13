@@ -3,61 +3,79 @@
  * 2017-03-27
  */
 
-var CODE_TABLE_PADDING = 320;
+let LS_KEY_LANG = "lang";
 
-var id = "";
-var token = "";
-var client = null;
+let userLang = "en-US";
+let paramLang = getParameter('lang');
 
-var currentSubCate = 1;
-var currentProtocol = null;
-var currentProtocolType = 1;
-var currentCategory = {
+if (paramLang) {
+    localStorage.setItem(LS_KEY_LANG, paramLang);
+} else {
+    // set LANG default to simplified Chinese
+    localStorage.setItem(LS_KEY_LANG, "zh-CN");
+}
+
+userLang = navigator.language || paramLang;
+
+i18n.init(function(err, t) {
+    $(".page_code").i18n({ lng: userLang });
+});
+
+let CODE_TABLE_PADDING = 320;
+
+let id = "";
+let token = "";
+let client = null;
+
+let currentSubCate = 1;
+let currentProtocol = null;
+let currentProtocolType = 1;
+let currentCategory = {
     id: 1,
-    name: '空调'
+    name: i18n.t("page_code.d_panel_category_init", { lng: userLang })
 };
 
-var currentFilterCategory = {
+let currentFilterCategory = {
     id: 1,
-    name: '空调'
+    name: i18n.t("page_code.d_panel_category_init", { lng: userLang })
 };
 
-var currentBrand = null;
-var currentFilterBrand = null;
-var currentProvince = {
+let currentBrand = null;
+let currentFilterBrand = null;
+let currentProvince = {
     code: '110000',
-    name: '北京市'
+    name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
 };
-var currentFilterProvince = {
+let currentFilterProvince = {
     code: '110000',
-    name: '北京市'
+    name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
 };
-var currentCity = {
+let currentCity = {
     code: '110100',
-    name: '北京市'
+    name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
 };
-var currentFilterCity = {
+let currentFilterCity = {
     code: '110100',
-    name: '北京市'
+    name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
 };
 
-var g_categories = [];
-var g_brands = [];
-var g_cities = [];
-var g_stbOperators = [];
+let g_categories = [];
+let g_brands = [];
+let g_cities = [];
+let g_stbOperators = [];
 
-var currentOperator = null;
+let currentOperator = null;
 
-var selectedRemote = null;
-var pass = 0;
+let selectedRemote = null;
+let pass = 0;
 
-var brandsToPublish = [];
-var remoteIndexesToPublish = [];
+let brandsToPublish = [];
+let remoteIndexesToPublish = [];
 
 ///////////////////////////// Initialization /////////////////////////////
 
 $('#menu_toggle').click(function(e) {
-    if (null != client && client == 'console') {
+    if (null != client && client === 'console') {
         return;
     }
     e.preventDefault();
@@ -73,14 +91,14 @@ $(document).ready(function() {
     initializeSelectors();
 
     $('#remote_file').change(function() {
-        var filePath = $(this).val();
-        var fileName = filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
+        let filePath = $(this).val();
+        let fileName = filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
         $('#remote_name').val(fileName);
     });
 
     $('#protocol_file').change(function() {
-        var filePath = $(this).val();
-        var fileName = filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
+        let filePath = $(this).val();
+        let fileName = filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
         $('#protocol_name_b').val(fileName);
     });
 
@@ -104,22 +122,26 @@ function initializeSelectors() {
 }
 
 function loadRemoteList(isSearch, remoteMap) {
-    var url;
+    let url = null;
 
     if (isSearch && remoteMap) {
-        url = '/irext/int/search_remote_indexes?remote_map='+remoteMap+'&from=0&count=2000&admin_id='+id+'&token='+token;
+        url = '/irext/int/search_remote_indexes?remote_map='+
+            remoteMap+'&from=0&count=2000&admin_id='+id+'&token='+token;
     } else {
-        if(currentFilterCategory.id == 3) {
-            url = '/irext/int/list_remote_indexes?category_id='+currentFilterCategory.id+'&city_code='+currentFilterCity.code+
+        if(currentFilterCategory.id === 3) {
+            url = '/irext/int/list_remote_indexes?category_id='+
+                currentFilterCategory.id+'&city_code='+currentFilterCity.code+
                 '&from=0&count=100&admin_id='+id+'&token='+token;
         } else {
-            url = '/irext/int/list_remote_indexes?category_id='+currentFilterCategory.id+'&brand_id='+currentFilterBrand.id+
+            url = '/irext/int/list_remote_indexes?category_id='+
+                currentFilterCategory.id+'&brand_id='+currentFilterBrand.id+
                 '&from=0&count=100&admin_id='+id+'&token='+token;
         }
     }
 
-    $('#remote_table_container').empty();
-    $('#remote_table_container').append('<table id="remote_table" data-row-style="rowStyle"></table>');
+    let tableContainer = $('#remote_table_container');
+    tableContainer.empty();
+    tableContainer.append('<table id="remote_table" data-row-style="rowStyle"></table>');
 
     $('#remote_table').bootstrapTable({
         method: 'get',
@@ -143,50 +165,50 @@ function loadRemoteList(isSearch, remoteMap) {
             checkbox: true
         }, {
             field: 'category_name',
-            title: '种类',
+            title: i18n.t("page_code.d_table_category_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true
         }, {
             field: 'brand_name',
-            title: '品牌',
+            title: i18n.t("page_code.d_table_brand_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true
         }, {
             field: 'city_name',
-            title: '城市',
+            title: i18n.t("page_code.d_table_city_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true
         }, {
             field: 'operator_name',
-            title: '运营商',
+            title: i18n.t("page_code.d_table_operator_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true,
             visible: false
         }, {
             field: 'priority',
-            title: '优先级',
+            title: i18n.t("page_code.d_table_priority_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true
         }, {
             field: 'protocol',
-            title: '协议',
+            title: i18n.t("page_code.d_table_protocol_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true
         }, {
             field: 'remote',
-            title: '控制码',
+            title: i18n.t("page_code.d_table_remote_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true
         }, {
             field: 'status',
-            title: '状态',
+            title: i18n.t("page_code.d_table_status_cn", { lng: userLang }),
             align: 'left',
             valign: 'middle',
             sortable: true,
@@ -197,19 +219,19 @@ function loadRemoteList(isSearch, remoteMap) {
     }).on('uncheck.bs.table', function (e, row) {
         selectedRemote = null;
     }).on('load-success.bs.table', function (e, data) {
-        var i;
+        let i = 0;
         for (i = 0; i < data.length; i++) {
             if (data[i].para === 0) {
-                if (data[i].status == '1') {
-                    data[i].status = '已发布';
-                } else if (data[i].status == '2') {
-                    data[i].status = '待验证';
-                } else if (data[i].status == '3') {
-                    data[i].status = '通过';
-                } else if (data[i].status == '4') {
-                    data[i].status = '未通过';
-                } else if (data[i].status == '5') {
-                    data[i].status = '重复'
+                if (data[i].status === 1) {
+                    data[i].status = i18n.t("page_code.d_status_published", { lng: userLang });
+                } else if (data[i].status === 2) {
+                    data[i].status = i18n.t("page_code.d_status_to_verify", { lng: userLang });
+                } else if (data[i].status === 3) {
+                    data[i].status = i18n.t("page_code.d_status_passed", { lng: userLang });
+                } else if (data[i].status === 4) {
+                    data[i].status = i18n.t("page_code.d_status_failed", { lng: userLang });
+                } else if (data[i].status === 5) {
+                    data[i].status = i18n.t("page_code.d_status_duplicated", { lng: userLang });
                 }
             } else {
                 data[i].status = 'From IRIS';
@@ -228,25 +250,25 @@ function loadRemoteList(isSearch, remoteMap) {
 }
 
 function rowStyle(row, index) {
-    var style = null;
+    let style = null;
     if (row.para === 0) {
-        if (row.status == '已发布') {
+        if (row.status === i18n.t("page_code.d_status_published", { lng: userLang })) {
             style = {
                 classes: 'default'
             };
-        } else if (row.status == '待验证') {
+        } else if (row.status === i18n.t("page_code.d_status_to_verify", { lng: userLang })) {
             style = {
                 classes: 'info'
             };
-        } else if (row.status == '通过') {
+        } else if (row.status === i18n.t("page_code.d_status_passed", { lng: userLang })) {
             style = {
                 classes: 'success'
             };
-        } else if (row.status == '未通过') {
+        } else if (row.status === i18n.t("page_code.d_status_failed", { lng: userLang })) {
             style = {
                 classes: 'danger'
             };
-        } else if (row.status == '重复') {
+        } else if (row.status === i18n.t("page_code.d_status_duplicated", { lng: userLang })) {
             style = {
                 classes: 'warning'
             };
@@ -264,39 +286,26 @@ function rowStyle(row, index) {
 }
 
 function createRemote() {
-    var remoteName = $('#remote_name').val();
-    var remoteFile = $('#remote_file').val();
-    var priority = $('#spinner').val();
-    var subCate = $('#sub_cate').val();
+    let remoteName = $('#remote_name').val();
+    let remoteFile = $('#remote_file').val();
+    let priority = $('#spinner').val();
+    let subCate = $('#sub_cate').val();
 
-    var remoteNumber = $('#remote_number').val();
-    var versionPatten = new RegExp('[0-9]\\.[0-9]\\.[0-9]');
+    let remoteNumber = $('#remote_number').val();
+    let versionPatten = new RegExp('[0-9]\\.[0-9]\\.[0-9]');
 
-    if (!remoteName || "" == remoteName) {
-        popUpHintDialog('请输入编码名称');
+    if (!remoteName || "" === remoteName) {
+        popUpHintDialog(i18n.t("page_code.d_hint_input_index_name", { lng: userLang }));
         return;
     }
 
-    if (!remoteFile || "" == remoteFile) {
-        popUpHintDialog('请输入控制码源文件');
+    if (!remoteFile || "" === remoteFile) {
+        popUpHintDialog(i18n.t("page_code.d_hint_input_index_file", { lng: userLang }));
         return;
     }
 
-    /*
-    console.log('categoryID = ' + currentCategory.id + ', categoryName = ' + currentCategory.name + ', ' + currentCategory.name_en +
-        ', ' + currentCategory.name_tw + ', brandID = ' + currentBrand.id +
-        ', brandName = ' + currentBrand.name + ', ' + currentBrand.name_en + ', ' + currentBrand.name_tw +
-        ', cityCode = ' + currentCity.code + ', cityName = ' + currentCity.name + ', ' + currentCity.name_tw +
-        ', opID = ' + currentOperator.operator_id + ', opName = ' + currentOperator.operator_name + ', ' + currentOperator.operator_name_tw + ', subCate = ' + subCate +
-        ', protocolID = ' + currentProtocol.id + ', protocolName = ' + currentProtocol.name +
-        ', remoteName = ' +remoteName + ', remoteFile = ' + remoteFile + ', remoteNumber = ' + remoteNumber);
-    */
-
-    var form = $('#remote_upload_form');
+    let form = $('#remote_upload_form');
     form.attr('action', '/irext/int/create_remote_index');
-    //form.attr('method', 'post');
-    //form.attr('encoding', 'multipart/form-data');
-    //form.attr('enctype', 'multipart/form-data');
 
     // set multipart-form parameters
     $('#category_name').val(currentCategory.name);
@@ -318,24 +327,24 @@ function createRemote() {
 
 function deleteRemote() {
     if(null == selectedRemote) {
-        popUpHintDialog('请先选中一个索引');
+        popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
-    var remoteToDelete = selectedRemote;
+    let remoteToDelete = selectedRemote;
     switch (remoteToDelete.status) {
-        case '已发布':
+        case i18n.t("page_code.d_status_published", { lng: userLang }):
             remoteToDelete.status = 1;
             break;
-        case '待验证':
+        case i18n.t("page_code.d_status_to_verify", { lng: userLang }):
             remoteToDelete.status = 2;
             break;
-        case '通过':
+        case i18n.t("page_code.d_status_to_passed", { lng: userLang }):
             remoteToDelete.status = 3;
             break;
-        case '不通过':
+        case i18n.t("page_code.d_status_to_failed", { lng: userLang }):
             remoteToDelete.status = 4;
             break;
-        case '重复':
+        case i18n.t("page_code.d_status_duplicated", { lng: userLang }):
             remoteToDelete.status = 5;
             break;
         default:
@@ -345,6 +354,7 @@ function deleteRemote() {
 
     remoteToDelete.admin_id = id;
     remoteToDelete.token = token;
+    let deleteConfirmDialog = $('#delete_confirm_dialog');
 
     $.ajax({
         url: '/irext/int/delete_remote_index',
@@ -353,45 +363,45 @@ function deleteRemote() {
         data: remoteToDelete,
         timeout: 20000,
         success: function (response) {
-            if(response.status.code == 0) {
-                $('#delete_confirm_dialog').modal('hide');
-                popUpHintDialog('已成功删除索引');
+            if(response.status.code === 0) {
+                deleteConfirmDialog.modal('hide');
+                popUpHintDialog(i18n.t("page_code.d_hint_delete_success", { lng: userLang }));
                 loadRemoteList();
-                $('#delete_confirm_dialog').modal('hide');
+                deleteConfirmDialog.modal('hide');
             } else {
-                $('#delete_confirm_dialog').modal('hide');
-                popUpHintDialog('删除索引操作失败');
-                $('#delete_confirm_dialog').modal('hide');
+                deleteConfirmDialog.modal('hide');
+                popUpHintDialog(i18n.t("page_code.d_hint_delete_failed", { lng: userLang }));
+                deleteConfirmDialog.modal('hide');
             }
         },
         error: function () {
-            $('#delete_confirm_dialog').modal('hide');
-            popUpHintDialog('删除索引操作失败');
-            $('#delete_confirm_dialog').modal('hide');
+            deleteConfirmDialog.modal('hide');
+            popUpHintDialog(i18n.t("page_code.d_hint_delete_failed", { lng: userLang }));
+            deleteConfirmDialog.modal('hide');
         }
     });
 }
 
 function fallbackRemote() {
-    if(null == selectedRemote) {
-        popUpHintDialog('请先选中一个索引');
+    if(null === selectedRemote) {
+        popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
-    var remoteToFallback = selectedRemote;
+    let remoteToFallback = selectedRemote;
     switch (remoteToFallback.status) {
-        case '已发布':
+        case i18n.t("page_code.d_status_published", { lng: userLang }):
             remoteToFallback.status = 1;
             break;
-        case '待验证':
+        case i18n.t("page_code.d_status_to_verify", { lng: userLang }):
             remoteToFallback.status = 2;
             break;
-        case '通过':
+        case i18n.t("page_code.d_status_to_passed", { lng: userLang }):
             remoteToFallback.status = 3;
             break;
-        case '不通过':
+        case i18n.t("page_code.d_status_to_failed", { lng: userLang }):
             remoteToFallback.status = 4;
             break;
-        case '重复':
+        case i18n.t("page_code.d_status_duplicated", { lng: userLang }):
             remoteToFallback.status = 5;
             break;
         default:
@@ -409,53 +419,53 @@ function fallbackRemote() {
         data: remoteToFallback,
         timeout: 20000,
         success: function (response) {
-            if(response.status.code == 0) {
+            if(response.status.code === 0) {
                 $('#fallback_confirm_dialog').modal('hide');
-                popUpHintDialog('已成功回退索引');
+                popUpHintDialog(i18n.t("page_code.d_hint_fallback_success", { lng: userLang }));
                 loadRemoteList();
             } else {
                 $('#fallback_confirm_dialog').modal('hide');
-                popUpHintDialog('回退索引操作失败');
+                popUpHintDialog(i18n.t("page_code.d_hint_fallback_failed", { lng: userLang }));
             }
         },
         error: function () {
             $('#fallback_confirm_dialog').modal('hide');
-            popUpHintDialog('回退索引操作失败');
+            popUpHintDialog(i18n.t("page_code.d_hint_fallback_failed", { lng: userLang }));
         }
     });
 }
 
 function searchRemote() {
-    var remoteMap = $('#remote_map').val();
+    let remoteMap = $('#remote_map').val();
 
-    if (null != remoteMap && "" != remoteMap && remoteMap.length > 5) {
+    if (null != remoteMap && "" !== remoteMap && remoteMap.length > 5) {
         loadRemoteList(true, remoteMap);
         $('#search_dialog').modal('hide');
     } else {
-        popUpHintDialog('编码映射格式不正确');
+        popUpHintDialog(i18n.t("page_code.d_hint_mapping_error", { lng: userLang }));
     }
 }
 
 function verifyRemote() {
     if(null == selectedRemote) {
-        popUpHintDialog('请先选中一个索引');
+        popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
-    var remoteToVerify = selectedRemote;
+    let remoteToVerify = selectedRemote;
     switch (remoteToVerify.status) {
-        case '已发布':
+        case i18n.t("page_code.d_status_published", { lng: userLang }):
             remoteToVerify.status = 1;
             break;
-        case '待验证':
+        case i18n.t("page_code.d_status_to_verify", { lng: userLang }):
             remoteToVerify.status = 2;
             break;
-        case '通过':
+        case i18n.t("page_code.d_status_to_passed", { lng: userLang }):
             remoteToVerify.status = 3;
             break;
-        case '不通过':
+        case i18n.t("page_code.d_status_to_failed", { lng: userLang }):
             remoteToVerify.status = 4;
             break;
-        case '重复':
+        case i18n.t("page_code.d_status_duplicated", { lng: userLang }):
             remoteToVerify.status = 5;
             break;
         default:
@@ -474,26 +484,20 @@ function verifyRemote() {
         data: remoteToVerify,
         timeout: 20000,
         success: function (response) {
-            if(response.status.code == 0) {
+            if(response.status.code === 0) {
                 $('#verify_confirm_dialog').modal('hide');
-                popUpHintDialog('已成功更新索引');
+                popUpHintDialog(i18n.t("page_code.d_hint_update_success", { lng: userLang }));
                 loadRemoteList();
             } else {
                 $('#verify_confirm_dialog').modal('hide');
-                popUpHintDialog('更新索引操作失败');
+                popUpHintDialog(i18n.t("page_code.d_hint_update_failed", { lng: userLang }));
             }
         },
         error: function () {
             $('#verify_confirm_dialog').modal('hide');
-            popUpHintDialog('更新索引操作失败');
+            popUpHintDialog(i18n.t("page_code.d_hint_update_failed", { lng: userLang }));
         }
     });
-}
-
-function reportUnpublished() {
-    // var date = formatDate(new Date(), 'yyyy-MM-dd');
-    // JSONToCSVConvertor(brandsToPublish, 'Unpublihshed Brand ' + date, true);
-    // JSONToCSVConvertor(remoteIndexesToPublish, 'Unpublihshed Remote ' + date, true);
 }
 
 function publishUnpublished() {
@@ -501,8 +505,9 @@ function publishUnpublished() {
 }
 
 function publishBrands() {
-    $('#publish_hint').empty();
-    $('#publish_hint').append('正在发布新增品牌，请稍候...');
+    let publishHint = $('#publish_hint');
+    publishHint.empty();
+    publishHint.append(i18n.t("page_code.d_hint_publishing_brand", { lng: userLang }));
 
     $.ajax({
         url: '/irext/int/publish_brands',
@@ -514,19 +519,19 @@ function publishBrands() {
         },
         timeout: 200000,
         success: function (response) {
-            if(response.status.code == 0) {
-                $('#publish_hint').empty();
-                $('#publish_hint').append('正在发布新增编码，请稍候...');
+            if(response.status.code === 0) {
+                publishHint.empty();
+                publishHint.append(i18n.t("page_code.d_hint_publishing_index", { lng: userLang }));
                 publishRemoteIndexes();
             } else {
-                $('#publish_hint').empty();
-                $('#publish_hint').append('正在发布新增编码，请稍候...');
+                publishHint.empty();
+                publishHint.append(i18n.t("page_code.d_hint_publishing_index", { lng: userLang }));
                 publishRemoteIndexes();
             }
         },
         error: function () {
-            $('#publish_hint').empty();
-            $('#publish_hint').append('正在发布新增编码，请稍候...');
+            publishHint.empty();
+            publishHint.append(i18n.t("page_code.d_hint_publishing_index", { lng: userLang }));
             publishRemoteIndexes();
         }
     });
@@ -543,37 +548,37 @@ function publishRemoteIndexes() {
         },
         timeout: 200000,
         success: function (response) {
-            if(response.status.code == 0) {
+            if(response.status.code === 0) {
                 $('#publish_dialog').modal('hide');
-                popUpHintDialog('已成功发布编码表');
+                popUpHintDialog(i18n.t("page_code.d_hint_publish_success", { lng: userLang }));
                 loadRemoteList();
             } else {
                 $('#publish_dialog').modal('hide');
-                popUpHintDialog('发布编码操作失败');
+                popUpHintDialog(i18n.t("page_code.d_hint_publish_failed", { lng: userLang }));
             }
         },
         error: function () {
             $('#publish_dialog').modal('hide');
-            popUpHintDialog('发布编码操作失败');
+            popUpHintDialog(i18n.t("page_code.d_hint_publish_failed", { lng: userLang }));
         }
     });
 }
 
 function createBrand() {
-    var newName = $('#brand_name_b').val();
-    var newNameEn = $('#brand_name_en_b').val();
-    var newNameTw = $('#brand_name_tw_b').val();
-    var brandPriority = $('#brand_priority').val();
+    let newName = $('#brand_name_b').val();
+    let newNameEn = $('#brand_name_en_b').val();
+    let newNameTw = $('#brand_name_tw_b').val();
+    let brandPriority = $('#brand_priority').val();
 
-    if (null == newName || "" == newName ||
-        null == newNameEn || "" == newNameEn ||
-        null == newNameTw) {
-        popUpHintDialog('请填写名称');
+    if (null === newName || "" === newName ||
+        null === newNameEn || "" === newNameEn ||
+        null === newNameTw || "" === newNameTw)  {
+        popUpHintDialog(i18n.t("page_code.d_hint_create_brand_fill_name", { lng: userLang }));
         return;
     }
 
     if (isBrandExists(newName)) {
-        popUpHintDialog('这个品牌已经存在');
+        popUpHintDialog(i18n.t("page_code.d_hint_create_brand_existed", { lng: userLang }));
         return;
     }
 
@@ -593,38 +598,38 @@ function createBrand() {
         },
         timeout: 20000,
         success: function (response) {
-            if(response.status.code == 0) {
+            if(response.status.code === 0) {
                 $('#create_brand_dialog').modal('hide');
-                popUpHintDialog('已成功添加品牌');
+                popUpHintDialog(i18n.t("page_code.d_hint_create_brand_success", { lng: userLang }));
                 initializeBrands();
             } else {
                 $('#create_brand_dialog').modal('hide');
-                popUpHintDialog('品牌添加的操作失败');
+                popUpHintDialog(i18n.t("page_code.d_hint_create_brand_failed", { lng: userLang }));
             }
         },
         error: function () {
             $('#create_brand_dialog').modal('hide');
-            popUpHintDialog('品牌添加的操作失败');
+            popUpHintDialog(i18n.t("page_code.d_hint_create_brand_failed", { lng: userLang }));
         }
     });
 }
 
 function createProtocol() {
-    var protocolName = $('#protocol_name_b').val();
-    var protocolFile = $('#protocol_file').val();
-    var protocolType = $('#protocol_type').val();
+    let protocolName = $('#protocol_name_b').val();
+    let protocolFile = $('#protocol_file').val();
+    let protocolType = $('#protocol_type').val();
 
-    if(!protocolName || "" == protocolName) {
-        popUpHintDialog('请输入协议名称');
+    if(!protocolName || "" === protocolName) {
+        popUpHintDialog(i18n.t("page_code.d_hint_create_protocol_fill_name", { lng: userLang }));
         return;
     }
 
-    if(!protocolFile || "" == protocolFile) {
-        popUpHintDialog('请输入协议XML文件');
+    if(!protocolFile || "" === protocolFile) {
+        popUpHintDialog(i18n.t("page_code.d_hint_create_protocol_upload_file", { lng: userLang }));
         return;
     }
 
-    var form = $('#protocol_upload_form');
+    let form = $('#protocol_upload_form');
     form.attr('action', '/irext/int/create_protocol');
     $('#protocol_admin_id').val(id);
 
@@ -654,8 +659,8 @@ function initializeProtocols() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var protocols = response.entity;
+            if(response.status.code === 0) {
+                let protocols = response.entity;
                 fillProtocolList(protocols);
 
                 if(protocols && protocols.length > 0) {
@@ -687,8 +692,8 @@ function initializeCategories() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var categories = response.entity;
+            if(response.status.code === 0) {
+                let categories = response.entity;
                 g_categories = categories;
 
                 fillCategoryList(categories);
@@ -724,8 +729,8 @@ function initializeProvince() {
         type: 'POST',
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var provinces = response.entity;
+            if(response.status.code === 0) {
+                let provinces = response.entity;
                 fillProvinceList(provinces);
 
                 if(provinces && provinces.length > 0) {
@@ -747,7 +752,7 @@ function initializeProvince() {
 }
 
 function initializeCity() {
-    var provincePrefix = currentProvince.code.substring(0, 2);
+    let provincePrefix = currentProvince.code.substring(0, 2);
     $.ajax({
         url: '/irext/int/list_cities',
         type: 'POST',
@@ -759,17 +764,17 @@ function initializeCity() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var cities = response.entity;
+            if(response.status.code === 0) {
+                let cities = response.entity;
                 if (cities && cities.length > 0) {
                     cities.push({
                         code: provincePrefix + '0000',
-                        name: '所有城市'
+                        name: i18n.t("page_code.d_hint_init_all_cities", { lng: userLang })
                     });
                 } else {
                     cities = [{
                         code: provincePrefix + '0000',
-                        name: '所有城市'
+                        name: i18n.t("page_code.d_hint_init_all_cities", { lng: userLang })
                     }];
                 }
                 g_cities = cities;
@@ -809,8 +814,8 @@ function initializeOperator() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var operators = response.entity;
+            if(response.status.code === 0) {
+                let operators = response.entity;
 
                 if (operators && operators.length > 0) {
                     operators.push({
@@ -858,8 +863,8 @@ function initializeBrands() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var brands = response.entity;
+            if(response.status.code === 0) {
+                let brands = response.entity;
                 g_brands = brands;
 
                 fillBrandList(brands);
@@ -895,8 +900,8 @@ function initializeFilterCategories() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var categories = response.entity;
+            if(response.status.code === 0) {
+                let categories = response.entity;
                 fillFilterCategoryList(categories);
 
                 if(categories && categories.length > 0) {
@@ -928,8 +933,8 @@ function initializeFilterProvince() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var provinces = response.entity;
+            if(response.status.code === 0) {
+                let provinces = response.entity;
                 fillFilterProvinceList(provinces);
 
                 if(provinces && provinces.length > 0) {
@@ -951,7 +956,7 @@ function initializeFilterProvince() {
 }
 
 function initializeFilterCity() {
-    var provincePrefix = currentFilterProvince.code.substring(0, 2);
+    let provincePrefix = currentFilterProvince.code.substring(0, 2);
     $.ajax({
         url: '/irext/int/list_cities',
         type: 'POST',
@@ -963,8 +968,8 @@ function initializeFilterCity() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var cities = response.entity;
+            if(response.status.code === 0) {
+                let cities = response.entity;
                 fillFilterCityList(cities);
 
                 if(cities && cities.length > 0) {
@@ -973,7 +978,7 @@ function initializeFilterCity() {
                         name: cities[0].name
                     }
                 }
-                if(currentFilterCategory.id == 3) {
+                if(currentFilterCategory.id === 3) {
                     loadRemoteList();
                 }
             } else {
@@ -1000,8 +1005,8 @@ function initializeFilterBrands() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
-                var brands = response.entity;
+            if(response.status.code === 0) {
+                let brands = response.entity;
                 fillFilterBrandList(brands);
 
                 if(brands && brands.length > 0) {
@@ -1010,7 +1015,7 @@ function initializeFilterBrands() {
                         name: brands[0].name
                     }
                 }
-                if(currentFilterCategory.id != 3) {
+                if(currentFilterCategory.id !== 3) {
                     loadRemoteList();
                 }
             } else {
@@ -1045,13 +1050,7 @@ function onProtocolTypeChange() {
 }
 
 function onCategoryChange() {
-    /*
-    currentCategory = {
-        id: $('#category_id').val(),
-        name: $('#category_id option:selected').text()
-    };
-    */
-    var currentCategoryID = $('#category_id').val();
+    let currentCategoryID = $('#category_id').val();
     currentCategory = getCategoryByID(currentCategoryID);
 
     switchCategory();
@@ -1122,13 +1121,7 @@ function switchCategory() {
 }
 
 function onBrandChange() {
-    /*
-    currentBrand = {
-        id: $('#brand_id').val(),
-        name: $('#brand_id option:selected').text()
-    };
-    */
-    var currentBrandID = $('#brand_id').val();
+    let currentBrandID = $('#brand_id').val();
 
     currentBrand = getBrandByID(currentBrandID);
 }
@@ -1143,21 +1136,15 @@ function onProvinceChange() {
 }
 
 function onCityChange() {
-    /*
-    currentCity = {
-        code: $('#city_code').val(),
-        name: $('#city_code option:selected').text()
-    };
-    */
-    var currentCityCode = $('#city_code').val();
+    let currentCityCode = $('#city_code').val();
 
     currentCity = getCityByCode(currentCityCode);
 
-    if (currentCity.code != '000000') {
+    if (currentCity.code !== '000000') {
         initializeOperator();
     } else {
         // if 'city not specified' is specified, empty operator list
-        var operators = [{
+        let operators = [{
             operator_id: '0',
             operator_name: '--'
         }];
@@ -1175,13 +1162,7 @@ function onCityChange() {
 }
 
 function onOperatorChange() {
-    /*
-    currentOperator = {
-        operator_id: $('#operator_id').val(),
-        operator_name: $('#operator_id option:selected').text()
-    };
-    */
-    var currentOperatorID = $('#operator_id').val();
+    let currentOperatorID = $('#operator_id').val();
 
     currentOperator = getStbOperatorByID(currentOperatorID);
 }
@@ -1287,41 +1268,51 @@ function onSelectRemote(data) {
 }
 
 function onFallbackRemote() {
-    var hintText = '';
+    let hintText = '';
     if (null == selectedRemote) {
-        popUpHintDialog('请先选中一个索引');
+        popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
 
-    if (currentFilterCategory.id == 3) {
-        hintText = '确认要回退' + selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
-            selectedRemote.protocol + ' ' + selectedRemote.remote + ' 吗?';
+    if (currentFilterCategory.id === 3) {
+        hintText = i18n.t("page_code.d_hint_fallback_confirm", { lng: userLang }) +
+            selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
+            selectedRemote.protocol + ' ' + selectedRemote.remote +
+            i18n.t("page_code.d_hint_confirm_q", { lng: userLang });
     } else {
-        hintText = '确认要回退' + selectedRemote.brand_name + ' ' + selectedRemote.category_name + ' ' +
-            selectedRemote.protocol + ' ' + selectedRemote.remote + ' 吗?';
+        hintText = i18n.t("page_code.d_hint_fallback_confirm", { lng: userLang }) +
+            selectedRemote.brand_name + ' ' + selectedRemote.category_name + ' ' +
+            selectedRemote.protocol + ' ' + selectedRemote.remote +
+            i18n.t("page_code.d_hint_confirm_q", { lng: userLang });
     }
 
-    $('#fallback_hint').empty();
-    $('#fallback_hint').append(hintText);
+    let fallbackInt = $('#fallback_hint');
+    fallbackInt.empty();
+    fallbackInt.append(hintText);
     $('#fallback_confirm_dialog').modal();
 }
 
 function onDeleteRemote() {
-    var hintText = '';
+    let hintText = '';
     if (null == selectedRemote) {
-        popUpHintDialog('请先选中一个索引');
+        popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
-    if (currentFilterCategory.id == 3) {
-        hintText = '确认要删除' + selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
-            selectedRemote.protocol + ' ' + selectedRemote.remote + ' 吗?';
+    if (currentFilterCategory.id === 3) {
+        hintText = i18n.t("page_code.d_hint_delete_confirm", { lng: userLang }) +
+            selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
+            selectedRemote.protocol + ' ' + selectedRemote.remote +
+            i18n.t("page_code.d_hint_confirm_q", { lng: userLang });
     } else {
-        hintText = '确认要删除' + selectedRemote.brand_name + ' ' + selectedRemote.category_name + ' ' +
-            selectedRemote.protocol + ' ' + selectedRemote.remote + ' 吗?';
+        hintText = i18n.t("page_code.d_hint_delete_confirm", { lng: userLang }) +
+            selectedRemote.brand_name + ' ' + selectedRemote.category_name + ' ' +
+            selectedRemote.protocol + ' ' + selectedRemote.remote +
+            i18n.t("page_code.d_hint_confirm_q", { lng: userLang });
     }
 
-    $('#delete_hint').empty();
-    $('#delete_hint').append(hintText);
+    let deleteHint = $('#delete_hint');
+    deleteHint.empty();
+    deleteHint.append(hintText);
     $('#delete_confirm_dialog').modal();
 }
 
@@ -1331,22 +1322,28 @@ function onSearchRemote() {
 
 function onVerifyRemote(isPass) {
     pass = isPass;
-    var hintText = '';
-    var passText = 0 == pass ? '通过':'不通过';
+    let hintText = '';
+    let passText = 0 === pass ?
+        i18n.t("page_code.d_pass", { lng: userLang }):i18n.t("page_code.d_not_pass", { lng: userLang });
     if (null == selectedRemote) {
-        popUpHintDialog('请先选中一个索引');
+        popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
-    if (currentFilterCategory.id == 3) {
-        hintText = '确认要' + passText + selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
-            selectedRemote.protocol + ' ' + selectedRemote.remote + ' 吗?';
+    if (currentFilterCategory.id === 3) {
+        hintText = i18n.t("page_code.d_hint_confirm_to", { lng: userLang }) +
+            passText + selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
+            selectedRemote.protocol + ' ' +
+            selectedRemote.remote + i18n.t("page_code.d_hint_confirm_q", { lng: userLang }) ;
     } else {
-        hintText = '确认要' + passText + selectedRemote.brand_name + ' ' + selectedRemote.category_name + ' ' +
-            selectedRemote.protocol + ' ' + selectedRemote.remote + ' 吗?';
+        hintText = i18n.t("page_code.d_hint_confirm_to", { lng: userLang }) +
+            passText + selectedRemote.brand_name + ' ' + selectedRemote.category_name + ' ' +
+            selectedRemote.protocol + ' ' +
+            selectedRemote.remote + i18n.t("page_code.d_hint_confirm_q", { lng: userLang }) ;
     }
 
-    $('#verify_hint').empty();
-    $('#verify_hint').append(hintText);
+    let verifyHint = $('#verify_hint');
+    verifyHint.empty();
+    verifyHint.append(hintText);
     $('#verify_confirm_dialog').modal();
 }
 
@@ -1365,7 +1362,7 @@ function getUnpublishedBrands() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
+            if(response.status.code === 0) {
                 brandsToPublish = response.entity;
                 getUnpublishedRemoteIndexes();
             } else {
@@ -1389,7 +1386,7 @@ function getUnpublishedRemoteIndexes() {
         },
         timeout: 20000,
         success: function(response) {
-            if(response.status.code == 0) {
+            if(response.status.code === 0) {
                 remoteIndexesToPublish = response.entity;
                 showPublishDialog();
             } else {
@@ -1403,18 +1400,21 @@ function getUnpublishedRemoteIndexes() {
 }
 
 function showPublishDialog() {
-    var hintText = '共有 <font color="#FF0000">' + brandsToPublish.length +
-        '</font> 个新增品牌，以及 <font color="#FF0000">' + remoteIndexesToPublish.length +
-        '</font> 个新增编码待发布，请确认';
-    $('#publish_hint').empty();
-    $('#publish_hint').append(hintText);
+    let hintText = i18n.t("page_code.d_hint_publish_totally", { lng: userLang }) +
+        '<span color="#FF0000">' + brandsToPublish.length +
+        '</span> ' + i18n.t("page_code.d_hint_publish_brands_and", { lng: userLang }) +
+        ' <span color="#FF0000">' + remoteIndexesToPublish.length +
+        '</span> ' + i18n.t("page_code.d_hint_publish_indexes_to_publish_confirm", { lng: userLang });
+    let publishHint = $('#publish_hint')
+    publishHint.empty();
+    publishHint.append(hintText);
     $('#publish_dialog').modal();
 }
 
 ///////////////////////////// UI functions /////////////////////////////
 function fillProtocolList(protocols) {
-    $('#protocol_id')
-        .find('option')
+    let protocolId = $('#protocol_id')
+    protocolId.find('option')
         .remove()
         .end();
 
@@ -1425,7 +1425,7 @@ function fillProtocolList(protocols) {
         }));
     });
 
-    $('#protocol_id').select2({
+    protocolId.select2({
         placeholder: 'Select Protocol'
     });
 }
@@ -1439,7 +1439,7 @@ function fillCategoryList(categories) {
     });
 
     $('#category_id').select2({
-        placeholder: '选择类型'
+        placeholder: i18n.t("page_code.d_hint_category_placeholder", { lng: userLang })
     });
 }
 
@@ -1452,13 +1452,13 @@ function fillProvinceList(provinces) {
     });
 
     $('#province_id').select2({
-        placeholder: '选择省份'
+        placeholder: i18n.t("page_code.d_hint_province_placeholder", { lng: userLang })
     });
 }
 
 function fillCityList(cities) {
-    $('#city_code')
-        .find('option')
+    let cityCode = $('#city_code');
+    cityCode.find('option')
         .remove()
         .end();
 
@@ -1469,14 +1469,14 @@ function fillCityList(cities) {
         }));
     });
 
-    $('#city_code').select2({
-        placeholder: '选择城市'
+    cityCode.select2({
+        placeholder: i18n.t("page_code.d_hint_city_placeholder", { lng: userLang })
     });
 }
 
 function fillOperatorList(operators) {
-    $('#operator_id')
-        .find('option')
+    let operatorId = $('#operator_id');
+    operatorId.find('option')
         .remove()
         .end();
 
@@ -1487,14 +1487,14 @@ function fillOperatorList(operators) {
         }));
     });
 
-    $('#operator_id').select2({
-        placeholder: '选择SP'
+    operatorId.select2({
+        placeholder: i18n.t("page_code.d_hint_sp_placeholder", { lng: userLang })
     });
 }
 
 function fillBrandList(brands) {
-    $('#brand_id')
-        .find('option')
+    let brandId = $('#brand_id');
+    brandId.find('option')
         .remove()
         .end();
 
@@ -1505,14 +1505,14 @@ function fillBrandList(brands) {
         }));
     });
 
-    $('#brand_id').select2({
-        placeholder: '选择品牌'
+    brandId.select2({
+        placeholder: i18n.t("page_code.d_hint_brand_placeholder", { lng: userLang })
     });
 }
 
 function fillFilterCategoryList(categories) {
-    $('#filter_category_id')
-        .find('option')
+    let filterCategoryId = $('#filter_category_id');
+    filterCategoryId.find('option')
         .remove()
         .end();
 
@@ -1523,14 +1523,14 @@ function fillFilterCategoryList(categories) {
         }));
     });
 
-    $('#filter_category_id').select2({
-        placeholder: '选择品牌'
+    filterCategoryId.select2({
+        placeholder: i18n.t("page_code.d_hint_category_placeholder", { lng: userLang })
     });
 }
 
 function fillFilterProvinceList(provinces) {
-    $('#filter_province_id')
-        .find('option')
+    let filterProvinceId = $('#filter_province_id');
+    filterProvinceId.find('option')
         .remove()
         .end();
 
@@ -1541,14 +1541,14 @@ function fillFilterProvinceList(provinces) {
         }));
     });
 
-    $('#filter_province_id').select2({
-        placeholder: '选择省份'
+    filterProvinceId.select2({
+        placeholder: i18n.t("page_code.d_hint_province_placeholder", { lng: userLang })
     });
 }
 
 function fillFilterCityList(cities) {
-    $('#filter_city_code')
-        .find('option')
+    let filterCityCode = $('#filter_city_code')
+    filterCityCode.find('option')
         .remove()
         .end();
 
@@ -1559,14 +1559,14 @@ function fillFilterCityList(cities) {
         }));
     });
 
-    $('#filter_city_code').select2({
-        placeholder: '选择城市'
+    filterCityCode.select2({
+        placeholder: i18n.t("page_code.d_hint_city_placeholder", { lng: userLang })
     });
 }
 
 function fillFilterBrandList(brands) {
-    $('#filter_brand_id')
-        .find('option')
+    let filterBrandId = $('#filter_brand_id');
+    filterBrandId.find('option')
         .remove()
         .end();
 
@@ -1577,8 +1577,8 @@ function fillFilterBrandList(brands) {
         }));
     });
 
-    $('#filter_brand_id').select2({
-        placeholder: '选择品牌'
+    filterBrandId.select2({
+        placeholder: i18n.t("page_code.d_hint_brand_placeholder", { lng: userLang })
     });
 }
 
@@ -1613,7 +1613,7 @@ function showFilterBrandSelector() {
 }
 
 function showProtocolSelector(show) {
-    if (true == show) {
+    if (true === show) {
         $('.protocol_panel').show();
     } else {
         $('.protocol_panel').hide();
@@ -1621,17 +1621,18 @@ function showProtocolSelector(show) {
 }
 
 function popUpHintDialog(hint) {
-    $('#text_hint').empty();
-    $('#text_hint').append(hint);
+    let TextHint = $('#text_hint');
+    TextHint.empty();
+    TextHint.append(hint);
     $('#hint_dialog').modal();
 }
 
 ///////////////////////////// Utilities /////////////////////////////
 
 function isBrandExists(newBrandName) {
-    var i = 0;
+    let i = 0;
     for(i = 0; i < g_brands.length; i++) {
-        if(g_brands[i].name == newBrandName) {
+        if(g_brands[i].name === newBrandName) {
             return true;
         }
     }
@@ -1639,9 +1640,10 @@ function isBrandExists(newBrandName) {
 }
 
 function getCategoryByID(categoryID) {
-    for(var i = 0; i < g_categories.length; i++) {
-        var category = g_categories[i];
-        if (category.id == categoryID) {
+    let i = 0;
+    for(i = 0; i < g_categories.length; i++) {
+        let category = g_categories[i];
+        if (category.id === categoryID) {
             return category;
         }
     }
@@ -1649,9 +1651,10 @@ function getCategoryByID(categoryID) {
 }
 
 function getBrandByID(brandID) {
-    for(var i = 0; i < g_brands.length; i++) {
-        var brand = g_brands[i];
-        if (brand.id == brandID) {
+    let i = 0;
+    for(i = 0; i < g_brands.length; i++) {
+        let brand = g_brands[i];
+        if (brand.id === brandID) {
             return brand;
         }
     }
@@ -1659,9 +1662,10 @@ function getBrandByID(brandID) {
 }
 
 function getCityByCode(cityCode) {
-    for(var i = 0; i < g_cities.length; i++) {
-        var city = g_cities[i];
-        if (city.code == cityCode) {
+    let i = 0;
+    for(i = 0; i < g_cities.length; i++) {
+        let city = g_cities[i];
+        if (city.code === cityCode) {
             return city;
         }
     }
@@ -1669,9 +1673,10 @@ function getCityByCode(cityCode) {
 }
 
 function getStbOperatorByID(operatorID) {
-    for(var i = 0; i < g_stbOperators.length; i++) {
-        var operator = g_stbOperators[i];
-        if (operator.operator_id == operatorID) {
+    let i = 0;
+    for(i = 0; i < g_stbOperators.length; i++) {
+        let operator = g_stbOperators[i];
+        if (operator.operator_id === operatorID) {
             return operator;
         }
     }
@@ -1679,10 +1684,10 @@ function getStbOperatorByID(operatorID) {
 }
 
 function translateToTC(textID, targetTextID) {
-    var val = $('#' + textID).val();
-    var tcVal = "";
+    let val = $('#' + textID).val();
+    let tcVal = "";
     Chinese.prototype.loaded.onkeep(function() {
-        var chinese = new Chinese();
+        let chinese = new Chinese();
         tcVal = chinese.toTraditional(val);
         if (null == tcVal) {
             tcVal = val;

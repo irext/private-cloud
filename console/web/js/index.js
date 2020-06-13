@@ -3,12 +3,12 @@
  * 2016-11-13
  */
 
-var LS_KEY_ID = "user_name";
-var LS_KEY_TOKEN = "token";
-var LS_KEY_LANG = "lang";
+let LS_KEY_ID = "user_name";
+let LS_KEY_TOKEN = "token";
+let LS_KEY_LANG = "lang";
 
-var userLang = "en-US";
-var paramLang = getParameter('lang');
+let userLang = "en-US";
+let paramLang = getParameter('lang');
 
 if (paramLang) {
     localStorage.setItem(LS_KEY_LANG, paramLang);
@@ -28,18 +28,18 @@ $("#document").ready(function() {
 });
 
 function signIn() {
-    var userName = $("#user_name").val();
-    var password = $("#password").val();
+    let userName = $("#user_name").val();
+    let password = $("#password").val();
     if (null == userName || "" === userName || null == password || "" === password) {
         toastr.error(i18n.t('page_index.d_signin_fill_email_pw', { lng: userLang }));
         return;
     }
-    var pwHash = MD5(password);
+    let pwHash = MD5(password);
     doSignIn(userName, pwHash);
 }
 
 function onChangePassword() {
-    var userName = $("#user_name").val();
+    let userName = $("#user_name").val();
     if (null == userName || "" === userName) {
         toastr.error(i18n.t('page_index.d_signin_fill_email', { lng: userLang }));
         return;
@@ -48,14 +48,14 @@ function onChangePassword() {
 }
 
 function popUpHintDialog(hint) {
-    var textHint = $("#text_hint");
+    let textHint = $("#text_hint");
     textHint.empty();
     textHint.append(hint);
     $("#hint_dialog").modal();
 }
 
 function navigateToPage(page, id, token) {
-    var form = $("<form method='post'></form>"),
+    let form = $("<form method='post'></form>"),
         input;
     form.attr({"action" : "/irext/nav/nav_to_url"});
 
@@ -78,7 +78,7 @@ function navigateToPage(page, id, token) {
 }
 
 function changePassword() {
-    var userName = $("#user_name").val();
+    let userName = $("#user_name").val();
     if (null == userName || "" === userName) {
         popUpHintDialog(i18n.t('page_index.d_signin_fill_email', { lng: userLang }));
         return;
@@ -108,8 +108,8 @@ function changePassword() {
 }
 
 function doSignIn(userName, password) {
-    var token = "";
-    var adminID = "";
+    let token = "";
+    let adminID = "";
     $.ajax({
         url: "/irext/certificate/admin_login",
         type: "POST",
@@ -121,9 +121,9 @@ function doSignIn(userName, password) {
                 token = response.entity.token;
                 adminID = response.entity.id;
                 toastr.success(i18n.t('page_index.d_signin_success', { lng: userLang }));
-                var permission = token.substring(token.indexOf(",") + 1);
-                var index = null;
-                var page = "";
+                let permission = token.substring(token.indexOf(",") + 1);
+                let index = null;
+                let page = "";
                 if (null != permission && permission !== "") {
                     index = permission.substring(0, 1);
                 }

@@ -170,38 +170,12 @@ RemoteIndex.updateRemoteIndex = function(remoteIndexID, newRemoteIndex, callback
         } else {
             var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
             logger.info("get remoteIndex by ID successfully in update remote index");
-            /*
-            remoteIndex.name = newRemoteIndex.name;
-            remoteIndex.category_id = newRemoteIndex.category_id;
-            remoteIndex.category_name = newRemoteIndex.category_name;
-            remoteIndex.brand_id = newRemoteIndex.brand_id;
-            remoteIndex.brand_name = newRemoteIndex.brand_name;
-            remoteIndex.city_code = newRemoteIndex.city_code;
-            remoteIndex.city_name = newRemoteIndex.city_name;
-            remoteIndex.operator_id = newRemoteIndex.operator_id;
-            remoteIndex.operator_name = newRemoteIndex.operator_name;
-            remoteIndex.protocol = newRemoteIndex.protocol;
-            remoteIndex.remote = newRemoteIndex.remote;
-            remoteIndex.remote_map = newRemoteIndex.remote_map;
-            remoteIndex.priority = newRemoteIndex.priority;
-            remoteIndex.status = enums.ITEM_VERIFY;
-            remoteIndex.sub_cate = newRemoteIndex.sub_cate;
-            remoteIndex.remote_number = newRemoteIndex.remote_number;
-            remoteIndex.operator_name_tw = newRemoteIndex.operator_name_tw;
-            remoteIndex.category_name_tw = newRemoteIndex.category_name_tw;
-            remoteIndex.brand_name_tw = newRemoteIndex.brand_name_tw;
-            remoteIndex.city_name_tw = newRemoteIndex.city_name_tw;
-            remoteIndex.binary_md5 = newRemoteIndex.binary_md5;
-            remoteIndex.contributor = newRemoteIndex.contributor;
-            remoteIndex.update_time = date;
-            */
-
             for (var prop in remoteIndex) {
                 if (undefined != newRemoteIndex[prop] && null != newRemoteIndex[prop]) {
                     remoteIndex[prop] = newRemoteIndex[prop];
                 }
             }
-            remoteIndex.update_time = data;
+            remoteIndex.update_time = date;
 
             remoteIndex.save(function(error, updatedRemoteIndex) {
                 if(error) {
