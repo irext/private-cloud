@@ -4,27 +4,27 @@
  */
 
 // system inclusion
-var logger = require('../mini_poem/logging/logger4js').helper;
+let logger = require('../mini_poem/logging/logger4js').helper;
 
-var formidable = require('formidable');
-var fs = require('fs');
+let formidable = require('formidable');
+let fs = require('fs');
 
 // local inclusion
-var ServiceResponse = require('../response/service_response.js');
-var CategoryResponse = require('../response/category_response.js');
-var BrandResponse = require('../response/brand_response.js');
-var ProtocolResponse = require('../response/protocol_response.js');
-var CityResponse = require('../response/city_response.js');
-var OperatorResponse = require('../response/operator_response.js');
-var RemoteIndexResponse = require('../response/remote_index_response.js');
+let ServiceResponse = require('../response/service_response.js');
+let CategoryResponse = require('../response/category_response.js');
+let BrandResponse = require('../response/brand_response.js');
+let ProtocolResponse = require('../response/protocol_response.js');
+let CityResponse = require('../response/city_response.js');
+let OperatorResponse = require('../response/operator_response.js');
+let RemoteIndexResponse = require('../response/remote_index_response.js');
 
-var internalLogic = require('../work_unit/code_manage_logic.js');
+let internalLogic = require('../work_unit/code_manage_logic.js');
 
-var Enums = require('../constants/enums');
-var ErrorCode = require('../constants/error_code');
+let Enums = require('../constants/enums');
+let ErrorCode = require('../constants/error_code');
 
-var enums = new Enums();
-var errorCode = new ErrorCode();
+let enums = new Enums();
+let errorCode = new ErrorCode();
 
 /*
  * function :   List Categories
@@ -33,11 +33,12 @@ var errorCode = new ErrorCode();
  * return :     CategoryResponse
  */
 exports.listCategories = function (req, res) {
-    var from = req.body.from;
-    var count = req.body.count;
+    let from = req.body.from;
+    let count = req.body.count;
+    let lang = req.body.lang || req.headers["accept-language"];
 
-    var categoryResponse = new CategoryResponse();
-    internalLogic.listCategoriesWorkUnit(from, count, function (listCategoriesErr, categories) {
+    let categoryResponse = new CategoryResponse();
+    internalLogic.listCategoriesWorkUnit(lang, from, count, function (listCategoriesErr, categories) {
         categoryResponse.status = listCategoriesErr;
         categoryResponse.entity = categories;
         res.send(categoryResponse);
@@ -53,12 +54,13 @@ exports.listCategories = function (req, res) {
  * return :     BrandResponse
  */
 exports.listBrands = function (req, res) {
-    var categoryID = req.body.category_id;
-    var from = req.body.from;
-    var count = req.body.count;
+    let categoryID = req.body.category_id;
+    let from = req.body.from;
+    let count = req.body.count;
+    let lang = req.body.lang || req.headers["accept-language"];
 
-    var brandResponse = new BrandResponse();
-    internalLogic.listBrandsWorkUnit(categoryID, from, count, function (listBrandsErr, brands) {
+    let brandResponse = new BrandResponse();
+    internalLogic.listBrandsWorkUnit(lang, categoryID, from, count, function (listBrandsErr, brands) {
         brandResponse.status = listBrandsErr;
         brandResponse.entity = brands;
         res.send(brandResponse);
@@ -74,7 +76,7 @@ exports.listBrands = function (req, res) {
  * return :     BrandResponse
  */
 exports.listUnpublishedBrands = function (req, res) {
-    var brandResponse = new BrandResponse();
+    let brandResponse = new BrandResponse();
     internalLogic.listUnpublishedBrandsWorkUnit(function (listBrandsErr, brands) {
         brandResponse.status = listBrandsErr;
         brandResponse.entity = brands;
@@ -90,10 +92,10 @@ exports.listUnpublishedBrands = function (req, res) {
  * return :     ProtocolResponse
  */
 exports.listIRProtocols = function (req, res) {
-    var from = req.body.from;
-    var count = req.body.count;
+    let from = req.body.from;
+    let count = req.body.count;
 
-    var protocolResponse = new ProtocolResponse();
+    let protocolResponse = new ProtocolResponse();
     internalLogic.listIRProtocolsWorkUnit(from, count, function (listProtocolsErr, protocols) {
         protocolResponse.status = listProtocolsErr;
         protocolResponse.entity = protocols;
@@ -108,8 +110,10 @@ exports.listIRProtocols = function (req, res) {
  * return :     ProvinceResponse
  */
 exports.listProvinces = function (req, res) {
-    var cityResponse = new CityResponse();
-    internalLogic.listProvincesWorkUnit(function (listProvincesErr, provinces) {
+    let cityResponse = new CityResponse();
+    let lang = req.body.lang || req.headers["accept-language"];
+
+    internalLogic.listProvincesWorkUnit(lang, function (listProvincesErr, provinces) {
         cityResponse.status = listProvincesErr;
         cityResponse.entity = provinces;
         res.send(cityResponse);
@@ -123,28 +127,11 @@ exports.listProvinces = function (req, res) {
  * return :     CityResponse
  */
 exports.listCities = function (req, res) {
-    var provincePrefix = req.body.province_prefix;
+    let provincePrefix = req.body.province_prefix;
+    let lang = req.body.lang || req.headers["accept-language"];
 
-    var cityResponse = new CityResponse();
-    internalLogic.listCitiesWorkUnit(provincePrefix, function (listCitiesErr, cities) {
-        cityResponse.status = listCitiesErr;
-        cityResponse.entity = cities;
-        res.send(cityResponse);
-        res.end();
-    });
-};
-
-/*
- * function :   List Cities are covered
- * parameter :  province code prefix
- * return :     CityResponse
- */
-exports.listCoveredCities = function (req, res) {
-    var from = req.body.from;
-    var count = req.body.count;
-
-    var cityResponse = new CityResponse();
-    internalLogic.listCoveredCitiesWorkUnit(from, count, function (listCitiesErr, cities) {
+    let cityResponse = new CityResponse();
+    internalLogic.listCitiesWorkUnit(lang, provincePrefix, function (listCitiesErr, cities) {
         cityResponse.status = listCitiesErr;
         cityResponse.entity = cities;
         res.send(cityResponse);
@@ -158,12 +145,13 @@ exports.listCoveredCities = function (req, res) {
  * return :     OperatorResponse
  */
 exports.listOperators = function (req, res) {
-    var cityCode = req.body.city_code;
-    var from = req.body.from;
-    var count = req.body.count;
+    let cityCode = req.body.city_code;
+    let from = req.body.from;
+    let count = req.body.count;
+    let lang = req.body.lang || req.headers["accept-language"];
 
-    var operatorResponse = new OperatorResponse();
-    internalLogic.listOperatorsWorkUnit(cityCode, from, count, function (listOperatorsErr, operators) {
+    let operatorResponse = new OperatorResponse();
+    internalLogic.listOperatorsWorkUnit(lang, cityCode, from, count, function (listOperatorsErr, operators) {
         operatorResponse.status = listOperatorsErr;
         operatorResponse.entity = operators;
         res.send(operatorResponse);
@@ -181,15 +169,16 @@ exports.listOperators = function (req, res) {
  * return :     Remote Index List
  */
 exports.listIndexes = function (req, res) {
-    var categoryID = req.body.category_id;
-    var brandID = req.body.brand_id;
-    var cityCode = req.body.city_code;
-    var operatorID = req.body.operator_id;
-    var from = req.body.from;
-    var count = req.body.count;
+    let categoryID = req.body.category_id;
+    let brandID = req.body.brand_id;
+    let cityCode = req.body.city_code;
+    let operatorID = req.body.operator_id;
+    let from = req.body.from;
+    let count = req.body.count;
+    let lang = req.body.lang || req.headers["accept-language"];
 
-    var remoteIndexResponse = new RemoteIndexResponse();
-    internalLogic.listRemoteIndexesWorkUnit(categoryID, brandID, cityCode, operatorID, from, count,
+    let remoteIndexResponse = new RemoteIndexResponse();
+    internalLogic.listRemoteIndexesWorkUnit(lang, categoryID, brandID, cityCode, operatorID, from, count,
         function (listRemoteIndexesErr, remoteIndexes) {
             remoteIndexResponse.status = listRemoteIndexesErr;
             remoteIndexResponse.entity = remoteIndexes;
@@ -207,14 +196,15 @@ exports.listIndexes = function (req, res) {
  * return :     Remote Index List
  */
 exports.listRemoteIndexes = function (req, res) {
-    var categoryID = req.query.category_id;
-    var brandID = req.query.brand_id;
-    var cityCode = req.query.city_code;
-    var operatorID = req.query.operator_id;
-    var from = req.query.from;
-    var count = req.query.count;
+    let categoryID = req.query.category_id;
+    let brandID = req.query.brand_id;
+    let cityCode = req.query.city_code;
+    let operatorID = req.query.operator_id;
+    let from = req.query.from;
+    let count = req.query.count;
+    let lang = req.body.lang || req.headers["accept-language"];
 
-    internalLogic.listRemoteIndexesWorkUnit(categoryID, brandID, cityCode, operatorID, from, count,
+    internalLogic.listRemoteIndexesWorkUnit(lang, categoryID, brandID, cityCode, operatorID, from, count,
         function (listRemoteIndexesErr, remoteIndexes) {
             res.send(remoteIndexes);
             res.end();
@@ -229,11 +219,12 @@ exports.listRemoteIndexes = function (req, res) {
  * return :     Remote Index List
  */
 exports.searchRemoteIndexes = function (req, res) {
-    var remoteMap = req.query.remote_map;
-    var from = req.query.from;
-    var count = req.query.count;
+    let remoteMap = req.query.remote_map;
+    let from = req.query.from;
+    let count = req.query.count;
+    let lang = req.query.lang || req.headers["accept-language"];
 
-    internalLogic.searchRemoteIndexesWorkUnit(remoteMap, from, count,
+    internalLogic.searchRemoteIndexesWorkUnit(lang, remoteMap, from, count,
         function (listRemoteIndexesErr, remoteIndexes) {
             // remoteIndexResponse.status = listRemoteIndexesErr;
             //remoteIndexResponse = remoteIndexes;
@@ -248,10 +239,10 @@ exports.searchRemoteIndexes = function (req, res) {
  * return :     Redirect to binary download
  */
 exports.downloadIndex = function (req, res) {
-    var remoteIndexID = req.body.index_id;
+    let remoteIndexID = req.body.index_id;
 
     internalLogic.downloadRemoteBinCachedWorkUnit(remoteIndexID, function (serveBinErr, filePath) {
-        if (errorCode.SUCCESS.code == serveBinErr.code) {
+        if (errorCode.SUCCESS.code === serveBinErr.code) {
             logger.info("download file located at " + filePath);
             res.download(filePath, "");
         } else {
@@ -268,10 +259,10 @@ exports.downloadIndex = function (req, res) {
  * return :     Redirect to binary download
  */
 exports.downloadRemoteIndex = function (req, res) {
-    var remoteIndexID = req.query.remote_index_id;
+    let remoteIndexID = req.query.remote_index_id;
 
     internalLogic.downloadRemoteBinCachedWorkUnit(remoteIndexID, function (serveBinErr, filePath) {
-        if (errorCode.SUCCESS.code == serveBinErr.code) {
+        if (errorCode.SUCCESS.code === serveBinErr.code) {
             logger.info("download file located at " + filePath);
             res.download(filePath, "");
         } else {
@@ -291,7 +282,7 @@ exports.downloadRemoteIndex = function (req, res) {
  * return :     Remote Index List
  */
 exports.listUnpublishedRemoteIndexes = function (req, res) {
-    var remoteIndexResponse = new RemoteIndexResponse();
+    let remoteIndexResponse = new RemoteIndexResponse();
     internalLogic.listUnpublishedRemoteIndexesWorkUnit(function (listRemoteIndexesErr, remoteIndexes) {
             remoteIndexResponse.status = listRemoteIndexesErr;
             remoteIndexResponse.entity = remoteIndexes;
@@ -306,22 +297,22 @@ exports.listUnpublishedRemoteIndexes = function (req, res) {
  * return :     None
  */
 exports.createRemoteIndex = function (req, res) {
-    var form = new formidable.IncomingForm({
+    let form = new formidable.IncomingForm({
         uploadDir: FILE_TEMP_PATH
     });
-    var remoteIndex;
-    var filePath;
-    var contentType;
-    var adminID;
+    let remoteIndex;
+    let filePath;
+    let contentType;
+    let adminID;
 
     form.on('file', function(field, file) {
         // rename the incoming file to the file's name
         logger.info("on file in formidable, change file name according to remote name");
 
-        fs.rename(file.path, form.uploadDir + "/" + file.name);
+        fs.rename(file.path, form.uploadDir + "/" + file.name, null);
     }).on('error', function(err) {
         logger.error("formidable parse form error : " + err);
-        res.send("<html>" +
+        res.send("<html lang='en-US'>" +
             "<body> " +
             "<div style='width: 100%; text-align: center; color: #FF0000'>编码文件提交失败</div>" +
             "</body>" +
@@ -339,23 +330,22 @@ exports.createRemoteIndex = function (req, res) {
             filePath = files.remote_file.path;
             // set MIME to octet-stream as there might not be any contentType passed from the front-end form
             contentType = files.type || "application/octet-stream";
-            logger.info("remoteIndex.kk_remote_number = " + remoteIndex.kk_remote_number);
             internalLogic.createRemoteIndexWorkUnit(remoteIndex, filePath, contentType, adminID,
                 function (createRemoteIndexErr) {
-                if(errorCode.SUCCESS.code == createRemoteIndexErr.code) {
-                    res.send("<html>" +
+                if(errorCode.SUCCESS.code === createRemoteIndexErr.code) {
+                    res.send("<html lang='en-US'>" +
                         "<body> " +
                         "<div style='width: 100%; text-align: center;'>编码文件提交成功</div>" +
                         "</body>" +
                         "</html>");
-                } else if (errorCode.DUPLICATED_REMOTE_CODE.code == createRemoteIndexErr.code) {
-                    res.send("<html>" +
+                } else if (errorCode.DUPLICATED_REMOTE_CODE.code === createRemoteIndexErr.code) {
+                    res.send("<html lang='en-US'>" +
                         "<body> " +
                         "<div style='width: 100%; text-align: center; color: #FF7777'>编码重复，无需新增</div>" +
                         "</body>" +
                         "</html>");
                 } else {
-                    res.send("<html>" +
+                    res.send("<html lang='en-US'>" +
                         "<body> " +
                         "<div style='width: 100%; text-align: center; color: #FF0000'>编码文件提交失败</div>" +
                         "</body>" +
@@ -373,10 +363,10 @@ exports.createRemoteIndex = function (req, res) {
  * return :     ServiceResponse
  */
 exports.deleteRemoteIndex = function (req, res) {
-    var remoteIndex = req.body;
-    var adminID = req.body.admin_id;
+    let remoteIndex = req.body;
+    let adminID = req.body.admin_id;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     internalLogic.deleteRemoteIndexWorkUnit(remoteIndex, adminID, function (deleteRemoteErr) {
         serviceResponse.status = deleteRemoteErr;
         res.send(serviceResponse);
@@ -391,11 +381,11 @@ exports.deleteRemoteIndex = function (req, res) {
  * return :     ServiceResponse
  */
 exports.verifyRemoteIndex = function (req, res) {
-    var remoteIndex = req.body;
-    var pass = req.body.pass;
-    var adminID = req.body.admin_id;
+    let remoteIndex = req.body;
+    let pass = req.body.pass;
+    let adminID = req.body.admin_id;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     internalLogic.verifyRemoteIndexWorkUnit(remoteIndex, pass, adminID, function (verifyRemoteErr) {
         serviceResponse.status = verifyRemoteErr;
         res.send(serviceResponse);
@@ -409,10 +399,10 @@ exports.verifyRemoteIndex = function (req, res) {
  * return :     ServiceResponse
  */
 exports.fallbackRemoteIndex = function (req, res) {
-    var remoteIndex = req.body;
-    var adminID = req.body.admin_id;
+    let remoteIndex = req.body;
+    let adminID = req.body.admin_id;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     internalLogic.fallbackRemoteIndexWorkUnit(remoteIndex, adminID, function (fallbackRemoteErr) {
         serviceResponse.status = fallbackRemoteErr;
         res.send(serviceResponse);
@@ -426,9 +416,9 @@ exports.fallbackRemoteIndex = function (req, res) {
  * return :     ServiceResponse
  */
 exports.publishRemoteIndex = function (req, res) {
-    var adminID = req.body.admin_id;
+    let adminID = req.body.admin_id;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     internalLogic.publishRemoteIndexWorkUnit(adminID, function (publishRemoteErr) {
         serviceResponse.status = publishRemoteErr;
         res.send(serviceResponse);
@@ -442,10 +432,10 @@ exports.publishRemoteIndex = function (req, res) {
  * return :     Service response
  */
 exports.createBrand = function (req, res) {
-    var brand = req.body;
-    var adminID = req.body.admin_id;
+    let brand = req.body;
+    let adminID = req.body.admin_id;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     internalLogic.createBrandWorkUnit(brand, adminID, function (createBrandErr) {
         serviceResponse.status = createBrandErr;
         res.send(serviceResponse);
@@ -459,9 +449,9 @@ exports.createBrand = function (req, res) {
  * return :     Service response
  */
 exports.publishBrands = function (req, res) {
-    var adminID = req.body.admin_id;
+    let adminID = req.body.admin_id;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     internalLogic.publishBrandsWorkUnit(adminID, function (publishBrandsErr) {
         serviceResponse.status = publishBrandsErr;
         res.send(serviceResponse);
@@ -475,19 +465,19 @@ exports.publishBrands = function (req, res) {
  * return :     None
  */
 exports.createProtocol = function (req, res) {
-    var form = new formidable.IncomingForm({
+    let form = new formidable.IncomingForm({
         uploadDir: FILE_TEMP_PATH + "/protocol"
     });
-    var protocol;
-    var filePath;
-    var contentType;
-    var adminID;
+    let protocol;
+    let filePath;
+    let contentType;
+    let adminID;
 
     form.on('file', function(field, file) {
-        fs.rename(file.path, form.uploadDir + "/" + file.name);
+        fs.rename(file.path, form.uploadDir + "/" + file.name, null);
     }).on('error', function(err) {
         logger.error("formidable parse form error : " + err);
-        res.send("<html>" +
+        res.send("<html lang='en-US'>" +
             "<body>" +
             "<div style='width: 100%; text-align: center; color: #FF0000'>协议文件提交失败</div>" +
             "</body>" +
@@ -507,15 +497,15 @@ exports.createProtocol = function (req, res) {
             contentType = files.type || "application/octet-stream";
             console.log("filePath = " + filePath + ", contentType = " + contentType);
             internalLogic.createProtocolWorkUnit(protocol, filePath, contentType, adminID, function (createProtocolErr) {
-                if(errorCode.SUCCESS.code == createProtocolErr.code) {
-                    res.send("<html>" +
+                if(errorCode.SUCCESS.code === createProtocolErr.code) {
+                    res.send("<html lang='en-US'>" +
                         "<body>" +
                         "<div style='width: 100%; text-align: center;'>协议文件提交成功</div>" +
                         "</body>" +
                         "</html>");
                     res.end();
                 } else {
-                    res.send("<html>" +
+                    res.send("<html lang='en-US'>" +
                         "<body>" +
                         "<div style='width: 100%; text-align: center; color: #FF0000'>协议文件提交失败</div>" +
                         "</body>" +

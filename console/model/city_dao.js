@@ -4,15 +4,15 @@
  */
 
 // global inclusion
-var orm = require('orm');
-var dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
-var logger = require('../mini_poem/logging/logger4js').helper;
+let orm = require('orm');
+let dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
+let logger = require('../mini_poem/logging/logger4js').helper;
 
 // local inclusion
-var ErrorCode = require('../constants/error_code');
-var errorCode = new ErrorCode();
+let ErrorCode = require('../constants/error_code');
+let errorCode = new ErrorCode();
 
-var City = dbOrm.define('city',
+let City = dbOrm.define('city',
     {
         id: Number,
         code: String,
@@ -27,7 +27,7 @@ var City = dbOrm.define('city',
 );
 
 City.listProvinces = function(callback) {
-    var error = errorCode.SUCCESS;
+    let error = errorCode.SUCCESS;
     dbOrm.driver.execQuery("SELECT * FROM city WHERE code LIKE '__0000'", function(getProvincesErr, result) {
             if (getProvincesErr) {
                 logger.info("get provinces failed : " + getProvincesErr);
@@ -41,7 +41,7 @@ City.listProvinces = function(callback) {
 };
 
 City.listCities = function(provincePrefix, callback) {
-    var error = errorCode.SUCCESS;
+    let error = errorCode.SUCCESS;
     // dbOrm is object of ORM
     dbOrm.driver.execQuery("SELECT * FROM city WHERE code LIKE '" + provincePrefix + "__00' AND code NOT LIKE '__0000'", function(getCitiesErr, result) {
             if (getCitiesErr) {

@@ -4,15 +4,15 @@
  */
 
 // global inclusion
-var orm = require('orm');
-var dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
-var logger = require('../mini_poem/logging/logger4js').helper;
+let orm = require('orm');
+let dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
+let logger = require('../mini_poem/logging/logger4js').helper;
 
 // local inclusion
-var ErrorCode = require('../constants/error_code');
-var errorCode = new ErrorCode();
+let ErrorCode = require('../constants/error_code');
+let errorCode = new ErrorCode();
 
-var StbOperator = dbOrm.define('stb_operator',
+let StbOperator = dbOrm.define('stb_operator',
     {
         id: Number,
         operator_id: String,

@@ -2,8 +2,8 @@
  * Created by Strawmanbobi
  * 2016-11-27
  */
-var app = require('../irext_console.js');
-var statService = require('../services/stat_service.js');
+let app = require('../irext_console.js');
+let statService = require('../services/stat_service.js');
 
 app.post('/irext/stat/generic_count', statService.genericCount);
 

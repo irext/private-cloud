@@ -5,39 +5,39 @@
 
 require('../mini_poem/configuration/constants');
 
-var AdminAuth = require('../authentication/admin_auth.js');
-var RequestSender = require('../mini_poem/http/request.js');
+let AdminAuth = require('../authentication/admin_auth.js');
+let RequestSender = require('../mini_poem/http/request.js');
 
-var ErrorCode = require('../constants/error_code.js');
-var logger = require('../mini_poem/logging/logger4js').helper;
+let ErrorCode = require('../constants/error_code.js');
+let logger = require('../mini_poem/logging/logger4js').helper;
 
-var errorCode = new ErrorCode();
+let errorCode = new ErrorCode();
 
-var adminAuth = new AdminAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
+let adminAuth = new AdminAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
-var SIGN_IN_SERVICE = "/irext/certificate/admin_login";
-var CHANGE_PASSWORD_SERVICE = "/irext/certificate/change_pw";
+let SIGN_IN_SERVICE = "/irext/certificate/admin_login";
+let CHANGE_PASSWORD_SERVICE = "/irext/certificate/change_pw";
 
 exports.adminLoginWorkUnit = function (userName, password, callback) {
-    var queryParams = new Map();
+    let queryParams = new Map();
 
-    var requestSender =
+    let requestSender =
         new RequestSender(EXTERNAL_SERVER_ADDRESS,
             EXTERNAL_SERVER_PORT,
             SIGN_IN_SERVICE,
             queryParams);
 
-    var signinInfo = {
+    let signinInfo = {
         user_name : userName,
         password : password
     };
     requestSender.sendPostRequest(signinInfo,
         function(signInRequestErr, signInResponse) {
-            if (signInRequestErr == errorCode.SUCCESS.code && null != signInResponse) {
-                var resp = JSON.parse(signInResponse);
-                if (undefined != resp.entity) {
-                    var admin = resp.entity;
-                    var token,
+            if (signInRequestErr === errorCode.SUCCESS.code && null != signInResponse) {
+                let resp = JSON.parse(signInResponse);
+                if (undefined !== resp.entity) {
+                    let admin = resp.entity;
+                    let token,
                         key,
                         ttl = 24 * 60 * 60 * 14,
                         timeStamp,
@@ -46,11 +46,11 @@ exports.adminLoginWorkUnit = function (userName, password, callback) {
                     token = admin.token;
                     key = "admin_" + admin.id;
                     adminAuth.setAuthInfo(key, token, ttl, function(setAdminAuthErr) {
-                        if (errorCode.SUCCESS.code == setAdminAuthErr.code) {
+                        if (errorCode.SUCCESS.code === setAdminAuthErr.code) {
                             key = "admin_name_" + admin.id;
                             name = admin.user_name;
                             adminAuth.setAuthInfo(key, name, ttl, function(setAdminNameErr) {
-                                if (errorCode.SUCCESS.code == setAdminNameErr.code) {
+                                if (errorCode.SUCCESS.code === setAdminNameErr.code) {
                                     admin.token = token;
                                 }
                                 callback(setAdminNameErr, admin);
@@ -68,9 +68,9 @@ exports.adminLoginWorkUnit = function (userName, password, callback) {
 };
 
 exports.verifyTokenWorkUnit = function (id, token, callback) {
-    var key = "admin_" + id;
+    let key = "admin_" + id;
     adminAuth.validateAuthInfo(key, token, function(validateAdminAuthErr, result) {
-        if (validateAdminAuthErr.code != errorCode.SUCCESS.code) {
+        if (validateAdminAuthErr.code !== errorCode.SUCCESS.code) {
             logger.info("token validation failed");
         }
         callback(validateAdminAuthErr);
@@ -78,12 +78,12 @@ exports.verifyTokenWorkUnit = function (id, token, callback) {
 };
 
 exports.verifyTokenWithPermissionWorkUnit = function (id, token, permissions, callback) {
-    var key = "admin_" + id;
+    let key = "admin_" + id;
     adminAuth.validateAuthInfo(key, token, function(validateAdminAuthErr, result) {
-        if (validateAdminAuthErr.code == errorCode.SUCCESS.code) {
+        if (validateAdminAuthErr.code === errorCode.SUCCESS.code) {
             logger.info("token validation successfully");
-            if (undefined != result && null != result && "" != result) {
-                if (result.indexOf(permissions) != -1) {
+            if (undefined !== result && null !== result && "" !== result) {
+                if (result.indexOf(permissions) !== -1) {
                     callback(errorCode.SUCCESS);
                 } else {
                     logger.info("permission do not match");
@@ -98,23 +98,23 @@ exports.verifyTokenWithPermissionWorkUnit = function (id, token, permissions, ca
 };
 
 exports.sendChangePwMailWorkUnit = function (userName, callbackURL, callback) {
-    var queryParams = new Map();
+    let queryParams = new Map();
 
-    var requestSender =
+    let requestSender =
         new RequestSender(EXTERNAL_SERVER_ADDRESS,
             EXTERNAL_SERVER_PORT,
             CHANGE_PASSWORD_SERVICE,
             queryParams);
 
-    var userInfo = {
+    let userInfo = {
         user_name : userName,
         callback_url :callbackURL
     };
     requestSender.sendPostRequest(userInfo,
         function(changePwRequestErr, changePwResponse) {
-            if (changePwRequestErr == errorCode.SUCCESS.code && null != changePwResponse) {
-                var resp = JSON.parse(changePwResponse);
-                if (undefined != resp.status && errorCode.SUCCESS == resp.status) {
+            if (changePwRequestErr === errorCode.SUCCESS.code && null != changePwResponse) {
+                let resp = JSON.parse(changePwResponse);
+                if (undefined !== resp.status && errorCode.SUCCESS === resp.status) {
                     callback(errorCode.SUCCESS);
                 } else {
                     callback(errorCode.FAILED);

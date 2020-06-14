@@ -4,16 +4,16 @@
  */
 
 // system inclusion
-var logger = require('../mini_poem/logging/logger4js').helper;
+let logger = require('../mini_poem/logging/logger4js').helper;
 
 // local inclusion
-var ServiceResponse = require('../response/service_response.js');
-var LoginResponse = require('../response/login_response.js');
+let ServiceResponse = require('../response/service_response.js');
+let LoginResponse = require('../response/login_response.js');
 
-var authenticationLogic = require('../work_unit/authentication_logic.js');
+let authenticationLogic = require('../work_unit/authentication_logic.js');
 
-var Enums = require('../constants/enums');
-var ErrorCode = require('../constants/error_code');
+let Enums = require('../constants/enums');
+let ErrorCode = require('../constants/error_code');
 
 
 /*
@@ -23,11 +23,11 @@ var ErrorCode = require('../constants/error_code');
  * return :     ServiceResponse
  */
 exports.adminLogin = function (req, res) {
-    var admin = req.body;
-    var userName = admin.user_name;
-    var password = admin.password;
+    let admin = req.body;
+    let userName = admin.user_name;
+    let password = admin.password;
 
-    var loginResponse = new LoginResponse();
+    let loginResponse = new LoginResponse();
     authenticationLogic.adminLoginWorkUnit(userName, password, function (adminLoginErr, admin) {
         logger.info("admin login successfully, entity = " + JSON.stringify(admin));
         loginResponse.status = adminLoginErr;
@@ -44,11 +44,11 @@ exports.adminLogin = function (req, res) {
  * return :     ServiceResponse
  */
 exports.verifyToken = function (req, res) {
-    var bodyParam = req.body;
-    var id = bodyParam.id;
-    var token = bodyParam.token;
+    let bodyParam = req.body;
+    let id = bodyParam.id;
+    let token = bodyParam.token;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     authenticationLogic.verifyTokenWorkUnit(id, token, function (verifyTokenErr) {
         serviceResponse.status = verifyTokenErr;
         res.send(serviceResponse);
@@ -63,11 +63,11 @@ exports.verifyToken = function (req, res) {
  * return :     ServiceResponse
  */
 exports.changePassword = function (req, res) {
-    var bodyParam = req.body;
-    var userName = bodyParam.user_name;
-    var callbackURL = bodyParam.callback_url;
+    let bodyParam = req.body;
+    let userName = bodyParam.user_name;
+    let callbackURL = bodyParam.callback_url;
 
-    var serviceResponse = new ServiceResponse();
+    let serviceResponse = new ServiceResponse();
     authenticationLogic.sendChangePwMailWorkUnit(userName, callbackURL, function (changePWErr) {
         serviceResponse.status = changePWErr;
         res.send(serviceResponse);

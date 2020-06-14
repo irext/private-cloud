@@ -4,23 +4,23 @@
  */
 
 // global inclusion
-var kvConn = require('../mini_poem/db/mongodb/mongodb_connection');
-var logger = require('../mini_poem/logging/logger4js').helper;
-var Map = require('../mini_poem/mem/map');
+let kvConn = require('../mini_poem/db/mongodb/mongodb_connection');
+let logger = require('../mini_poem/logging/logger4js').helper;
+let Map = require('../mini_poem/mem/map');
 
 // local inclusion
-var ErrorCode = require('../constants/error_code');
-var errorCode = new ErrorCode();
+let ErrorCode = require('../constants/error_code');
+let errorCode = new ErrorCode();
 
-var VirtualRemote = function() {
+let VirtualRemote = function() {
 };
 
-var remoteMap = new Map();
+let remoteMap = new Map();
 
 VirtualRemote.prototype.findRemoteByKey = function(protocol, remote, remoteKey, code, callback) {
     // traverse all collections per remote
-    var collectionName = remote + "_" + protocol;
-    var vRemote = remoteMap.get(collectionName);
+    let collectionName = remote + "_" + protocol;
+    let vRemote = remoteMap.get(collectionName);
     if(null == vRemote) {
         try {
             vRemote = kvConn.defineByCollection(collectionName, {

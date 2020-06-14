@@ -12,13 +12,13 @@ exports.stringTruncate = function (srcStr, maxLength) {
 
 exports.stringMask = function (srcStr, prefixLength, maskLength) {
     // auto mask string
-    var retStr = "";
-    var srcStrLength = srcStr.length;
+    let retStr = "";
+    let srcStrLength = srcStr.length;
     if(srcStrLength <= prefixLength) {
         return srcStr;
     }
     retStr = srcStr.substring(0, prefixLength);
-    for(var i = 0; i < maskLength; i++) {
+    for(let i = 0; i < maskLength; i++) {
         retStr += "*";
     }
     if(srcStrLength <= prefixLength + maskLength) {
@@ -29,8 +29,8 @@ exports.stringMask = function (srcStr, prefixLength, maskLength) {
 };
 
 exports.verifyPhoneNumber = function (number){
-    var a = /^((\(\d{3}\))|(\d{3}\-))?13\d{9}|14[57]\d{8}|15\d{9}|18\d{9}$/;
-    if(number.length!=11||!number.match(a)) {
+    let a = /^((\(\d{3}\))|(\d{3}-))?13\d{9}|14[57]\d{8}|15\d{9}|18\d{9}$/;
+    if(number.length !== 11||!number.match(a)) {
         return 0;
     } else {
         return 1;

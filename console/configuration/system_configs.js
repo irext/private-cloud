@@ -7,8 +7,8 @@
 //noinspection JSUnresolvedFunction
 require('../mini_poem/configuration/constants');
 //noinspection JSUnresolvedFunction
-var Enums = require('./../constants/enums');
-var enums = new Enums();
+let Enums = require('./../constants/enums');
+let enums = new Enums();
 
 //noinspection JSUnresolvedVariable
 exports.setupEnvironment = function () {

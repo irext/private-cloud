@@ -4,16 +4,16 @@
  */
 
 // global inclusion
-var orm = require('orm');
-var dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
-var logger = require('../mini_poem/logging/logger4js').helper;
-var dateUtils = require('../mini_poem/utils/date_utils.js');
+let orm = require('orm');
+let dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
+let logger = require('../mini_poem/logging/logger4js').helper;
+let dateUtils = require('../mini_poem/utils/date_utils.js');
 
 // local inclusion
-var ErrorCode = require('../constants/error_code');
-var errorCode = new ErrorCode();
+let ErrorCode = require('../constants/error_code');
+let errorCode = new ErrorCode();
 
-var Category = dbOrm.define('category',
+let Category = dbOrm.define('category',
     {
         id: Number,
         name: String,
@@ -29,8 +29,8 @@ var Category = dbOrm.define('category',
 );
 
 Category.createCategory = function(category, callback) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-    var newCategory = new Category({
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+    let newCategory = new Category({
         name: category.name,
         status: 1,
         update_time: date,

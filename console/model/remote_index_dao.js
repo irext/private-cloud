@@ -4,19 +4,19 @@
  */
 
 // global inclusion
-var orm = require('orm');
-var dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
-var logger = require('../mini_poem/logging/logger4js').helper;
-var dateUtils = require('../mini_poem/utils/date_utils.js');
+let orm = require('orm');
+let dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
+let logger = require('../mini_poem/logging/logger4js').helper;
+let dateUtils = require('../mini_poem/utils/date_utils.js');
 
 // local inclusion
-var ErrorCode = require('../constants/error_code');
-var Enums = require('../constants/enums');
+let ErrorCode = require('../constants/error_code');
+let Enums = require('../constants/enums');
 
-var errorCode = new ErrorCode();
-var enums = new Enums();
+let errorCode = new ErrorCode();
+let enums = new Enums();
 
-var RemoteIndex = dbOrm.define('remote_index',
+let RemoteIndex = dbOrm.define('remote_index',
     {
         id: Number,
         category_id: Number,
@@ -48,8 +48,8 @@ var RemoteIndex = dbOrm.define('remote_index',
 );
 
 RemoteIndex.createRemoteIndex = function(remoteIndex, callback) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-    var newRemoteIndex = new RemoteIndex({
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+    let newRemoteIndex = new RemoteIndex({
         name: remoteIndex.name,
         category_id: remoteIndex.category_id,
         category_name: remoteIndex.category_name,
@@ -168,9 +168,8 @@ RemoteIndex.updateRemoteIndex = function(remoteIndexID, newRemoteIndex, callback
             logger.error("get remoteIndex by ID error in update remote index : " + error);
             callback(errorCode.FAILED, null);
         } else {
-            var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-            logger.info("get remoteIndex by ID successfully in update remote index");
-            for (var prop in remoteIndex) {
+            let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+            for (let prop in remoteIndex) {
                 if (undefined != newRemoteIndex[prop] && null != newRemoteIndex[prop]) {
                     remoteIndex[prop] = newRemoteIndex[prop];
                 }
@@ -195,7 +194,6 @@ RemoteIndex.verifyRemoteIndex = function(remoteIndexID, status, callback) {
             logger.error("get remoteIndex by ID error in verify remote index : " + error);
             callback(errorCode.FAILED, null);
         } else {
-            logger.info("get remoteIndex by ID successfully in verify remote index");
             remoteIndex.status = status;
 
             remoteIndex.save(function(error, updatedRemoteIndex) {
@@ -216,7 +214,6 @@ RemoteIndex.fallbackRemoteIndex = function(remoteIndexID, status, callback) {
             logger.error("get remoteIndex by ID error in fallback remote index : " + error);
             callback(errorCode.FAILED, null);
         } else {
-            logger.info("get remoteIndex by ID successfully in fallback remote index");
             remoteIndex.status = status;
 
             remoteIndex.save(function(error, updatedRemoteIndex) {

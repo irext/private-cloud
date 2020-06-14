@@ -6,12 +6,12 @@
 // system inclusion
 
 // local inclusion
-var StatResponse = require('../response/stat_response.js');
+let StatResponse = require('../response/stat_response.js');
 
-var statLogic = require('../work_unit/stat_logic.js');
+let statLogic = require('../work_unit/stat_logic.js');
 
-var Enums = require('../constants/enums');
-var ErrorCode = require('../constants/error_code');
+let Enums = require('../constants/enums');
+let ErrorCode = require('../constants/error_code');
 
 /*
  * function :   Count supported categories, brands and remote indexes
@@ -19,7 +19,7 @@ var ErrorCode = require('../constants/error_code');
  * return :     Customized statistics response
  */
 exports.genericCount = function(req, res) {
-    var statResponse = new StatResponse();
+    let statResponse = new StatResponse();
     statLogic.countRemoteWorkUnit(function(countRemoteErr, statContent) {
         statResponse.status = countRemoteErr;
         statResponse.entity = statContent;
@@ -34,7 +34,7 @@ exports.genericCount = function(req, res) {
  * return :     Customized statistics response
  */
 exports.statCategories = function(req, res) {
-    var statResponse = new StatResponse();
+    let statResponse = new StatResponse();
     statLogic.statCategoriesWorkUnit(function(statCategoriesErr, statCategories) {
         statResponse.status = statCategoriesErr;
         statResponse.entity = statCategories;
@@ -49,9 +49,9 @@ exports.statCategories = function(req, res) {
  * return :     Customized statistics response
  */
 exports.statBrands = function(req, res) {
-    var categoryID = req.body.category_id;
+    let categoryID = req.body.category_id;
 
-    var statResponse = new StatResponse();
+    let statResponse = new StatResponse();
     statLogic.statBrandsWorkUnit(categoryID, function(statBrandsErr, statBrands) {
         statResponse.status = statBrandsErr;
         statResponse.entity = statBrands;
@@ -66,7 +66,7 @@ exports.statBrands = function(req, res) {
  * return :     Customized statistics response
  */
 exports.statCities = function(req, res) {
-    var statResponse = new StatResponse();
+    let statResponse = new StatResponse();
     statLogic.statCitiesWorkUnit(function(statCitiesErr, statCities) {
         statResponse.status = statCitiesErr;
         statResponse.entity = statCities;

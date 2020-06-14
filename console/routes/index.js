@@ -3,7 +3,7 @@
  * 2016-11-27
  */
 
-var server = require('../irext_console.js');
+let server = require('../irext_console.js');
 
 require('./navigation_routes.js');
 require('./authentication_routes.js');

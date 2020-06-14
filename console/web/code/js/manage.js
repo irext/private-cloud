@@ -101,13 +101,6 @@ $(document).ready(function() {
         let fileName = filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
         $('#protocol_name_b').val(fileName);
     });
-
-    $('.dob_cbtn').click(function() {
-        onDoBClick(this.id);
-    });
-
-    updateTransferState(TRANSFER_STATE_NONE);
-
 });
 
 function initializeSelectors() {
@@ -128,7 +121,7 @@ function loadRemoteList(isSearch, remoteMap) {
         url = '/irext/int/search_remote_indexes?remote_map='+
             remoteMap+'&from=0&count=2000&admin_id='+id+'&token='+token;
     } else {
-        if(currentFilterCategory.id === 3) {
+        if(parseInt(currentFilterCategory.id) === 3) {
             url = '/irext/int/list_remote_indexes?category_id='+
                 currentFilterCategory.id+'&city_code='+currentFilterCity.code+
                 '&from=0&count=100&admin_id='+id+'&token='+token;
@@ -446,7 +439,7 @@ function searchRemote() {
     }
 }
 
-function verifyRemote() {
+function verifyRemote(pass) {
     if(null == selectedRemote) {
         popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
@@ -688,7 +681,8 @@ function initializeCategories() {
             from : 0,
             count : 200,
             admin_id : id,
-            token : token
+            token : token,
+            lang: userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -724,7 +718,8 @@ function initializeProvince() {
         dataType: 'JSON',
         data: {
             admin_id : id,
-            token : token
+            token : token,
+            lang : userLang
         },
         type: 'POST',
         timeout: 20000,
@@ -760,7 +755,8 @@ function initializeCity() {
         data: {
             province_prefix : provincePrefix,
             admin_id : id,
-            token : token
+            token : token,
+            lang : userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -810,7 +806,8 @@ function initializeOperator() {
             from : 0,
             count : 200,
             admin_id : id,
-            token : token
+            token : token,
+            lang: userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -859,7 +856,8 @@ function initializeBrands() {
             from : 0,
             count : 300,
             admin_id : id,
-            token : token
+            token : token,
+            lang: userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -896,7 +894,8 @@ function initializeFilterCategories() {
             from : 0,
             count : 200,
             admin_id : id,
-            token : token
+            token : token,
+            lang: userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -929,7 +928,8 @@ function initializeFilterProvince() {
         dataType: 'JSON',
         data: {
             admin_id : id,
-            token : token
+            token : token,
+            lang : userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -964,7 +964,8 @@ function initializeFilterCity() {
         data: {
             province_prefix : provincePrefix,
             admin_id : id,
-            token : token
+            token : token,
+            lang : userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -978,7 +979,7 @@ function initializeFilterCity() {
                         name: cities[0].name
                     }
                 }
-                if(currentFilterCategory.id === 3) {
+                if(parseInt(currentFilterCategory.id) === 3) {
                     loadRemoteList();
                 }
             } else {
@@ -1001,7 +1002,8 @@ function initializeFilterBrands() {
             from : 0,
             count : 300,
             admin_id : id,
-            token : token
+            token : token,
+            lang: userLang
         },
         timeout: 20000,
         success: function(response) {
@@ -1052,7 +1054,6 @@ function onProtocolTypeChange() {
 function onCategoryChange() {
     let currentCategoryID = $('#category_id').val();
     currentCategory = getCategoryByID(currentCategoryID);
-
     switchCategory();
 }
 
@@ -1274,7 +1275,7 @@ function onFallbackRemote() {
         return;
     }
 
-    if (currentFilterCategory.id === 3) {
+    if (parseInt(currentFilterCategory.id) === 3) {
         hintText = i18n.t("page_code.d_hint_fallback_confirm", { lng: userLang }) +
             selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
             selectedRemote.protocol + ' ' + selectedRemote.remote +
@@ -1298,7 +1299,7 @@ function onDeleteRemote() {
         popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
-    if (currentFilterCategory.id === 3) {
+    if (parseInt(currentFilterCategory.id) === 3) {
         hintText = i18n.t("page_code.d_hint_delete_confirm", { lng: userLang }) +
             selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
             selectedRemote.protocol + ' ' + selectedRemote.remote +
@@ -1329,7 +1330,7 @@ function onVerifyRemote(isPass) {
         popUpHintDialog(i18n.t("page_code.d_hint_common_select_index", { lng: userLang }));
         return;
     }
-    if (currentFilterCategory.id === 3) {
+    if (parseInt(currentFilterCategory.id) === 3) {
         hintText = i18n.t("page_code.d_hint_confirm_to", { lng: userLang }) +
             passText + selectedRemote.city_name + ' ' + selectedRemote.category_name + ' ' +
             selectedRemote.protocol + ' ' +
@@ -1643,7 +1644,7 @@ function getCategoryByID(categoryID) {
     let i = 0;
     for(i = 0; i < g_categories.length; i++) {
         let category = g_categories[i];
-        if (category.id === categoryID) {
+        if (parseInt(category.id) === parseInt(categoryID)) {
             return category;
         }
     }
@@ -1654,7 +1655,7 @@ function getBrandByID(brandID) {
     let i = 0;
     for(i = 0; i < g_brands.length; i++) {
         let brand = g_brands[i];
-        if (brand.id === brandID) {
+        if (parseInt(brand.id) === parseInt(brandID)) {
             return brand;
         }
     }

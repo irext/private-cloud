@@ -4,19 +4,19 @@
  */
 
 // global inclusion
-var orm = require('orm');
-var dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
-var logger = require('../mini_poem/logging/logger4js').helper;
-var dateUtils = require('../mini_poem/utils/date_utils.js');
+let orm = require('orm');
+let dbOrm = require('../mini_poem/db/mysql/mysql_connection').mysqlDB;
+let logger = require('../mini_poem/logging/logger4js').helper;
+let dateUtils = require('../mini_poem/utils/date_utils.js');
 
 // local inclusion
-var ErrorCode = require('../constants/error_code');
-var errorCode = new ErrorCode();
+let ErrorCode = require('../constants/error_code');
+let errorCode = new ErrorCode();
 
-var Enums = require('../constants/enums');
-var enums = new Enums();
+let Enums = require('../constants/enums');
+let enums = new Enums();
 
-var IRProtocol = dbOrm.define('ir_protocol',
+let IRProtocol = dbOrm.define('ir_protocol',
     {
         id: Number,
         name: String,
@@ -32,8 +32,8 @@ var IRProtocol = dbOrm.define('ir_protocol',
 );
 
 IRProtocol.createIRProtocol = function(protocol, callback) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-    var newProtocol = new IRProtocol({
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
+    let newProtocol = new IRProtocol({
         name: protocol.name,
         status: protocol.status,
         type: protocol.type,

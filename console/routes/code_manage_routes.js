@@ -3,8 +3,8 @@
  * 2016-11-27
  */
 
-var app = require('../irext_console.js');
-var intService = require('../services/code_manage_service.js');
+let app = require('../irext_console.js');
+let intService = require('../services/code_manage_service.js');
 
 app.post('/irext/int/list_provinces', intService.listProvinces);
 app.post('/irext/int/list_cities', intService.listCities);

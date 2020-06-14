@@ -11,7 +11,7 @@
  * return :     Redirect to the certain URL
  */
 exports.navToURL = function(req, res) {
-    var bodyParam = req.body;
-    var page = bodyParam.page;
+    let bodyParam = req.body;
+    let page = bodyParam.page;
     res.redirect("/" + page);
 };
