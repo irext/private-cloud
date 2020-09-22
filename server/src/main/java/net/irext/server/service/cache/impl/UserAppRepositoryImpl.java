@@ -38,15 +38,15 @@ public class UserAppRepositoryImpl implements IUserAppRepository {
     }
 
     public void add(Integer id, String token) {
-        hashOperations.put(KEY, id, token);
+        hashOperations.put(KEY, token, id);
     }
 
-    public void delete(final Integer id) {
-        hashOperations.delete(KEY, id);
+    public void delete(final String token) {
+        hashOperations.delete(KEY, token);
     }
 
-    public String find(final Integer id) {
-        return (String) hashOperations.get(KEY, id);
+    public Integer find(final String token) {
+        return (Integer)hashOperations.get(KEY, token);
     }
 
 }

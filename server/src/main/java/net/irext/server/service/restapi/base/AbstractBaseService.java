@@ -95,7 +95,8 @@ public abstract class AbstractBaseService implements TokenValidation {
     private Status validateUserToken(Integer userId, String token) {
         Status status = new Status();
 
-        if (userAppRepository.find(userId).equals(token)) {
+        Integer cachedId = userAppRepository.find(token);
+        if (null != cachedId && cachedId.equals(userId)) {
             status.setCode(Constants.ERROR_CODE_SUCCESS);
         } else {
             status.setCode(Constants.ERROR_CODE_AUTH_FAILURE);

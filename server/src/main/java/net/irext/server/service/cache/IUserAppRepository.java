@@ -14,7 +14,7 @@ public interface IUserAppRepository {
 
     void add(Integer id, String token);
 
-    void delete(Integer id);
+    void delete(String token);
 
-    String find(Integer id);
+    Integer find(String token);
 }
