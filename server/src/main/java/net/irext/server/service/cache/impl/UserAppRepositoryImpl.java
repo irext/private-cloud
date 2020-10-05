@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 /**
- * Filename:       IIRBinaryRepositoryImpl.java
+ * Filename:       UserAppRepositoryImpl.java
  * Revised:        Date: 2018-12-29
  * Revision:       Revision: 1.0
  * <p>
