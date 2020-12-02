@@ -55,22 +55,3 @@ exports.verifyToken = function (req, res) {
         res.end();
     });
 };
-
-/*
- * function :   Change password
- * parameter :  id parameter of token KV
- *              token parameter of token KV
- * return :     ServiceResponse
- */
-exports.changePassword = function (req, res) {
-    let bodyParam = req.body;
-    let userName = bodyParam.user_name;
-    let callbackURL = bodyParam.callback_url;
-
-    let serviceResponse = new ServiceResponse();
-    authenticationLogic.sendChangePwMailWorkUnit(userName, callbackURL, function (changePWErr) {
-        serviceResponse.status = changePWErr;
-        res.send(serviceResponse);
-        res.end();
-    });
-};

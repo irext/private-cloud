@@ -15,8 +15,7 @@ let errorCode = new ErrorCode();
 
 let adminAuth = new AdminAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
-let SIGN_IN_SERVICE = "/irext/certificate/admin_login";
-let CHANGE_PASSWORD_SERVICE = "/irext/certificate/change_pw";
+let SIGN_IN_SERVICE = "/irext-server/app/admin_login";
 
 exports.adminLoginWorkUnit = function (userName, password, callback) {
     let queryParams = new Map();
@@ -28,7 +27,7 @@ exports.adminLoginWorkUnit = function (userName, password, callback) {
             queryParams);
 
     let signinInfo = {
-        user_name : userName,
+        userName : userName,
         password : password
     };
     requestSender.sendPostRequest(signinInfo,
@@ -95,32 +94,4 @@ exports.verifyTokenWithPermissionWorkUnit = function (id, token, permissions, ca
             callback(validateAdminAuthErr);
         }
     });
-};
-
-exports.sendChangePwMailWorkUnit = function (userName, callbackURL, callback) {
-    let queryParams = new Map();
-
-    let requestSender =
-        new RequestSender(EXTERNAL_SERVER_ADDRESS,
-            EXTERNAL_SERVER_PORT,
-            CHANGE_PASSWORD_SERVICE,
-            queryParams);
-
-    let userInfo = {
-        user_name : userName,
-        callback_url :callbackURL
-    };
-    requestSender.sendPostRequest(userInfo,
-        function(changePwRequestErr, changePwResponse) {
-            if (changePwRequestErr === errorCode.SUCCESS.code && null != changePwResponse) {
-                let resp = JSON.parse(changePwResponse);
-                if (undefined !== resp.status && errorCode.SUCCESS === resp.status) {
-                    callback(errorCode.SUCCESS);
-                } else {
-                    callback(errorCode.FAILED);
-                }
-            } else {
-                callback(errorCode.FAILED);
-            }
-        });
 };
