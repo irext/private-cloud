@@ -18,4 +18,4 @@ java -jar private-server.jar
 
 
 ### Usage
-Please refer to Web API in http://www.irext.net/doc/ for restful webservice call.
+Please refer to Web API in https://cc.irext.net/doc/ for restful webservice call.
