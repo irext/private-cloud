@@ -207,7 +207,6 @@ public class IRIndexingService extends AbstractBaseService {
             String cityCode = listIndexesRequest.getCityCode();
             int from = listIndexesRequest.getFrom();
             int count = listIndexesRequest.getCount();
-            int withParaData = listIndexesRequest.getWithParaData();
 
             IndexesResponse response = validateToken(id, token, IndexesResponse.class);
             if (response.getStatus().getCode() == Constants.ERROR_CODE_AUTH_FAILURE) {
@@ -215,7 +214,40 @@ public class IRIndexingService extends AbstractBaseService {
             }
 
             List<RemoteIndex> remoteIndexList =
-                    indexingLogic.listRemoteIndexes(categoryId, brandId, cityCode, from, count, withParaData);
+                    indexingLogic.listRemoteIndexes(categoryId, brandId, cityCode, from, count, 0);
+            if (remoteIndexList != null) {
+                response.getStatus().setCode(Constants.ERROR_CODE_SUCCESS);
+                response.setEntity(remoteIndexList);
+            } else {
+                response.getStatus().setCode(Constants.ERROR_CODE_NETWORK_ERROR);
+            }
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getExceptionResponse(IndexesResponse.class);
+        }
+    }
+
+    @PostMapping("/list_collected_indexes")
+    public IndexesResponse listCollectedRemoteIndexes(HttpServletRequest request,
+                                                      @HeaderParam("user-lang") String userLang,
+                                                      @RequestBody ListIndexesRequest listIndexesRequest) {
+        try {
+            int id = listIndexesRequest.getId();
+            String token = listIndexesRequest.getToken();
+            int categoryId = listIndexesRequest.getCategoryId();
+            int brandId = listIndexesRequest.getBrandId();
+            String cityCode = listIndexesRequest.getCityCode();
+            int from = listIndexesRequest.getFrom();
+            int count = listIndexesRequest.getCount();
+
+            IndexesResponse response = validateToken(id, token, IndexesResponse.class);
+            if (response.getStatus().getCode() == Constants.ERROR_CODE_AUTH_FAILURE) {
+                return response;
+            }
+
+            List<RemoteIndex> remoteIndexList =
+                    indexingLogic.listCollectedRemoteIndexes(categoryId, brandId, cityCode, from, count);
             if (remoteIndexList != null) {
                 response.getStatus().setCode(Constants.ERROR_CODE_SUCCESS);
                 response.setEntity(remoteIndexList);

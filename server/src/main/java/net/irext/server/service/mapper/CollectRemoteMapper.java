@@ -20,11 +20,11 @@ import java.util.List;
 @Controller
 public interface CollectRemoteMapper {
 
-    @Select("SELECT * FROM collect_remote WHERE category_id = #{categoryId} AND brand_id = #{brandId} AND status = 2")
+    @Select("SELECT * FROM collect_remote WHERE category_id = #{categoryId} AND brand_id = #{brandId} AND status = 2 LIMIT #{from}, #{count}")
     @ResultMap("BaseResultMap")
-    List<CollectRemote> selectCollectRemotesByBrand(Integer categoryId, Integer brandId);
+    List<CollectRemote> selectCollectRemotesByBrand(Integer categoryId, Integer brandId, Integer from, Integer count);
 
-    @Select("SELECT * FROM collect_remote WHERE category_id = #{categoryId} AND city_code = #{cityCode} AND status = 2")
+    @Select("SELECT * FROM collect_remote WHERE category_id = #{categoryId} AND city_code = #{cityCode} AND status = 2 LIMIT #{from}, #{count}")
     @ResultMap("BaseResultMap")
-    List<CollectRemote> selectCollectRemotesByCity(Integer categoryId, String cityCode);
+    List<CollectRemote> selectCollectRemotesByCity(Integer categoryId, String cityCode, Integer from, Integer count);
 }

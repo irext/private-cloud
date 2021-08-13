@@ -21,7 +21,7 @@ import java.util.List;
 @Mapper
 @Controller
 public interface BrandMapper {
-    @Select("SELECT * FROM brand WHERE status = 1 AND category_id = #{categoryId} ORDER BY id LIMIT #{from}, #{count}")
+    @Select("SELECT * FROM brand WHERE status = 1 AND category_id = #{categoryId} ORDER BY priority LIMIT #{from}, #{count}")
     @ResultMap("BaseResultMap")
     List<Brand> listBrands(int categoryId, int from, int count);
 }

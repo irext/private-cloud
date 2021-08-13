@@ -8,6 +8,7 @@ import net.irext.server.service.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -119,37 +120,41 @@ public class IndexingLogic {
 
     public List<RemoteIndex> listRemoteIndexes(int categoryId, int brandId, String cityCode,
                                                int from, int count, int withParaData) {
-        List<RemoteIndex> remoteIndexList;
+        List<RemoteIndex> remoteIndexList = new ArrayList<>();
         if (categoryId == Constants.CategoryID.STB.getValue()) {
             remoteIndexList = remoteIndexMapper.listRemoteIndexByCity(cityCode, from, count);
         } else {
             remoteIndexList = remoteIndexMapper.listRemoteIndexByBrand(categoryId, brandId, from, count);
         }
 
-        if (1 == withParaData) {
-            List<CollectRemote> collectRemoteList;
+        return remoteIndexList;
+    }
 
-            if (Constants.CategoryID.STB.getValue() != categoryId) {
-                collectRemoteList = collectRemoteMapper.selectCollectRemotesByBrand(categoryId, brandId);
-            } else {
-                collectRemoteList = collectRemoteMapper.selectCollectRemotesByCity(categoryId, cityCode);
-            }
+    public List<RemoteIndex> listCollectedRemoteIndexes(int categoryId, int brandId, String cityCode,
+                                               int from, int count) {
+        List<RemoteIndex> remoteIndexList = new ArrayList<>();
+        List<CollectRemote> collectRemoteList;
 
-            // convert collectRemote to remoteIndex
-            for (CollectRemote collectRemote : collectRemoteList) {
-                RemoteIndex remoteIndex = new RemoteIndex();
-                remoteIndex.setId(collectRemote.getId());
-                remoteIndex.setCategoryId(categoryId);
-                remoteIndex.setCategoryName(collectRemote.getCategoryName());
-                remoteIndex.setBrandId(brandId);
-                remoteIndex.setBrandName(collectRemote.getBrandName());
-                remoteIndex.setCityCode(collectRemote.getCityCode());
-                remoteIndex.setCityName(collectRemote.getCityName());
-                remoteIndex.setPriority(999);
-                remoteIndex.setSubCate((byte)Constants.BinaryType.TYPE_PARA_DATA.getValue());
-                remoteIndex.setStatus((byte) Constants.STATUS_PARA_DATA);
-                remoteIndexList.add(remoteIndex);
-            }
+        if (Constants.CategoryID.STB.getValue() != categoryId) {
+            collectRemoteList = collectRemoteMapper.selectCollectRemotesByBrand(categoryId, brandId, from, count);
+        } else {
+            collectRemoteList = collectRemoteMapper.selectCollectRemotesByCity(categoryId, cityCode, from, count);
+        }
+
+        // convert collectRemote to remoteIndex
+        for (CollectRemote collectRemote : collectRemoteList) {
+            RemoteIndex remoteIndex = new RemoteIndex();
+            remoteIndex.setId(collectRemote.getId());
+            remoteIndex.setCategoryId(categoryId);
+            remoteIndex.setCategoryName(collectRemote.getCategoryName());
+            remoteIndex.setBrandId(brandId);
+            remoteIndex.setBrandName(collectRemote.getBrandName());
+            remoteIndex.setCityCode(collectRemote.getCityCode());
+            remoteIndex.setCityName(collectRemote.getCityName());
+            remoteIndex.setPriority(999);
+            remoteIndex.setSubCate((byte)Constants.BinaryType.TYPE_PARA_DATA.getValue());
+            remoteIndex.setStatus((byte) Constants.STATUS_PARA_DATA);
+            remoteIndexList.add(remoteIndex);
         }
         return remoteIndexList;
     }
