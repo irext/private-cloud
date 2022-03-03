@@ -2,7 +2,7 @@
 
 This repository is the private cloud edition of IRext web services
 
-In order to deploy private cloud service to your IDC or ECS environment, a Docker or Kubernetes should be installed first, then download [docker image](http://irext-lib-release.oss-cn-hangzhou.aliyuncs.com/pc-docker-image/0.2.5/irext-private_0.2.5.tar.gz) and [data pack](http://irext-lib-release.oss-cn-hangzhou.aliyuncs.com/pc-docker-image/0.2.5/irext-private-data-20200922.tar.gz) and deploy with following commands:
+In order to deploy private cloud service to your IDC or ECS environment, a Docker or Kubernetes should be installed first, then download [docker image](http://irext-lib-release.oss-cn-hangzhou.aliyuncs.com/pc-docker-image/0.2.5/irext-private_0.2.5.tar.gz) and [data pack](https://irext-lib-release.oss-cn-hangzhou.aliyuncs.com/pc-docker-image/0.2.6/irext-private-data-20210815.tar.gz) and deploy with following commands:
 
 ````
 sudo docker load < irext-private_x.x.x.tar.gz
