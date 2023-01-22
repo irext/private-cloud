@@ -169,7 +169,7 @@ public class IndexingLogic {
 
     public String statRemoteRef(RemoteIndex remoteIndex) {
         try {
-            String url = "http://cc.irext.net:8300/irext/stat/stat_remotes";
+            String url = "http://site.irext.net:8300/irext/stat/stat_remotes";
             MediaType JSON
                     = MediaType.parse("application/json; charset=utf-8");
 
