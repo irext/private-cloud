@@ -18,4 +18,4 @@ irext-private:x.x.x /data/start_irext.sh
 
 Then access the local console with URL http://localhost:8080
 
-Refer to https://irext.net/doc/#local_console for more details.
+Refer to https://site.irext.net/doc/#local_console for more details.
