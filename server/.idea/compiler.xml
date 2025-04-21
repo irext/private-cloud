@@ -10,7 +10,6 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="private-server" target="1.8" />
       <module name="wrapper" target="1.5" />
     </bytecodeTargetLevel>
   </component>
