@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Filename:       IDecodeSessionRepositoryImpl.java
@@ -38,6 +39,7 @@ public class DecodeSessionRepositoryImpl implements IDecodeSessionRepository {
 
     public void add(final String decodeSessionId, Integer binaryId) {
         hashOperations.put(KEY, decodeSessionId, binaryId);
+        redisTemplate.expire(decodeSessionId, 7 , TimeUnit.DAYS);
     }
 
     public void delete(String decodeSessionId) {

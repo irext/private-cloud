@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Filename:       UserAppRepositoryImpl.java
@@ -39,6 +40,7 @@ public class UserAppRepositoryImpl implements IUserAppRepository {
 
     public void add(Integer id, String token) {
         hashOperations.put(KEY, token, id);
+        redisTemplate.expire(token, 7 , TimeUnit.DAYS);
     }
 
     public void delete(final String token) {

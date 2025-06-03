@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Filename:       IIRBinaryRepositoryImpl.java
@@ -41,6 +42,7 @@ public class IRBinaryRepositoryImpl implements IIRBinaryRepository {
 
     public void add(Integer id, RemoteIndex remoteIndex) {
         hashOperations.put(KEY, id, remoteIndex);
+        redisTemplate.expire(Integer.toString(id), 7 , TimeUnit.DAYS);
     }
 
     public void delete(final Integer id) {

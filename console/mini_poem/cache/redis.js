@@ -29,7 +29,7 @@ var Cache = function(_host, _port, _user, _password) {
 Cache.prototype = Object.create(BaseCache.prototype);
 
 Cache.prototype.set = function(key, value, ttl, callback) {
-    this.redisClient.set(key, value, function(err) {
+    this.redisClient.set(key, value, 'EX', ttl, function(err) {
         if(err) {
             logger.error("Redis set value failed with key " + key);
             callback(errorCode.FAILED);
