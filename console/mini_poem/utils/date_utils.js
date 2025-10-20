@@ -4,7 +4,7 @@
  */
 
 function formatDate(date, fmt) {
-    var o = {
+    let o = {
         "M+" : date.getMonth() + 1,
         "d+" : date.getDate(),
         "h+" : date.getHours(),
@@ -15,25 +15,25 @@ function formatDate(date, fmt) {
     };
     if(/(y+)/.test(fmt))
         fmt=fmt.replace(RegExp.$1, (date.getFullYear()+"").substr(4 - RegExp.$1.length));
-    for(var k in o)
+    for(let k in o)
         if(new RegExp("("+ k +")").test(fmt))
             fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
     return fmt;
 }
 
 function getNextDay(dateString) {
-    var nextDayStr;
-    var nextMonthStr;
-    var nextYearStr;
-    var currentDate = new Date(dateString);
-    var nextDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
-    var nextDay = nextDate.getDate();
+    let nextDayStr;
+    let nextMonthStr;
+    let nextYearStr;
+    let currentDate = new Date(dateString);
+    let nextDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+    let nextDay = nextDate.getDate();
     if(nextDay < 10) {
         nextDayStr = "0" + nextDay;
     } else {
         nextDayStr = nextDay;
     }
-    var nextMonth = nextDate.getMonth() + 1;
+    let nextMonth = nextDate.getMonth() + 1;
     if(nextMonth < 10) {
         nextMonthStr = "0" + nextMonth;
     } else {
@@ -44,18 +44,18 @@ function getNextDay(dateString) {
 }
 
 function getPreviousDay(dateString) {
-    var lastDayStr;
-    var lastMonthStr;
-    var lastYearStr;
-    var currentDate = new Date(dateString);
-    var lastDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
-    var lastDay = lastDate.getDate();
+    let lastDayStr;
+    let lastMonthStr;
+    let lastYearStr;
+    let currentDate = new Date(dateString);
+    let lastDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+    let lastDay = lastDate.getDate();
     if(lastDay < 10) {
         lastDayStr = "0" + lastDay;
     } else {
         lastDayStr = lastDay;
     }
-    var lastMonth = lastDate.getMonth() + 1;
+    let lastMonth = lastDate.getMonth() + 1;
     if(lastMonth < 10) {
         lastMonthStr = "0" + lastMonth;
     } else {
@@ -70,9 +70,9 @@ function getDateDiffer(startTime, endTime, diffType) {
     endTime = endTime.replace(/\-/g, "/");
 
     diffType = diffType.toLowerCase();
-    var sTime = new Date(startTime);
-    var eTime = new Date(endTime);
-    var divNum = 1;
+    let sTime = new Date(startTime);
+    let eTime = new Date(endTime);
+    let divNum = 1;
     switch (diffType) {
         case "second":
             divNum = 1000;
@@ -94,7 +94,7 @@ function getDateDiffer(startTime, endTime, diffType) {
 
 function dateDiff(sDate1, sDate2) {
 
-    var aDate, oDate1, oDate2, iDays;
+    let aDate, oDate1, oDate2, iDays;
     aDate = sDate1.split("-");
     oDate1 = new Date(aDate[1] + '-' + aDate[2] + '-' + aDate[0]);  //转换为yyyy-MM-dd格式
     aDate = sDate2.split("-");

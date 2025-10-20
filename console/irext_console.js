@@ -4,23 +4,23 @@
  */
 
 // system inclusion
-var express= require('express');
-var app = module.exports = express();
-var http = require('http').Server(app);
-var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
+let express= require('express');
+let app = module.exports = express();
+let http = require('http').Server(app);
+let bodyParser = require('body-parser');
+let methodOverride = require('method-override');
 
 // global inclusion
 require('./mini_poem/configuration/constants');
-var System = require('./mini_poem/utils/system_utils');
-var dbConn = require('./mini_poem/db/mysql/mysql_connection');
+let System = require('./mini_poem/utils/system_utils');
+let dbConn = require('./mini_poem/db/mysql/mysql_connection');
 
 // local inclusion
-var systemConfig = require('./configuration/system_configs');
-var Enums = require('./constants/enums');
-var ErrorCode = require('./constants/error_code');
-var enums = new Enums();
-var errorCode = new ErrorCode();
+let systemConfig = require('./configuration/system_configs');
+let Enums = require('./constants/enums');
+let ErrorCode = require('./constants/error_code');
+let enums = new Enums();
+let errorCode = new ErrorCode();
 
 SERVER = enums.SERVER_MAIN;
 
@@ -33,23 +33,23 @@ app.use(methodOverride());
 app.use(tokenValidation);
 app.use("/", express.static(__dirname + '/web/'));
 systemConfig.setupEnvironment();
-var serverListenPort = LISTEN_PORT;
+let serverListenPort = LISTEN_PORT;
 
 console.log("initializing MySQL connection to : " + MYSQL_DB_SERVER_ADDRESS + ":" + MYSQL_DB_NAME);
 dbConn.setMySQLParameter(MYSQL_DB_SERVER_ADDRESS, MYSQL_DB_NAME, MYSQL_DB_USER, MYSQL_DB_PASSWORD);
 
 require('./routes');
 
-var certificateLogic = require('./work_unit/authentication_logic.js');
+let certificateLogic = require('./work_unit/authentication_logic.js');
 
-// kick start the engine
-System.startupHttp(http, serverListenPort, "irext Console V1.2.7");
+// kickstart the engine
+System.startupHttp(http, serverListenPort, "irext Console V1.5.0");
 
 ////////////////// authentication middleware //////////////////
 function tokenValidation (req, res, next) {
-    var bodyParam;
-    var adminID = null;
-    var token = null;
+    let bodyParam;
+    let adminID = null;
+    let token = null;
     bodyParam = req.body;
 
     if (null != bodyParam) {
@@ -73,14 +73,14 @@ function tokenValidation (req, res, next) {
         token = req.query.token;
     }
     if (req.url.indexOf("/irext/int") !== -1) {
-        var contentType = req.get("content-type");
+        let contentType = req.get("content-type");
         if (null != contentType && contentType.indexOf("multipart/form-data") != -1) {
             // request of content type of multipart/form-data would be validated inside each service
             next();
         } else {
             certificateLogic.verifyTokenWorkUnit(adminID, token, function(validateTokenErr) {
                 if(errorCode.SUCCESS.code !== validateTokenErr.code) {
-                    var fakeResponse = {
+                    let fakeResponse = {
                         status: validateTokenErr,
                         entity: null
                     };
@@ -92,12 +92,12 @@ function tokenValidation (req, res, next) {
             });
         }
     } else if (req.url.indexOf("/irext/nav/nav_to_url") !== -1) {
-        var page = bodyParam.page;
-        var pageCode = page.indexOf("code");
-        var pageDoc = page.indexOf("doc");
-        var pageStat = page.indexOf("stat");
+        let page = bodyParam.page;
+        let pageCode = page.indexOf("code");
+        let pageDoc = page.indexOf("doc");
+        let pageStat = page.indexOf("stat");
 
-        var permissions = "";
+        let permissions = "";
 
         if (-1 !== pageCode) {
             permissions = ",0";

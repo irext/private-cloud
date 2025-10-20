@@ -117,6 +117,7 @@ function doSignIn(userName, password) {
         contentType: "application/json; charset=utf-8",
         timeout: 20000,
         success: function(response) {
+            console.log(JSON.stringify(response))
             if(response.status.code === 0) {
                 token = response.entity.token;
                 adminID = response.entity.id;

@@ -1,6 +1,7 @@
 package net.irext.server.service.businesslogic;
 
 import com.squareup.okhttp.*;
+import jakarta.servlet.ServletContext;
 import net.irext.decode.sdk.bean.TemperatureRange;
 import net.irext.server.service.mapper.CollectKeyMapper;
 import net.irext.server.service.mapper.DecodeRemoteMapper;
@@ -18,7 +19,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
-import javax.servlet.ServletContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

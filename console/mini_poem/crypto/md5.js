@@ -9,7 +9,7 @@ function MD5(sMessage, fullSize) {
     }
 
     function AddUnsigned(lX, lY) {
-        var lX4, lY4, lX8, lY8, lResult;
+        let lX4, lY4, lX8, lY8, lResult;
         lX8 = (lX & 0x80000000);
         lY8 = (lY & 0x80000000);
         lX4 = (lX & 0x40000000);
@@ -59,14 +59,14 @@ function MD5(sMessage, fullSize) {
     }
 
     function ConvertToWordArray(sMessage) {
-        var lWordCount;
-        var lMessageLength = sMessage.length;
-        var lNumberOfWords_temp1 = lMessageLength + 8;
-        var lNumberOfWords_temp2 = (lNumberOfWords_temp1 - (lNumberOfWords_temp1 % 64)) / 64;
-        var lNumberOfWords = (lNumberOfWords_temp2 + 1) * 16;
-        var lWordArray = Array(lNumberOfWords - 1);
-        var lBytePosition = 0;
-        var lByteCount = 0;
+        let lWordCount;
+        let lMessageLength = sMessage.length;
+        let lNumberOfWords_temp1 = lMessageLength + 8;
+        let lNumberOfWords_temp2 = (lNumberOfWords_temp1 - (lNumberOfWords_temp1 % 64)) / 64;
+        let lNumberOfWords = (lNumberOfWords_temp2 + 1) * 16;
+        let lWordArray = Array(lNumberOfWords - 1);
+        let lBytePosition = 0;
+        let lByteCount = 0;
         while (lByteCount < lMessageLength) {
             lWordCount = (lByteCount - (lByteCount % 4)) / 4;
             lBytePosition = (lByteCount % 4) * 8;
@@ -82,7 +82,7 @@ function MD5(sMessage, fullSize) {
     }
 
     function WordToHex(lValue) {
-        var WordToHexValue = "", WordToHexValue_temp = "", lByte, lCount;
+        let WordToHexValue = "", WordToHexValue_temp = "", lByte, lCount;
         for (lCount = 0; lCount <= 3; lCount++) {
             lByte = (lValue >>> (lCount * 8)) & 255;
             WordToHexValue_temp = "0" + lByte.toString(16);
@@ -91,12 +91,12 @@ function MD5(sMessage, fullSize) {
         return WordToHexValue;
     }
 
-    var x = Array();
-    var k, AA, BB, CC, DD, a, b, c, d
-    var S11 = 7, S12 = 12, S13 = 17, S14 = 22;
-    var S21 = 5, S22 = 9 , S23 = 14, S24 = 20;
-    var S31 = 4, S32 = 11, S33 = 16, S34 = 23;
-    var S41 = 6, S42 = 10, S43 = 15, S44 = 21;
+    let x = Array();
+    let k, AA, BB, CC, DD, a, b, c, d
+    let S11 = 7, S12 = 12, S13 = 17, S14 = 22;
+    let S21 = 5, S22 = 9 , S23 = 14, S24 = 20;
+    let S31 = 4, S32 = 11, S33 = 16, S34 = 23;
+    let S41 = 6, S42 = 10, S43 = 15, S44 = 21;
 // Steps 1 and 2. Append padding bits and length and convert to words
     x = ConvertToWordArray(sMessage);
 // Step 3. Initialise
@@ -180,7 +180,7 @@ function MD5(sMessage, fullSize) {
         d = AddUnsigned(d, DD);
     }
 // Step 5. Output the 128 bit digest
-    var temp;
+    let temp;
     if (undefined != fullSize && null != fullSize) {
         temp = WordToHex(a) + WordToHex(b) + WordToHex(c) + WordToHex(d);
     } else {

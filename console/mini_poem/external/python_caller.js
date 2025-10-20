@@ -3,16 +3,16 @@
  * 2016-12-03
  */
 
-var pythonShell = require('python-shell');
+let pythonShell = require('python-shell');
 
-var constants = require('../configuration/constants.js');
-var logger = require('../logging/logger4js').helper;
+let constants = require('../configuration/constants.js');
+let logger = require('../logging/logger4js').helper;
 
-var ErrorCode = require('../configuration/error_code.js');
+let ErrorCode = require('../configuration/error_code.js');
 
-var errorCode = new ErrorCode();
+let errorCode = new ErrorCode();
 
-var PythonCaller = function() {
+let PythonCaller = function() {
 
 };
 
@@ -27,12 +27,12 @@ var PythonCaller = function() {
  * return :             Error code of python caller
  */
 PythonCaller.prototype.call = function() {
-    var userArgIndex = 0;
-    var numArgs = arguments.length;
-    var callback = null;
-    var scriptPath = null;
-    var scriptName = null;
-    var userArguments = [];
+    let userArgIndex = 0;
+    let numArgs = arguments.length;
+    let callback = null;
+    let scriptPath = null;
+    let scriptName = null;
+    let userArguments = [];
     if(numArgs < 3) {
         logger.error("internal error while calling python script from application : no script specified");
         // TODO: specify the error code for this type of error
@@ -51,12 +51,12 @@ PythonCaller.prototype.call = function() {
                 throw errorCode.PYTHON_SCRIPT_PATH_NOT_SPECIFIED;
             } else {
                 // parse user arguments from python caller
-                var args = arguments[2];
+                let args = arguments[2];
                 for(userArgIndex = 0; userArgIndex < args.length; userArgIndex++) {
                     userArguments.push(args[userArgIndex]);
                 }
                 // logger.info("user arguments = " + userArguments);
-                var options = {
+                let options = {
                     mode: 'text',
                     pythonPath: PYTHON_PATH,
                     pythonOptions: ['-u'],

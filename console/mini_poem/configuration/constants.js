@@ -20,7 +20,7 @@ global.FILE_TEMP_PATH = "";
 
 // db : MySQL
 global.MYSQL_DB_SERVER_ADDRESS = "127.0.0.1";
-global.MYSQL_DB_NAME = "default_db";
+global.MYSQL_DB_NAME = "db_default";
 global.MYSQL_DB_USER = "root";
 global.MYSQL_DB_PASSWORD = "root";
 

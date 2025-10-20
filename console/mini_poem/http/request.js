@@ -4,17 +4,17 @@
  */
 
 // system inclusion
-var queryString = require('querystring');
-var http = require('http');
-var request = require('request');
+let queryString = require('querystring');
+let http = require('http');
+let request = require('axios');
 
 // local inclusion
-var Map = require('../mem/map.js');
-var ErrorCode = require('../configuration/error_code.js');
+let Map = require('../mem/map.js');
+let ErrorCode = require('../configuration/error_code.js');
 
-var errorCode = new ErrorCode();
+let errorCode = new ErrorCode();
 
-var logger = require('../logging/logger4js').helper;
+let logger = require('../logging/logger4js').helper;
 
 /**
  *
@@ -24,7 +24,7 @@ var logger = require('../logging/logger4js').helper;
  * @param _queryParams : map of query parameters
  * @constructor
  */
-var Request = function(_host, _port, _service, _queryParams) {
+let Request = function(_host, _port, _service, _queryParams) {
     this.host = _host;
     this.port = _port;
     this.service = _service;
@@ -32,9 +32,9 @@ var Request = function(_host, _port, _service, _queryParams) {
 };
 
 Request.prototype.urlizeQueryParams = function() {
-    var i = 0;
-    var urlParams = '';
-    var paramElement = null;
+    let i = 0;
+    let urlParams = '';
+    let paramElement = null;
     if(undefined == this.queryParams || null == this.queryParams) {
         return  '';
     }
@@ -54,9 +54,9 @@ Request.prototype.urlizeQueryParams = function() {
 };
 
 Request.prototype.sendGetRequest = function(options, callback) {
-    var data = '';
-    var httpTag = options.https ? 'https://' : 'http://';
-    var url = httpTag + this.host + ':' + this.port + this.service +
+    let data = '';
+    let httpTag = options.https ? 'https://' : 'http://';
+    let url = httpTag + this.host + ':' + this.port + this.service +
         this.urlizeQueryParams();
 
     if(options.https) {
@@ -94,10 +94,10 @@ Request.prototype.sendGetRequest = function(options, callback) {
 };
 
 Request.prototype.sendPostRequest = function(bodyData, callback) {
-    var requestData = JSON.stringify(bodyData);
-    var url = this.service +
+    let requestData = JSON.stringify(bodyData);
+    let url = this.service +
         this.urlizeQueryParams();
-    var options = {
+    let options = {
         host: this.host,
         port: this.port,
         path: url,
@@ -107,8 +107,8 @@ Request.prototype.sendPostRequest = function(bodyData, callback) {
         }
     };
 
-    var req = http.request(options, function(res) {
-        var data = '';
+    let req = http.request(options, function(res) {
+        let data = '';
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
             data += chunk;
@@ -130,9 +130,9 @@ Request.prototype.sendPostRequest = function(bodyData, callback) {
 };
 
 Request.prototype.postMultipartForm = function(formData, callback) {
-    var url = this.service +
+    let url = this.service +
         this.urlizeQueryParams();
-    var req = request.post({url: url, formData: formData}, function optionalCallback(err, res, body) {
+    let req = request.post({url: url, formData: formData}, function optionalCallback(err, res, body) {
         if (err) {
             console.error('exception occured in http request : ' + e);
             callback(errorCode.FAILED, null);
@@ -148,18 +148,18 @@ Request.prototype.postMultipartForm = function(formData, callback) {
 
 // post simple file to HTTP server
 Request.prototype.postSimpleFile = function(fileName, fileContent, contentType, options, callback) {
-    var httpTag = options.https ? 'https://' : 'http://';
-    var url = httpTag + this.host + ':' + this.port + this.service +
+    let httpTag = options.https ? 'https://' : 'http://';
+    let url = httpTag + this.host + ':' + this.port + this.service +
         this.urlizeQueryParams();
 
-    var req = request.post(url, function (err, resp, body) {
+    let req = request.post(url, function (err, resp, body) {
         if (err) {
             callback(errorCode.FAILED, resp);
         } else {
             callback(errorCode.SUCCESS, resp);
         }
     });
-    var form = req.form();
+    let form = req.form();
     form.append('file', fileContent, {
         filename: fileName,
         contentType: contentType

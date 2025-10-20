@@ -4,13 +4,13 @@
  */
 
 function objectMemberCount(conditions) {
-    var memberCount = 0;
-    for(var f in conditions) {
+    let memberCount = 0;
+    for(let f in conditions) {
         memberCount++;
     }
-    var whereClause = "";
-           var index = 0;
-           for(var field in conditions) {
+    let whereClause = "";
+           let index = 0;
+           for(let field in conditions) {
                whereClause += field + " = '" + conditions[field] + "'";
                if(index < memberCount - 1) {
                    whereClause += " AND ";

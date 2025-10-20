@@ -29,7 +29,6 @@ exports.adminLogin = function (req, res) {
 
     let loginResponse = new LoginResponse();
     authenticationLogic.adminLoginWorkUnit(userName, password, function (adminLoginErr, admin) {
-        logger.info("admin login successfully, entity = " + JSON.stringify(admin));
         loginResponse.status = adminLoginErr;
         loginResponse.entity = admin;
         res.send(loginResponse);

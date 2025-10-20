@@ -3,9 +3,9 @@
  * 2016-12-02
  */
 
-var dateUtils = require('./date_utils');
-var platform = require('platform');
-var UAParser = require('ua-parser-js');
+let dateUtils = require('./date_utils');
+let platform = require('platform');
+let UAParser = require('ua-parser-js');
 
 function startup(expressApp, port, serverName) {
     if(expressApp && expressApp.listen && typeof(expressApp.listen) == "function") {
@@ -32,8 +32,8 @@ function getOS() {
 }
 
 function getUAInfo(ua) {
-    var parser = new UAParser();
-    var result = parser.setUA(ua).getResult();
+    let parser = new UAParser();
+    let result = parser.setUA(ua).getResult();
     return result;
 }
 

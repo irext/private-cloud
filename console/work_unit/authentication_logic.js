@@ -9,6 +9,7 @@ let AdminAuth = require('../authentication/admin_auth.js');
 let RequestSender = require('../mini_poem/http/request.js');
 
 let ErrorCode = require('../constants/error_code.js');
+const {set} = require("express/lib/application");
 let logger = require('../mini_poem/logging/logger4js').helper;
 
 let errorCode = new ErrorCode();
@@ -18,6 +19,7 @@ let adminAuth = new AdminAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 let SIGN_IN_SERVICE = "/irext-server/app/admin_login";
 
 exports.adminLoginWorkUnit = function (userName, password, callback) {
+
     let queryParams = new Map();
 
     let requestSender =
@@ -47,20 +49,21 @@ exports.adminLoginWorkUnit = function (userName, password, callback) {
                     adminAuth.setAuthInfo(key, token, ttl, function(setAdminAuthErr) {
                         if (errorCode.SUCCESS.code === setAdminAuthErr.code) {
                             key = "admin_name_" + admin.id;
-                            name = admin.user_name;
+                            name = admin.userName;
                             adminAuth.setAuthInfo(key, name, ttl, function(setAdminNameErr) {
                                 if (errorCode.SUCCESS.code === setAdminNameErr.code) {
                                     admin.token = token;
                                 }
                                 callback(setAdminNameErr, admin);
                             });
+                        } else {
+                            callback(errorCode.FAILED, null);
                         }
                     });
                 } else {
                     callback(errorCode.FAILED, null);
                 }
             } else {
-                logger.error("admin sign in failed");
                 callback(errorCode.FAILED, null);
             }
         });

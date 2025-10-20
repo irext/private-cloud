@@ -1,6 +1,7 @@
 package net.irext.server.service.restapi;
 
 import com.google.gson.Gson;
+import jakarta.servlet.ServletContext;
 import net.irext.server.service.businesslogic.OperationLogic;
 import net.irext.server.service.cache.IDecodeSessionRepository;
 import net.irext.server.service.cache.IIRBinaryRepository;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletContext;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.File;
 import java.io.FileInputStream;

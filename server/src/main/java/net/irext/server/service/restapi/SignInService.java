@@ -1,5 +1,6 @@
 package net.irext.server.service.restapi;
 
+import jakarta.servlet.http.HttpServletRequest;
 import net.irext.server.service.Constants;
 import net.irext.server.service.businesslogic.UserLoginLogic;
 import net.irext.server.service.cache.IUserAppRepository;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Filename:       SignInServiceImpl.java

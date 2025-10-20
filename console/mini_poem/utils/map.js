@@ -3,7 +3,7 @@
  * 2014-03-14
  */
 
-var Map = function() {
+let Map = function() {
     this.elements = [];
 };
 
@@ -27,7 +27,7 @@ Map.prototype.put = function(_key, _value) {
 };
 
 Map.prototype.remove = function(_key) {
-    var bln = false;
+    let bln = false;
     try {
         for (i = 0; i < this.elements.length; i++) {
             if (this.elements[i].key == _key) {
@@ -74,7 +74,7 @@ Map.prototype.element = function(_index) {
 };
 
 Map.prototype.containsKey = function(_key) {
-    var bln = false;
+    let bln = false;
     try {
         for (i = 0; i < this.elements.length; i++) {
             if (this.elements[i].key == _key) {
@@ -88,7 +88,7 @@ Map.prototype.containsKey = function(_key) {
 };
 
 Map.prototype.containsValue = function(_value) {
-    var bln = false;
+    let bln = false;
     try {
         for (i = 0; i < this.elements.length; i++) {
             if (this.elements[i].value == _value) {
@@ -102,7 +102,7 @@ Map.prototype.containsValue = function(_value) {
 };
 
 Map.prototype.values = function() {
-    var arr = [];
+    let arr = [];
     for (i = 0; i < this.elements.length; i++) {
         arr.push(this.elements[i].value);
     }
@@ -110,7 +110,7 @@ Map.prototype.values = function() {
 };
 
 Map.prototype.keys = function() {
-    var arr = [];
+    let arr = [];
     for (i = 0; i < this.elements.length; i++) {
         arr.push(this.elements[i].key);
     }

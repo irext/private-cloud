@@ -1,5 +1,7 @@
 package net.irext.server.service.restapi;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
 import net.irext.server.service.Constants;
 import net.irext.server.service.businesslogic.IndexingLogic;
 import net.irext.server.service.model.*;
@@ -13,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HeaderParam;
 import java.util.List;
 

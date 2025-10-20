@@ -1,5 +1,7 @@
 package net.irext.server.service.cache.impl;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
 import net.irext.server.service.cache.IIRBinaryRepository;
 import net.irext.server.service.model.RemoteIndex;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +9,6 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 

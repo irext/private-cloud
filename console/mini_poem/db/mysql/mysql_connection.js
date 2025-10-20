@@ -3,13 +3,13 @@
  * 2014-09-22
  */
 
-var orm = require('orm');
-var logger = require('../../logging/logger4js').helper;
 require('../../configuration/constants');
+let orm = require('orm');
+let logger = require('../../logging/logger4js').helper;
 
-var ormOpt;
+let ormOpt;
 
-exports.setMySQLParameter = function(dbHost, dbName, dbUser, dbPassword) {
+exports.setMySQLParameter = function (dbHost, dbName, dbUser, dbPassword) {
     logger.info("initialize mysql connection, user = " + dbUser);
     ormOpt = {
         protocol: "mysql",
@@ -18,7 +18,7 @@ exports.setMySQLParameter = function(dbHost, dbName, dbUser, dbPassword) {
         user: dbUser,
         password: dbPassword,
         charset: 'utf8',
-        query: { pool: false }
+        query: {pool: false}
     };
     exports.mysqlDB = orm.connect(ormOpt);
 };

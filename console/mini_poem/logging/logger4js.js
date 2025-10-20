@@ -3,21 +3,21 @@
  * 2014-08-30
  */
 
-var constants = require('../configuration/constants');
-var Enums = require('../configuration/enums');
-var log4js = require('log4js');
-var enums = new Enums();
-var dateUtils = require('../utils/date_utils');
+let constants = require('../configuration/constants');
+let Enums = require('../configuration/enums');
+let log4js = require('log4js');
+let enums = new Enums();
+let dateUtils = require('../utils/date_utils');
 
 var helper = helper || {};
 exports.helper = helper;
 
-var logRoot = "./logs/";
-var userDebugLogFolder = "user_debug/";
-var devLogFolder = "dev/";
-var productionLogFolder = "production/";
+let logRoot = "./logs/";
+let userDebugLogFolder = "user_debug/";
+let devLogFolder = "dev/";
+let productionLogFolder = "production/";
 
-var logFile = "common.log";
+let logFile = "common.log";
 
 log4js.configure({
     appenders: {
@@ -57,12 +57,12 @@ log4js.configure({
     replaceConsole: true
 });
 
-var userProductionLog = log4js.getLogger('userProductionLog');
-var userDebugLog = log4js.getLogger('userDebugLog');
-var userDevelopmentLog = log4js.getLogger('userDevelopmentLog');
+let userProductionLog = log4js.getLogger('userProductionLog');
+let userDebugLog = log4js.getLogger('userDebugLog');
+let userDevelopmentLog = log4js.getLogger('userDevelopmentLog');
 
 helper.info = function (msg) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
         console.log(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {
@@ -74,7 +74,7 @@ helper.info = function (msg) {
 };
 
 helper.error = function (msg) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
         console.log(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {
@@ -85,7 +85,7 @@ helper.error = function (msg) {
 };
 
 helper.warn = function (msg) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
         console.log(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {
@@ -96,7 +96,7 @@ helper.warn = function (msg) {
 };
 
 helper.debug = function (msg) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
         console.log(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {
@@ -107,7 +107,7 @@ helper.debug = function (msg) {
 };
 
 helper.trace = function (msg) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
         console.log(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {
@@ -118,7 +118,7 @@ helper.trace = function (msg) {
 };
 
 helper.fatal = function (msg) {
-    var date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
+    let date = dateUtils.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss S");
     if (enums.APP_DEVELOPMENT_MODE === ENV) {
         console.log(date + ": " + msg);
     } else if (enums.APP_PRODUCTION_MODE === ENV) {

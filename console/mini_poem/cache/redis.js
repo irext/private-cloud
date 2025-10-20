@@ -4,18 +4,18 @@
  */
 
 require('../configuration/constants');
-var ErrorCode = require('../configuration/error_code');
-var Enums = require('../configuration/enums');
-var BaseCache = require('./base_cache.js');
+let ErrorCode = require('../configuration/error_code');
+let Enums = require('../configuration/enums');
+let BaseCache = require('./base_cache.js');
 
-var redis = require("redis");
+let redis = require("redis");
 
-var logger = require('../logging/logger4js').helper;
+let logger = require('../logging/logger4js').helper;
 
-var errorCode = new ErrorCode();
-var enums = new Enums();
+let errorCode = new ErrorCode();
+let enums = new Enums();
 
-var Cache = function(_host, _port, _user, _password) {
+let Cache = function(_host, _port, _user, _password) {
     this.redisClient = redis.createClient(_port, _host, {detect_buffers: true});
     // initialize client according to run-time ENV
     // in _user indicates the redis instance:token pair value

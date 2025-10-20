@@ -26,7 +26,7 @@ function Map() {
     };
 
     this.remove = function(_key) {
-        var bln = false;
+        let bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
                 if (this.elements[i].key == _key) {
@@ -73,7 +73,7 @@ function Map() {
     };
 
     this.containsKey = function(_key) {
-        var bln = false;
+        let bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
                 if (this.elements[i].key == _key) {
@@ -87,7 +87,7 @@ function Map() {
     };
 
     this.containsValue = function(_value) {
-        var bln = false;
+        let bln = false;
         try {
             for (i = 0; i < this.elements.length; i++) {
                 if (this.elements[i].value == _value) {
@@ -101,7 +101,7 @@ function Map() {
     };
 
     this.values = function() {
-        var arr = [];
+        let arr = [];
         for (i = 0; i < this.elements.length; i++) {
             arr.push(this.elements[i].value);
         }
@@ -109,7 +109,7 @@ function Map() {
     };
 
     this.keys = function() {
-        var arr = [];
+        let arr = [];
         for (i = 0; i < this.elements.length; i++) {
             arr.push(this.elements[i].key);
         }

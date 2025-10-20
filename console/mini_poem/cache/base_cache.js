@@ -3,7 +3,7 @@
  * 2014-12-01.
  */
 
-var BaseCache = function(_cacheType, _host, _port, _user, _password) {
+let BaseCache = function(_cacheType, _host, _port, _user, _password) {
     throw new Error("Abstract class");
 };
 
