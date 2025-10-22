@@ -9,7 +9,7 @@ Private server is a runtime that any user can deploy and access it with IRext re
 - A Linux OS is preferred
 
 ### Deploy
-- Fetch or compile libirda_decoder.so out of source code of irext/core.
+- Fetch or compile libirdecode_jni.so out of source code of irext/core.
 - Run following command when you fetched or compiled the private-server.jar out of the private server Spring-Boot project.
 
 ```shell script

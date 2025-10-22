@@ -54,7 +54,7 @@ public class IRDecode {
     }
 
     private IRDecode() {
-        String libPath = "/data/irext/libir_decoder.so";
+        String libPath = "/data/irext/libirdecode_jni.so";
         LoggerUtil.getInstance().trace(TAG, "loading server library " + libPath);
         System.load(libPath);
     }
