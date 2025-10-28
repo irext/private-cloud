@@ -1,0 +1,24 @@
+{
+    "app": {
+        "name": "IRext"
+    },
+    "page_index": {
+        "title": "IRext Local Console - 1.5.0",
+        "d_signin_title": "Sign in",
+        "d_signin_email": "Email",
+        "d_signin_password": "Password",
+        "d_signin_signin": "Sign in",
+        "d_changepw_title": "Reset PW",
+        "d_changepw_hint": "A new password will be generated and an email will be sent to your mail box, confirm it ?",
+        "d_changepw_confirm": "OK",
+        "d_changepw_cancel": "Cancel",
+        "common_signout": "Sign out",
+        "d_signin_success": "Sign in successfully, redirecting to console in 3 seconds",
+        "d_signin_failed": "Failed to sign in, please check your email and password",
+        "d_signup_email_sent": "New password is sent to your email, please check",
+        "d_signup_email_occupied": "This email address is already in use",
+        "d_signin_fill_email_pw": "Please fill email and password",
+        "d_signin_fill_email": "Please fill email",
+        "d_signup_email_failed": "Failed to reset password, please check your email address"
+    }
+}
