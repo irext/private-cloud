@@ -3,7 +3,7 @@ package net.irext.decode.sdk;
 import net.irext.decode.sdk.bean.ACStatus;
 import net.irext.decode.sdk.bean.TemperatureRange;
 import net.irext.decode.sdk.utils.Constants;
-import net.irext.server.service.utils.LoggerUtil;
+import net.irext.server.utils.LoggerUtil;
 
 /**
  * Filename:       IRDecode.java
