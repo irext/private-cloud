@@ -32,7 +32,7 @@ public class Constants {
     public static final int STATUS_INVALID = 0;
     public static final int STATUS_PARA_DATA = 15;
 
-    public static final String REMOTE_REF_URL = "http://192.168.75.128:8083/irext-server/remote_ref/create_remote_ref";
+    public static final String REMOTE_REF_URL = "http://srv.irext.net/irext-server/remote_ref/create_remote_ref";
 
     public enum CategoryID {
         AIR_CONDITIONER(1),

@@ -6,9 +6,11 @@ import net.irext.server.request.CreateRemoteReferenceRequest;
 import net.irext.server.utils.Constants;
 import net.irext.server.mapper.*;
 import net.irext.server.model.*;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,7 +201,7 @@ public class IndexingLogic {
             remoteRef.setBrandName(brandName);
             remoteRef.setCityCode(remoteIndex.getCityCode());
             remoteRef.setOperatorId(remoteIndex.getOperatorId());
-            remoteRef.setRemoteCode(remoteIndex.getId().toString());
+            remoteRef.setRemoteCode("");
             remoteRef.setRemote(remoteIndex.getRemote());
             remoteRef.setProtocol(remoteIndex.getProtocol());
             remoteRef.setRemoteMap(remoteIndex.getRemoteMap());
@@ -220,11 +222,29 @@ public class IndexingLogic {
                     .url(url)
                     .post(body)
                     .build();
-            Response response = client.newCall(request).execute();
-            return response.body().string();
+
+            client.newCall(request).enqueue(new Callback() {
+
+                @Override
+                public void onFailure(Request request, IOException e) {
+                    System.err.println("remoteRef request failed: " + e.getMessage());
+                }
+
+                @Override
+                public void onResponse(Response response) throws IOException {
+                    try {
+                        if (!response.isSuccessful()) {
+                            throw new IOException("unexpected code from remoteRef response: " + response);
+                        }
+
+                    } catch (Exception e) {
+                        System.err.println("error processing remoteRef response: " + e.getMessage());
+                    }
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return  null;
+        return null;
     }
 }

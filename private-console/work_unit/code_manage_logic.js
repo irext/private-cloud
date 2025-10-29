@@ -40,9 +40,10 @@ let adminAuth = new AdminAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 // relative XML file path
 let PROTOCOL_PATH = "protocol";
 
-let contributeProtocolService = "/irext-server/contribute/contribute_protocol";
+let contributeProtocolService = "/irext-server/contribution/contribute_protocol";
 let contributeBrandsService = "/irext-server/contribution/contribute_brands";
 let contributeRemoteIndexesService = "/irext-server/contribution/contribute_remote_indexes";
+let createRemoteRefService = "/irext-server/remote_ref/create_remote_ref";
 
 exports.listCategoriesWorkUnit = function (lang, from, count, callback) {
     let conditions = {
@@ -331,7 +332,7 @@ exports.searchRemoteIndexesWorkUnit = function (lang, remoteMap, from, count, ca
         });
 };
 
-exports.downloadRemoteBinCachedWorkUnit = function (remoteIndexID, callback) {
+exports.downloadRemoteBinCachedWorkUnit = function (adminId, token, remoteIndexID, callback) {
     RemoteIndex.getRemoteIndexByID(remoteIndexID, function (getRemoteIndexErr, remoteIndex) {
         if (errorCode.SUCCESS.code === getRemoteIndexErr.code && null != remoteIndex) {
             let fileName = "irda_" + remoteIndex.protocol + "_" + remoteIndex.remote + ".bin";
@@ -342,6 +343,93 @@ exports.downloadRemoteBinCachedWorkUnit = function (remoteIndexID, callback) {
             fs.exists(localBinFileName, function (exists) {
                 if (exists) {
                     logger.info("file " + localBinFileName + " already exists, serve directly");
+                    // create remote reference of this remote index
+                    let categoryId = 0;
+                    let categoryName = '';
+                    let brandId = 0;
+                    let brandName = '';
+                    let name = '';
+                    let remoteRef = null;
+                    RemoteIndex.getRemoteIndexByID(remoteIndexID, function (getRemoteIndexErr, remoteIndex) {
+                        if (errorCode.SUCCESS.code === getRemoteIndexErr.code) {
+                            categoryId = remoteIndex.category_id;
+                            brandId = remoteIndex.brand_id;
+                            Category.getCategoryByID(categoryId, function (getCategoryErr, category) {
+                                if (errorCode.SUCCESS.code === getCategoryErr.code) {
+                                    categoryName = category.name;
+                                    if (enums.CATEGORY_STB !== categoryId) {
+                                        Brand.getBrandByID(brandId, function (getBrandErr, brand) {
+                                            if (errorCode.SUCCESS.code === getBrandErr.code) {
+                                                brandName = brand.name;
+                                                name = brandName + categoryName;
+                                                remoteRef = {
+                                                    "name": name,
+                                                    "categoryId": categoryId,
+                                                    "categoryName": categoryName,
+                                                    "brandId": brandId,
+                                                    "brandName": brandName,
+                                                    "cityCode": "",
+                                                    "operatorId": 0,
+                                                    "remoteCode": "",
+                                                    "subCate": remoteIndex.sub_cate,
+                                                    "protocol": remoteIndex.protocol,
+                                                    "remote": remoteIndex.remote,
+                                                    "remoteMap": remoteIndex.remote_map,
+                                                }
+                                                let queryParams = new Map();
+                                                let requestSender =
+                                                    new RequestSender(EXTERNAL_SERVER_ADDRESS,
+                                                        EXTERNAL_SERVER_PORT,
+                                                        createRemoteRefService,
+                                                        queryParams);
+                                                let createRemoteRefRequest = {
+                                                    "id": adminId,
+                                                    "token": token,
+                                                    "remoteRef": remoteRef,
+                                                };
+                                                requestSender.sendPostRequest(createRemoteRefRequest,
+                                                    function (createRemoteRefErr, createRemoteRefResponse) {
+                                                        logger.info(createRemoteRefErr);
+                                                    });
+                                            }
+                                        });
+                                    } else {
+                                        name = categoryName + "-" + remoteIndex.city_code + "-" + remoteIndex.operator_id;
+                                        remoteRef = {
+                                            "name": name,
+                                            "categoryId": categoryId,
+                                            "categoryName": categoryName,
+                                            "brandId": 0,
+                                            "brandName": "",
+                                            "cityCode": remoteIndex.city_code,
+                                            "operatorId": remoteIndex.operator_id,
+                                            "remoteCode": "",
+                                            "subCate": remoteIndex.sub_cate,
+                                            "protocol": remoteIndex.protocol,
+                                            "remote": remoteIndex.remote,
+                                            "remoteMap": remoteIndex.remote_map,
+                                        }
+                                        let queryParams = new Map();
+                                        let requestSender =
+                                            new RequestSender(EXTERNAL_SERVER_ADDRESS,
+                                                EXTERNAL_SERVER_PORT,
+                                                createRemoteRefService,
+                                                queryParams);
+                                        let createRemoteRefRequest = {
+                                            "id": adminId,
+                                            "token": token,
+                                            "remoteRef": remoteRef,
+                                        };
+                                        requestSender.sendPostRequest(createRemoteRefRequest,
+                                            function (createRemoteRefErr, createRemoteRefResponse) {
+                                                logger.info(createRemoteRefErr);
+                                            });
+                                    }
+                                }
+                            });
+                        }
+                    });
+
                     callback(error, localBinFileName);
                 } else {
                     logger.info("file " + localBinFileName + " does not exist");
@@ -848,7 +936,7 @@ exports.publishBrandsWorkUnit = function (adminID, callback) {
                             function (contributeBrandsRequestErr, contributeBrandsResponse) {
                                 logger.info(contributeBrandsRequestErr);
                                 callback(errorCode.SUCCESS);
-                            });
+                        });
                         callback(errorCode.SUCCESS);
                     });
                 } else {
