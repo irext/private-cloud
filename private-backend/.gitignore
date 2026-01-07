@@ -97,3 +97,8 @@ fabric.properties
 target
 private-backend.iml
 private-server.iml
+
+# Downloaded bin cache
+bin_cache/
+bin_cache/*
+bin_cache/**

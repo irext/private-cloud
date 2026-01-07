@@ -128,7 +128,7 @@ public class OperationLogic {
                     IRDecode irDecode = IRDecode.getInstance();
                     int ret = irDecode.openBinary(categoryId, subCate, binaryContent, binaryContent.length);
                     if (0 == ret) {
-                        decoded = irDecode.decodeBinary(keyCode, acStatus, changeWindDirection);
+                        decoded = irDecode.decodeBinary(keyCode, acStatus);
                     }
                     irDecode.closeBinary();
                     return decoded;
@@ -270,7 +270,6 @@ public class OperationLogic {
             return null;
         }
     }
-
     private InputStream getBinInputStream(String fileName) {
         String downloadURL = IR_BIN_DOWNLOAD_PREFIX + fileName;
         try {

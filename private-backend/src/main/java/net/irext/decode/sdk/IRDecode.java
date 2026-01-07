@@ -27,12 +27,12 @@ public class IRDecode {
 
     private native int irOpenBinary(int category, int subCate, byte[] binaries, int binLength);
 
-    private native int[] irDecode(int keyCode, ACStatus acStatus, int changeWindDirection);
+    private native int[] irDecode(int keyCode, ACStatus acStatus);
 
     private native void irClose();
 
     private native int[] irDecodeCombo(int category, int subCate, byte[] binaries, int binLength,
-                                       int keyCode, ACStatus acStatus, int changeWindDirection);
+                                       int keyCode, ACStatus acStatus);
 
     private native TemperatureRange irACGetTemperatureRange(int acMode);
 
@@ -71,22 +71,22 @@ public class IRDecode {
         return irOpenBinary(category, subCate, binaries, binLength);
     }
 
-    public int[] decodeBinary(int keyCode, ACStatus acStatus, int changeWindDir) {
+    public int[] decodeBinary(int keyCode, ACStatus acStatus) {
         int[] decoded;
         synchronized (mSync) {
             acStatus = ensureACStatus(acStatus, keyCode);
-            decoded = irDecode(keyCode, acStatus, changeWindDir);
+            decoded = irDecode(keyCode, acStatus);
         }
         return decoded;
     }
 
     public int[] decodeBinary(int category, int subCate, byte[] binaries, int binLength,
-            int keyCode, ACStatus acStatus, int changeWindDir) {
+            int keyCode, ACStatus acStatus) {
         int[] decoded;
         synchronized (mSync) {
             acStatus = ensureACStatus(acStatus, keyCode);
             decoded = irDecodeCombo(category, subCate, binaries, binLength,
-                    keyCode, acStatus, changeWindDir);
+                    keyCode, acStatus);
         }
         return decoded;
     }

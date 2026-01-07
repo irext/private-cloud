@@ -31,7 +31,7 @@ public class Constants {
     public static final String ERROR_CODE_INVALID_BRAND_TEXT = "invalid brand";
     public static final String ERROR_CODE_INVALID_PARAMETER_TEXT = "invalid parameter";
 
-    public static final String ERROR_CODE_INVALID_SESSION_TEXT = "invalid server session";
+    public static final String ERROR_CODE_INVALID_SESSION_TEXT = "invalid decode session";
 
     public enum CategoryID {
         AIR_CONDITIONER(1),
@@ -46,7 +46,10 @@ public class Constants {
         LIGHT(10),
         BSTB(11),
         CLEANING_ROBOT(12),
-        AIR_CLEANER(13);
+        AIR_CLEANER(13),
+        DYSON_SERIES(14),
+        CAMERA(15),
+        HEATER(16);
 
         private final int id;
 
