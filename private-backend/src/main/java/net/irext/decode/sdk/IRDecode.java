@@ -10,7 +10,7 @@ import net.irext.server.utils.LoggerUtil;
  * Revised:        Date: 2017-04-22
  * Revision:       Revision: 1.0
  * <p>
- * Description:    Wrapper-sdk of IR server
+ * Description:    Wrapper-sdk of IR decode
  * <p>
  * Revision log:
  * 2017-04-23: created by strawmanbobi
@@ -45,7 +45,6 @@ public class IRDecode {
     private native int irACGetSupportedWindDirection(int acMode);
 
     private static IRDecode mInstance;
-
     public static IRDecode getInstance() {
         if (null == mInstance) {
             mInstance = new IRDecode();
@@ -85,8 +84,7 @@ public class IRDecode {
         int[] decoded;
         synchronized (mSync) {
             acStatus = ensureACStatus(acStatus, keyCode);
-            decoded = irDecodeCombo(category, subCate, binaries, binLength,
-                    keyCode, acStatus);
+            decoded = irDecodeCombo(category, subCate, binaries, binLength, keyCode, acStatus);
         }
         return decoded;
     }
