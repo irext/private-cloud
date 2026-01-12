@@ -116,8 +116,7 @@ public class OperationLogic {
         return remoteIndex;
     }
 
-    public int[] decodeIR(RemoteIndex remoteIndex, ACStatus acStatus,
-                        int keyCode, int changeWindDirection) {
+    public int[] decodeIR(RemoteIndex remoteIndex, ACStatus acStatus, int keyCode) {
         try {
             int[] decoded = null;
             synchronized (this) {

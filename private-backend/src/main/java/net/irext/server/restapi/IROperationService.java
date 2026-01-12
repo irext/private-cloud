@@ -147,10 +147,14 @@ public class IROperationService extends AbstractBaseService {
             int indexId = decodeRequest.getIndexId();
             ACStatus acStatus = decodeRequest.getAcStatus();
             int keyCode = decodeRequest.getKeyCode();
-            int changeWindDir = decodeRequest.getChangeWindDir();
+            Integer changeWindDir = decodeRequest.getChangeWindDir();
             Integer directDecode = decodeRequest.getDirectDecode();
             Integer paraData = decodeRequest.getParaData();
             RemoteIndex remoteIndex = null;
+
+            if (null == acStatus.getChangeWindDir() && null != changeWindDir) {
+                acStatus.setChangeWindDir(changeWindDir);
+            }
             int[] decoded = null;
             LoggerUtil.getInstance().trace(TAG, "decodeIR entry, keyCode = " + keyCode + ", acStatus = " +
                     new Gson().toJson(acStatus));
@@ -187,7 +191,7 @@ public class IROperationService extends AbstractBaseService {
                     }
                     // NOTE: here remoteIndex instances changes
                     remoteIndex = operationLogic.prepareBinary(remoteIndex.getId());
-                    decoded = operationLogic.decodeIR(remoteIndex, acStatus, keyCode, changeWindDir);
+                    decoded = operationLogic.decodeIR(remoteIndex, acStatus, keyCode);
                 }
             }
             response.setEntity(decoded);
