@@ -1,7 +1,7 @@
 package net.irext.server.businesslogic;
 
 import com.google.gson.Gson;
-import com.squareup.okhttp.*;
+import okhttp3.*;
 import net.irext.server.request.CreateRemoteReferenceRequest;
 import net.irext.server.utils.Constants;
 import net.irext.server.mapper.*;
@@ -217,7 +217,7 @@ public class IndexingLogic {
 
             String remoteRefBody = new Gson().toJson(createRemoteRefRequest);
 
-            RequestBody body = RequestBody.create(JSON, remoteRefBody);
+            RequestBody body = RequestBody.create(remoteRefBody, JSON);
             Request request = new Request.Builder()
                     .url(url)
                     .post(body)
@@ -226,12 +226,12 @@ public class IndexingLogic {
             client.newCall(request).enqueue(new Callback() {
 
                 @Override
-                public void onFailure(Request request, IOException e) {
+                public void onFailure(Call call, IOException e) {
                     System.err.println("remoteRef request failed: " + e.getMessage());
                 }
 
                 @Override
-                public void onResponse(Response response) throws IOException {
+                public void onResponse(Call call, Response response) throws IOException {
                     try {
                         if (!response.isSuccessful()) {
                             throw new IOException("unexpected code from remoteRef response: " + response);

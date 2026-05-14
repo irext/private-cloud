@@ -1,4 +1,4 @@
-## debug env configuration
+## release env configuration
 server.port=8081
 
 spring.cache.type=redis

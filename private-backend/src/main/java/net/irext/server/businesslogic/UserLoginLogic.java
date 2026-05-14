@@ -1,7 +1,7 @@
 package net.irext.server.businesslogic;
 
 import com.google.gson.Gson;
-import com.squareup.okhttp.*;
+import okhttp3.*;
 import net.irext.server.model.UserApp;
 import net.irext.server.request.AppSignInRequest;
 import net.irext.server.response.LoginResponse;
@@ -27,16 +27,18 @@ public class UserLoginLogic {
         String requestBody = new Gson().toJson(appSignInRequest);
         OkHttpClient client = new OkHttpClient();
 
-        RequestBody body = RequestBody.create(JSON, requestBody);
+        RequestBody body = RequestBody.create(requestBody, JSON);
         Request request = new Request.Builder()
                 .url(url)
                 .post(body)
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            String responseBody = response.body().string();
-            LoginResponse loginResponse = new Gson().fromJson(responseBody, LoginResponse.class);
-            return loginResponse.getEntity();
+            if (response.body() != null) {
+                String responseBody = response.body().string();
+                LoginResponse loginResponse = new Gson().fromJson(responseBody, LoginResponse.class);
+                return loginResponse.getEntity();
+            }
         } catch(Exception e) {
             e.printStackTrace();
         }

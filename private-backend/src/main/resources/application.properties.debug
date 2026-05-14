@@ -1,5 +1,5 @@
 ## debug env configuration
-server.port=8081
+server.port=8082
 
 spring.cache.type=redis
 spring.data.redis.host=localhost

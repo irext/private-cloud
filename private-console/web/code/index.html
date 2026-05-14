@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="../public_js/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="../public_js/bower_components/toastr/toastr.min.css">
     <link rel="stylesheet" href="../public_js/bower_components/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="../public_js/bower_components/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="../public_js/bower_components/bootstrap-table/dist/bootstrap-table.min.css">
     <link rel="stylesheet" href="../public_js/bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">
     <link rel="stylesheet" href="css/code_index.css">
@@ -63,157 +64,33 @@
             <hr>
             <div>
                 <div class="btn-group" role="group" aria-label="...">
-                    <button class="btn btn-normal" onclick="loadRemoteList();" style="font-size: 14px;">
-                        <span class="glyphicon glyphicon-refresh" style="vertical-align:middle; margin-bottom: 3px;"></span>
+                    <button class="btn btn-normal btn-default" onclick="loadRemoteList();" style="font-size: 14px; margin-right: 2px;">
+                        <i class="fas fa-refresh"></i>
                     </button>
-                    <button class="btn btn-normal" onclick="onCreateRemote();" style="font-size: 14px;">
-                        <span class="glyphicon glyphicon-plus" style="vertical-align:middle; margin-bottom: 3px;"></span>
+                    <button id="search_bin_button" class="btn btn-normal btn-default" onclick="onSearchRemote();" style="font-size: 14px; margin-right: 2px;">
+                        <i class="fas fa-search"></i>
                     </button>
-                    <button class="btn btn-normal" onclick="onDeleteRemote();" style="font-size: 14px;">
-                        <span class="glyphicon glyphicon-trash" style="vertical-align:middle; margin-bottom: 3px;"></span>
+
+                    <button class="btn btn-default pc-only btn-width" id="download_bin_button" onclick="downloadBin();"
+                            style="font-size: 14px; margin-left: 2px; width: 120px;">
+                        <i class="fas fa-download" style="margin-right: 2px;"></i>
+                        <span data-i18n="page_code.download_code">下载</span>
                     </button>
-                    <button class="btn btn-normal" onclick="onFallbackRemote();" style="font-size: 14px;">
-                        <span class="glyphicon glyphicon-arrow-left" style="vertical-align:middle; margin-bottom: 3px;"></span>
+                    <!--
+                    <button class="btn btn-default pc-only btn-width" id="decode_bin_button" onclick="onDecodeOnline();"
+                            style="font-size: 14px; margin-left: 2px; width: 120px;">
+                        <i class="fas fa-rocket" style="margin-right: 2px;"></i>
+                        <span data-i18n="page_code.decode_online">在线解码</span>
                     </button>
-                    <button class="btn btn-normal" onclick="onVerifyRemote(1);" style="font-size: 14px;">
-                        <span class="glyphicon glyphicon-remove" style="vertical-align:middle; margin-bottom: 3px;"></span>
+                    <button class="btn btn-default pc-only btn-width" id="transfer_bin_button" onclick="onTransferBin();"
+                            style="font-size: 14px; margin-left: 2px; width: 120px;">
+                        <i class="fas fa-broadcast-tower" style="margin-right: 2px;"></i>
+                        <span data-i18n="page_code.decode_on_board">发射编码</span>
                     </button>
-                    <button class="btn btn-normal" onclick="onVerifyRemote(0);" style="font-size: 14px;">
-                        <span class="glyphicon glyphicon-ok" style="vertical-align:middle; margin-bottom: 3px;"></span>
-                    </button>
-                    <button class="btn btn-normal btn-info" onclick="downloadBin();" style="font-size: 14px;" id="download_bin_button" >
-                        <span class="glyphicon glyphicon-cloud-download" style="vertical-align:middle; margin-bottom: 3px;"></span>
-                    </button>
+                    -->
                 </div>
-                <button id="search_bin_button" class="btn btn-normal btn-default" onclick="onSearchRemote();" style="font-size: 14px;">
-                    <span class="glyphicon glyphicon-search" style="vertical-align:middle; margin-bottom: 3px;"></span>
-                </button>
             </div>
             <div id = "remote_table_container" style="width: 100%">
-            </div>
-        </div>
-    </div>
-
-    <!-- dialogs -->
-    <div class="modal fade" id="create_remote_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_create_index_title">新建编码</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="row marketing">
-                        <form id="remote_upload_form" enctype="multipart/form-data" method="post"
-                              action="/irext/int/create_remote_index"  target="post_iframe">
-                            <div class="col-lg-6">
-                                <div class="input-group">
-                                    <span class="input-group-addon" data-i18n="page_code.d_create_index_priority">优先排序</span>
-                                    <input type="text" data-ride="spinner" id="spinner" name="priority"
-                                           class="form-control input-number" value="1" data-min="1" data-max="999">
-                                    <span class="input-group-btn" style="border-radius: 0;">
-                                        <button type="button" class="btn btn-default" data-value="decrease" data-target="#spinner"
-                                                data-toggle="spinner" style="border-radius: 0;">
-                                            <span class="glyphicon-minus"></span>
-                                        </button>
-                                    </span>
-                                    <span class="input-group-btn">
-                                        <button type="button" class="btn btn-default" data-value="increase" data-target="#spinner"
-                                                data-toggle="spinner">
-                                            <span class="glyphicon-plus"></span>
-                                        </button>
-                                    </span>
-                                </div>
-                                <br>
-                                <div class="input-group">
-                                    <span class="input-group-addon" data-i18n="page_code.d_create_index_category">家电类型</span>
-                                    <select id="category_id" name="category_id" class="input-group-addon" onchange="onCategoryChange();" style="width: 100%;">
-                                    </select>
-                                    <input type="hidden" id="category_name" name="category_name">
-                                    <input type="hidden" id="category_name_tw" name="category_name_tw">
-                                    <!-- <span class="input-group-addon pointer">+</span> -->
-                                </div>
-                                <br>
-                                <div class="input-group" id="brand_panel">
-                                    <span class="input-group-addon" data-i18n="page_code.d_create_index_brand">家电品牌</span>
-                                    <select id="brand_id" name="brand_id" class="input-group-addon" onchange="onBrandChange();" style="width: 100%; border-radius: 0;">
-                                    </select>
-                                    <input type="hidden" id="brand_name" name="brand_name">
-                                    <input type="hidden" id="brand_name_tw" name="brand_name_tw">
-                                    <span class="input-group-addon pointer glyphicon-plus" onclick="onCreateBrand();"></span>
-                                </div>
-                                <div class="input-group" id="province_panel" style="display: none;">
-                                    <span class="input-group-addon" data-i18n="page_code.d_create_index_province">选择省份</span>
-                                    <select id="province_id" name="province_id" onchange="onProvinceChange();" style="width: 100%;">
-                                    </select>
-                                    <!-- <span class="input-group-addon pointer">+</span> -->
-                                </div>
-                                <br>
-                                <div id="city_panel" style="display: none;">
-                                    <div class="input-group">
-                                        <span class="input-group-addon" style="cursor: pointer;" data-i18n="page_code.d_create_index_city"
-                                              onclick="discoverCityCode();">选择城市</span>
-                                        <select id="city_code" name="city_code" onchange="onCityChange();" style="width: 100%;">
-                                        </select>
-                                        <input type="hidden" id="city_name" name="city_name">
-                                        <input type="hidden" id="city_name_tw" name="city_name_tw">
-                                        <!-- <span class="input-group-addon pointer">+</span> -->
-                                    </div>
-                                    <br>
-                                </div>
-                                <div id="operator_panel" style="display: none;">
-                                    <div class="input-group">
-                                        <span class="input-group-addon" data-i18n="page_code.d_create_index_sp">选择SP&nbsp;&nbsp;</span>
-                                        <select id="operator_id" name="operator_id" onchange="onOperatorChange();" style="width: 100%;">
-                                        </select>
-                                        <input type="hidden" id="operator_name" name="operator_name">
-                                        <input type="hidden" id="operator_name_tw" name="operator_name_tw">
-                                        <!-- <span class="input-group-addon pointer">+</span> -->
-                                    </div>
-                                    <br>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-6">
-                                <div class="protocol_panel" style="display: none;">
-                                    <div class="input-group protocol_panel" style="display:none;">
-                                        <span class="input-group-addon" data-i18n="page_code.d_create_index_protocol">编码协议</span>
-                                        <select id="protocol_id" name="protocol_id" onchange="onProtocolChange();" style="width: 100%;">
-                                        </select>
-                                        <input type="hidden" id="protocol_name" name="protocol_name">
-                                        <span class="input-group-addon pointer glyphicon-plus" onclick="onCreateProtocol();"></span>
-                                    </div>
-                                    <br>
-                                </div>
-                                <div class="input-group">
-                                    <span class="input-group-addon" data-i18n="page_code.d_create_index_subcate">编码类型</span>
-                                    <select id="sub_cate" name="sub_cate" class="input-group-addon" onchange="onSubCateChange();" style="width: 100%;">
-                                        <option value="0" disabled data-i18n="page_code.d_create_index_subcate_binary">Binary</option>
-                                        <option value="1" data-i18n="page_code.d_create_index_subcate_quaternary" selected>Quaternary</option>
-                                        <option value="2" data-i18n="page_code.d_create_index_subcate_hexdecimal">Hexadecimal</option>
-                                    </select>
-                                    <!-- <span class="input-group-addon pointer">+</span> -->
-                                </div>
-                                <br>
-                                <div class="input-group" style="max-height: 25px;">
-                                    <span class="input-group-addon" data-i18n="page_code.d_create_index_code_name">源码名称</span>
-                                    <input type="text" class="form-control" placeholder="Remote Name" id="remote_name" name="remote_name">
-                                </div>
-                                <br>
-                                <div class="input-group" style="max-height: 25px;">
-                                    <span class="input-group-addon" data-i18n="page_code.d_create_index_code_file">源码文件</span>
-                                    <input type="file" class="form-control" name="remote_file" placeholder="Remote File" id="remote_file">
-                                </div>
-                            </div>
-                            <input type="hidden" name="admin_id" id="admin_id">
-                        </form>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <a class="btn btn-normal btn-success" href="#" onclick="createRemote();" data-i18n="page_code.d_create_index_submit">提交</a>
-                    <button type="button" class="btn btn-warning" data-dismiss="modal" data-i18n="page_code.d_create_index_cancel">关闭</button>
-                </div>
             </div>
         </div>
     </div>
@@ -235,225 +112,9 @@
                     <br>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" onclick="searchRemote();" data-i18n="page_code.d_search_index_search">搜索</button>
+                    <button type="button" class="btn btn-primary" onclick="searchRemote();" data-i18n="page_code.d_search_index_search">搜索</button>
                     <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="page_code.d_search_index_cancel">取消</button>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- delete hint dialog -->
-    <div class="modal fade" id="delete_confirm_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_delete_index_title">删除编码</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="delete_hint"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" onclick="deleteRemote();" data-i18n="page_code.d_delete_index_delete">删除</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="page_code.d_delete_index_cancel">取消</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- fallback hint dialog -->
-    <div class="modal fade" id="fallback_confirm_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_fallback_index_title">回退编码</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="fallback_hint" data-i18n="page_code.d_fallback_index_tip">确认要回退编码到待验证状态吗？</div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" onclick="fallbackRemote();" data-i18n="page_code.d_fallback_index_fallback">确定</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="page_code.d_fallback_index_cancel">取消</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- verify hint dialog -->
-    <div class="modal fade" id="verify_confirm_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_verify_index_title">验证编码</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="verify_hint"></div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-info" onclick="verifyRemote(true);" data-i18n="page_code.d_verify_index_verify">确定</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="page_code.d_verify_index_cancel">取消</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- publish hint dialog -->
-    <div class="modal fade" id="publish_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_publish_index_title">发布编码</h4>
-                </div>
-                <div class="modal-body">
-                    <div id="publish_hint"></div>
-                </div>
-                <div class="modal-footer">
-                    <!-- <button type="button" class="btn btn-info" onclick="publishUnpublished();">报表</button> -->
-                    <button type="button" class="btn btn-success" onclick="publishBrands();" data-i18n="page_code.d_publish_index_publish">确定</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="page_code.d_publish_index_cancel">取消</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- uploading hint dialog -->
-    <div class="modal fade" id="uploading_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_submit_index_title">提交编码文件</h4>
-                </div>
-                <div class="modal-body">
-                    <iframe name="post_iframe" id="post_iframe" style="border: none; width: 100%; height: 50px;">
-                        <html>
-                        <body>
-                        <div style="width: 100%; text-align: center; font-family: serif,serif" data-i18n="page_code.d_submit_index_progress">正在提交</div>
-                        </body>
-                        </html>
-                    </iframe>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="page_code.d_submit_index_ok">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- creating protocol dialog -->
-    <div class="modal fade" id="creating_protocol_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_submit_protocol_title">提交协议文件</h4>
-                </div>
-                <div class="modal-body">
-                    <iframe name="post_protocol_iframe" id="post_protocol_iframe" style="border: none; width: 100%; height: 50px;">
-                        <html>
-                        <body>
-                        <div style="width: 100%; text-align: center; font-family: '微软雅黑'" data-i18n="page_code.d_submit_protocol_progress">正在提交</div>
-                        </body>
-                        </html>
-                    </iframe>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" data-i18n="page_code.d_submit_protocol_ok">确定</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- create brand dialog -->
-    <div class="modal fade" id="create_brand_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title" data-i18n="page_code.d_create_brand_title">创建品牌</h4>
-                </div>
-                <div class="modal-body">
-                    <div class="input-group" style="max-height: 25px;">
-                        <span class="input-group-addon" data-i18n="page_code.d_create_category">电器类型</span>
-                        <input type="text" class="form-control" id="category_name_b" value="" readonly>
-                    </div>
-                    <br>
-                    <div class="input-group" style="max-height: 25px;">
-                        <span class="input-group-addon" data-i18n="page_code.d_create_brand_name">品牌名称</span>
-                        <input type="text" class="form-control" id="brand_name_b" value=""
-                               onchange="translateToTC('brand_name_b', 'brand_name_tw_b');">
-                    </div>
-                    <br>
-                    <div class="input-group" style="max-height: 25px;">
-                        <span class="input-group-addon" data-i18n="page_code.d_create_brand_name_en">英文名称</span>
-                        <input type="text" class="form-control" id="brand_name_en_b" value="">
-                    </div>
-                    <br>
-                    <div class="input-group" style="max-height: 25px;">
-                        <span class="input-group-addon" data-i18n="page_code.d_create_brand_name_tw">繁中名称</span>
-                        <input type="text" class="form-control" id="brand_name_tw_b" value="">
-                    </div>
-                    <br>
-                    <div class="input-group" style="max-height: 25px;">
-                        <span class="input-group-addon" data-i18n="page_code.d_create_brand_priority">优先排序</span>
-                        <input type="text" data-ride="brand_priority" id="brand_priority" name="brand_priority"
-                               class="form-control input-number" value="1" data-min="1" data-max="999">
-                    </div>
-                    <br>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="createBrand();" data-i18n="page_code.d_create_brand_ok">确定创建</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- create protocol dialog -->
-    <div class="modal fade" id="create_protocol_dialog" role="dialog" aria-labelledby="myModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="protocol_upload_form" enctype="multipart/form-data" method="post"
-                      action="/irext/int/create_protocol" target="post_protocol_iframe">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title" data-i18n="page_code.d_create_protocol_title">创建协议</h4>
-                    </div>
-                    <div class="modal-body">
-                        <div class="input-group" style="max-height: 25px;">
-                            <span class="input-group-addon" data-i18n="page_code.d_create_protocol_name">协议名称</span>
-                            <input type="text" class="form-control" id="protocol_name_b" name="protocol_name_b" value="">
-                        </div>
-                        <br>
-                        <div class="input-group" style="max-height: 25px;">
-                            <span class="input-group-addon" data-i18n="page_code.d_create_protocol_file">协议文件</span>
-                            <input type="file" class="form-control" id="protocol_file" name="protocol_file" value="">
-                        </div>
-                        <br>
-                        <div class="input-group" style="max-height: 25px;">
-                            <span class="input-group-addon" data-i18n="page_code.d_create_protocol_type">协议类型</span>
-                            <select id="protocol_type" name="protocol_type" class="input-group-addon" onchange="onProtocolTypeChange();" style="width: 100%;">
-                                <option value="0" disabled data-i18n="page_code.d_create_protocol_binary">Binary</option>
-                                <option value="1" selected data-i18n="page_code.d_create_protocol_quaternary">Quaternary</option>
-                                <option value="2" data-i18n="page_code.d_create_protocol_hexadecimal">Hexadecimal</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="createProtocol();" data-i18n="page_code.d_create_protocol_ok">确定创建</button>
-                    </div>
-                    <input type="hidden" id="protocol_admin_id" name="admin_id">
-                </form>
             </div>
         </div>
     </div>

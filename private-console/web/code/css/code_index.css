@@ -101,3 +101,9 @@ body {
     }
 }
 
+/* Remove all border radius for square corners */
+*, *:before, *:after {
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0 !important;
+}

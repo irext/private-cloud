@@ -1,6 +1,6 @@
 package net.irext.server.businesslogic;
 
-import com.squareup.okhttp.*;
+import okhttp3.*;
 import jakarta.servlet.ServletContext;
 import net.irext.decode.sdk.bean.TemperatureRange;
 import net.irext.server.mapper.CollectKeyMapper;
@@ -286,8 +286,12 @@ public class OperationLogic {
                 .get()
                 .build();
 
-        Response response = new OkHttpClient().newCall(request).execute();
-        return response.body().byteStream();
+        OkHttpClient client = new OkHttpClient();
+        Response response = client.newCall(request).execute();
+        if (response.body() != null) {
+            return response.body().byteStream();
+        }
+        return null;
     }
 
     public File getDownloadFile(ServletContext context, int remoteIndexId) {
