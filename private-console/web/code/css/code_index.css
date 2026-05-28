@@ -119,7 +119,62 @@ body {
     -ms-user-select: none;
     user-select: none;
     background-image: none;
-    border: 1px solid transparent;
+    border: 1px solid #ccc;
+}
+
+.cbtn.btn-default {
+    border-color: #ccc;
+    background-color: #fff;
+    color: #333;
+}
+
+.cbtn.btn-default:hover {
+    border-color: #adadad;
+    background-color: #e6e6e6;
+}
+
+.cbtn.btn-primary {
+    border-color: #2e6da4;
+    background-color: #337ab7;
+    color: #fff;
+}
+
+.cbtn.btn-primary:hover {
+    border-color: #204d74;
+    background-color: #286090;
+}
+
+.cbtn.btn-danger {
+    border-color: #d43f3a;
+    background-color: #d9534f;
+    color: #fff;
+}
+
+.cbtn.btn-danger:hover {
+    border-color: #ac2925;
+    background-color: #c9302c;
+}
+
+.cbtn.btn-warning {
+    border-color: #eea236;
+    background-color: #f0ad4e;
+    color: #fff;
+}
+
+.cbtn.btn-warning:hover {
+    border-color: #d58512;
+    background-color: #ec971f;
+}
+
+.cbtn.btn-success {
+    border-color: #4cae4c;
+    background-color: #5cb85c;
+    color: #fff;
+}
+
+.cbtn.btn-success:hover {
+    border-color: #398439;
+    background-color: #449d44;
 }
 
 .stb_keys {
@@ -156,4 +211,13 @@ body {
     -webkit-border-radius: 0 !important;
     -moz-border-radius: 0 !important;
     border-radius: 0 !important;
+}
+
+/* Ensure hint dialog appears above other dialogs */
+#hint_dialog {
+    z-index: 10060 !important;
+}
+
+#hint_dialog .modal-backdrop {
+    z-index: 10059 !important;
 }

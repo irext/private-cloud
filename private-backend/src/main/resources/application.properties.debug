@@ -7,6 +7,6 @@ spring.data.redis.port=6379
 
 spring.datasource.url=jdbc:mysql://localhost:3306/irext?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
 spring.datasource.username=root
-spring.datasource.password=root
+spring.datasource.password=421aWill.
 
-user.data.basedir=/data/
+user.irext.server=http://localhost:8083

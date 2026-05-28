@@ -9,11 +9,13 @@ let app = module.exports = express();
 let http = require('http').Server(app);
 let bodyParser = require('body-parser');
 let methodOverride = require('method-override');
+let logger = require('./mini_poem/logging/logger4js').helper;
 
 // global inclusion
 require('./mini_poem/configuration/constants');
 let System = require('./mini_poem/utils/system_utils');
 let dbConn = require('./mini_poem/db/mysql/mysql_connection');
+let TicketPair = require("./authentication/ticket_pair.js");
 
 // local inclusion
 let systemConfig = require('./configuration/system_configs');
@@ -40,10 +42,29 @@ dbConn.setMySQLParameter(MYSQL_DB_SERVER_ADDRESS, MYSQL_DB_NAME, MYSQL_DB_USER, 
 
 require('./routes');
 
-let certificateLogic = require('./work_unit/authentication_logic.js');
+let ticketPair = new TicketPair(REDIS_HOST, REDIS_PORT, null, null);
+let authenticationLogic = require('./work_unit/authentication_logic.js');
+
+let appKey = process.env.APP_KEY;
+let appSecret = process.env.APP_SECRET;
+
+authenticationLogic.applicationSignInWorkUnit(appKey, appSecret, function (signInErr, userApp) {
+    if (errorCode.SUCCESS.code === signInErr.code) {
+        let id = "ticket_" + userApp.id;
+        let token = userApp.token;
+        let ttl = 24 * 60 * 60 * 14;
+        ticketPair.setTicketPair(id, token, ttl, function (setTicketPairErr) {
+            DECODE_APP_ID = userApp.id;
+            DECODE_APP_TOKEN = token;
+            console.log("application server detected");
+        });
+    } else {
+        console.log("sign in to application server failed");
+    }
+});
 
 // kickstart the engine
-System.startupHttp(http, serverListenPort, "irext Console V1.5.0");
+System.startupHttp(http, serverListenPort, "IRext Console V1.5.2");
 
 ////////////////// authentication middleware //////////////////
 function tokenValidation (req, res, next) {
@@ -57,28 +78,33 @@ function tokenValidation (req, res, next) {
         token = bodyParam.token;
     }
 
-    if (req.url.indexOf("/irext/int/list_remote_indexes") !== -1) {
+    if (req.url.indexOf("/irext/code/list_remote_indexes") !== -1) {
         // override for get method
         adminID = req.query.admin_id;
         token = req.query.token;
     }
-    if (req.url.indexOf("/irext/int/search_remote_indexes") !== -1) {
+    if (req.url.indexOf("/irext/code/search_remote_indexes") !== -1) {
         // override for get method
         adminID = req.query.admin_id;
         token = req.query.token;
     }
-    if (req.url.indexOf("/irext/int/download_remote_index") !== -1) {
+    if (req.url.indexOf("/irext/code/download_remote_index") !== -1) {
         // override for get method
         adminID = req.query.admin_id;
         token = req.query.token;
     }
-    if (req.url.indexOf("/irext/int") !== -1) {
+    if (req.url.indexOf("/irext/decode/decode_online") !== -1) {
+        // Skip authentication for online decode (read-only operation)
+        next();
+        return;
+    }
+    if (req.url.indexOf("/irext/code") !== -1 || req.url.indexOf("/irext/decode") !== -1) {
         let contentType = req.get("content-type");
-        if (null != contentType && contentType.indexOf("multipart/form-data") != -1) {
+        if (null != contentType && contentType.indexOf("multipart/form-data") !== -1) {
             // request of content type of multipart/form-data would be validated inside each service
             next();
         } else {
-            certificateLogic.verifyTokenWorkUnit(adminID, token, function(validateTokenErr) {
+            authenticationLogic.verifyTokenWorkUnit(adminID, token, function(validateTokenErr) {
                 if(errorCode.SUCCESS.code !== validateTokenErr.code) {
                     let fakeResponse = {
                         status: validateTokenErr,
@@ -107,7 +133,7 @@ function tokenValidation (req, res, next) {
             permissions = ",2";
         }
 
-        certificateLogic.verifyTokenWithPermissionWorkUnit(adminID, token, permissions, function(validateTokenErr) {
+        authenticationLogic.verifyTokenWithPermissionWorkUnit(adminID, token, permissions, function(validateTokenErr) {
             if(errorCode.SUCCESS.code !== validateTokenErr.code) {
                 res.redirect("/error/auth_error.html");
             } else {

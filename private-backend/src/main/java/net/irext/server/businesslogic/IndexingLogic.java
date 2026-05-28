@@ -8,6 +8,7 @@ import net.irext.server.mapper.*;
 import net.irext.server.model.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
@@ -68,6 +69,9 @@ public class IndexingLogic {
     public void setCollectRemoteMapper(CollectRemoteMapper collectRemoteMapper) {
         this.collectRemoteMapper = collectRemoteMapper;
     }
+
+    @Value("${user.irext.server}")
+    private String irextServerUrl;
 
     private static final String IR_BIN_FILE_PREFIX = "irda_";
     private static final String IR_BIN_FILE_SUFFIX = ".bin";
@@ -172,7 +176,7 @@ public class IndexingLogic {
 
     public String statRemoteRef(RemoteIndex remoteIndex, int id, String token) {
         try {
-            String url = Constants.REMOTE_REF_URL;
+            String url = irextServerUrl + Constants.REMOTE_REF_URL;
             MediaType JSON
                     = MediaType.parse("application/json; charset=utf-8");
 

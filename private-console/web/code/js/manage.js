@@ -3,8 +3,6 @@
  * 2017-03-27
  */
 
-let LS_KEY_LANG = "lang";
-
 let userLang = "en-US";
 let paramLang = getParameter('lang');
 
@@ -19,6 +17,7 @@ userLang = navigator.language || paramLang;
 
 i18n.init(function(err, t) {
     $(".page_code").i18n({ lng: userLang });
+    $("[data-i18n]").css("visibility", "visible");
 });
 
 let CODE_TABLE_PADDING = 320;
@@ -27,31 +26,14 @@ let id = "";
 let token = "";
 let client = null;
 
-let currentSubCate = 1;
-let currentProtocol = null;
-let currentProtocolType = 1;
-let currentCategory = {
-    id: 1,
-    name: i18n.t("page_code.d_panel_category_init", { lng: userLang })
-};
-
 let currentFilterCategory = {
     id: 1,
     name: i18n.t("page_code.d_panel_category_init", { lng: userLang })
 };
 
-let currentBrand = null;
 let currentFilterBrand = null;
-let currentProvince = {
-    code: '110000',
-    name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
-};
 let currentFilterProvince = {
     code: '110000',
-    name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
-};
-let currentCity = {
-    code: '110100',
     name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
 };
 let currentFilterCity = {
@@ -59,18 +41,7 @@ let currentFilterCity = {
     name: i18n.t("page_code.d_panel_city_init", { lng: userLang })
 };
 
-let g_categories = [];
-let g_brands = [];
-let g_cities = [];
-let g_stbOperators = [];
-
-let currentOperator = null;
-
 let selectedRemote = null;
-let pass = 0;
-
-let brandsToPublish = [];
-let remoteIndexesToPublish = [];
 
 ///////////////////////////// Initialization /////////////////////////////
 
@@ -88,45 +59,24 @@ $(document).ready(function() {
     token = localStorage.getItem(LS_KEY_TOKEN);
     client = getParameter('client');
 
-    initializeSelectors();
-
-    $('#remote_file').change(function() {
-        let filePath = $(this).val();
-        let fileName = filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
-        $('#remote_name').val(fileName);
-    });
-
-    $('#protocol_file').change(function() {
-        let filePath = $(this).val();
-        let fileName = filePath.substring(filePath.lastIndexOf('\\') + 1, filePath.lastIndexOf('.'));
-        $('#protocol_name_b').val(fileName);
-    });
-});
-
-function initializeSelectors() {
     initializeFilterCategories();
     initializeFilterBrands();
     initializeFilterProvince();
-    initializeSubCates();
-
-    initializeProtocols();
-    initializeCategories();
-    initializeProvince();
-}
+});
 
 function loadRemoteList(isSearch, remoteMap) {
     let url = null;
 
     if (isSearch && remoteMap) {
-        url = '/irext/int/search_remote_indexes?remote_map='+
+        url = '/irext/code/search_remote_indexes?remote_map='+
             remoteMap+'&from=0&count=2000&admin_id='+id+'&token='+token;
     } else {
         if(parseInt(currentFilterCategory.id) === 3) {
-            url = '/irext/int/list_remote_indexes?category_id='+
+            url = '/irext/code/list_remote_indexes?category_id='+
                 currentFilterCategory.id+'&city_code='+currentFilterCity.code+
                 '&from=0&count=100&admin_id='+id+'&token='+token;
         } else {
-            url = '/irext/int/list_remote_indexes?category_id='+
+            url = '/irext/code/list_remote_indexes?category_id='+
                 currentFilterCategory.id+'&brand_id='+currentFilterBrand.id+
                 '&from=0&count=100&admin_id='+id+'&token='+token;
         }
@@ -217,17 +167,23 @@ function loadRemoteList(isSearch, remoteMap) {
             if (data[i].para === 0) {
                 if (data[i].status === 1) {
                     data[i].status = i18n.t("page_code.d_status_published", { lng: userLang });
+                    data[i].intStatus = ITEM_VALID;
                 } else if (data[i].status === 2) {
                     data[i].status = i18n.t("page_code.d_status_to_verify", { lng: userLang });
+                    data[i].intStatus = ITEM_VERIFY;
                 } else if (data[i].status === 3) {
                     data[i].status = i18n.t("page_code.d_status_passed", { lng: userLang });
+                    data[i].intStatus = ITEM_PASS;
                 } else if (data[i].status === 4) {
                     data[i].status = i18n.t("page_code.d_status_failed", { lng: userLang });
+                    data[i].intStatus = ITEM_FAILED;
                 } else if (data[i].status === 5) {
                     data[i].status = i18n.t("page_code.d_status_duplicated", { lng: userLang });
+                    data[i].intStatus = ITEM_DUPLICATED;
                 }
             } else {
-                data[i].status = 'From IRIS';
+                data[i].status = i18n.t("page_code.d_status_collected", { lng: userLang });
+                data[i].intStatus = ITEM_VALID;
             }
 
             $('#remote_table').bootstrapTable('updateRow', {
@@ -290,261 +246,10 @@ function searchRemote() {
 }
 
 ///////////////////////////// Data process /////////////////////////////
-function initializeSubCates() {
-    $('#sub_cate').select2({
-        placeholder: 'Select Subcate'
-    });
-}
-
-function initializeProtocols() {
-    $.ajax({
-        url: '/irext/int/list_ir_protocols',
-        dataType: 'JSON',
-        type: 'POST',
-        data: {
-            from : 0,
-            count : 200,
-            admin_id : id,
-            token : token
-        },
-        timeout: 20000,
-        success: function(response) {
-            if(response.status.code === 0) {
-                let protocols = response.entity;
-                fillProtocolList(protocols);
-
-                if(protocols && protocols.length > 0) {
-                    currentProtocol = {
-                        id: protocols[0].id,
-                        name: protocols[0].name
-                    }
-                }
-            } else {
-                console.log('failed to get protocols');
-            }
-        },
-        error: function() {
-            console.log('failed to get protocols');
-        }
-    });
-}
-
-function initializeCategories() {
-    $.ajax({
-        url: '/irext/int/list_categories',
-        dataType: 'JSON',
-        type: 'POST',
-        data: {
-            from : 0,
-            count : 200,
-            admin_id : id,
-            token : token,
-            lang: userLang
-        },
-        timeout: 20000,
-        success: function(response) {
-            if(response.status.code === 0) {
-                let categories = response.entity;
-                g_categories = categories;
-
-                fillCategoryList(categories);
-
-                if(categories && categories.length > 0) {
-                    currentCategory = {
-                        id: categories[0].id,
-                        name: categories[0].name,
-                        name_en: categories[0].name_en,
-                        name_tw: categories[0].name_tw
-                    }
-                }
-
-                initializeBrands();
-            } else {
-                console.log('failed to get categories');
-            }
-        },
-        error: function() {
-            console.log('failed to get categories');
-        }
-    });
-}
-
-function initializeProvince() {
-    $.ajax({
-        url: '/irext/int/list_provinces',
-        dataType: 'JSON',
-        data: {
-            admin_id : id,
-            token : token,
-            lang : userLang
-        },
-        type: 'POST',
-        timeout: 20000,
-        success: function(response) {
-            if(response.status.code === 0) {
-                let provinces = response.entity;
-                fillProvinceList(provinces);
-
-                if(provinces && provinces.length > 0) {
-                    currentProvince = {
-                        code: provinces[0].code,
-                        name: provinces[0].name
-                    }
-                }
-
-                initializeCity();
-            } else {
-                console.log('failed to get provinces');
-            }
-        },
-        error: function() {
-            console.log('failed to get provinces');
-        }
-    });
-}
-
-function initializeCity() {
-    let provincePrefix = currentProvince.code.substring(0, 2);
-    $.ajax({
-        url: '/irext/int/list_cities',
-        type: 'POST',
-        dataType: 'JSON',
-        data: {
-            province_prefix : provincePrefix,
-            admin_id : id,
-            token : token,
-            lang : userLang
-        },
-        timeout: 20000,
-        success: function(response) {
-            if(response.status.code === 0) {
-                let cities = response.entity;
-                if (cities && cities.length > 0) {
-                    cities.push({
-                        code: provincePrefix + '0000',
-                        name: i18n.t("page_code.d_hint_init_all_cities", { lng: userLang })
-                    });
-                } else {
-                    cities = [{
-                        code: provincePrefix + '0000',
-                        name: i18n.t("page_code.d_hint_init_all_cities", { lng: userLang })
-                    }];
-                }
-                g_cities = cities;
-
-                fillCityList(cities);
-
-                if(cities && cities.length > 0) {
-                    currentCity = {
-                        code: cities[0].code,
-                        name: cities[0].name,
-                        name_tw: cities[0].name_tw
-                    }
-                }
-
-                initializeOperator();
-            } else {
-                console.log('failed to get cities');
-            }
-        },
-        error: function() {
-            console.log('failed to get cities');
-        }
-    });
-}
-
-function initializeOperator() {
-    $.ajax({
-        url: '/irext/int/list_operators',
-        type: 'POST',
-        dataType: 'JSON',
-        data: {
-            city_code : currentCity.code,
-            from : 0,
-            count : 200,
-            admin_id : id,
-            token : token,
-            lang: userLang
-        },
-        timeout: 20000,
-        success: function(response) {
-            if(response.status.code === 0) {
-                let operators = response.entity;
-
-                if (operators && operators.length > 0) {
-                    operators.push({
-                        operator_id: '0',
-                        operator_name: '--'
-                    });
-                } else {
-                    operators = [{
-                        operator_id: '0',
-                        operator_name: '--'
-                    }];
-                }
-                g_stbOperators = operators;
-
-                fillOperatorList(operators);
-
-                if(operators && operators.length > 0) {
-                    currentOperator = {
-                        operator_id: operators[0].operator_id,
-                        operator_name: operators[0].operator_name,
-                        operator_name_tw: operators[0].operator_name_tw
-                    }
-                }
-            } else {
-                console.log('failed to get operators');
-            }
-        },
-        error: function() {
-            console.log('failed to get operators');
-        }
-    });
-}
-
-function initializeBrands() {
-    $.ajax({
-        url: '/irext/int/list_brands',
-        type: 'POST',
-        dataType: 'JSON',
-        data: {
-            category_id : currentCategory.id,
-            from : 0,
-            count : 300,
-            admin_id : id,
-            token : token,
-            lang: userLang
-        },
-        timeout: 20000,
-        success: function(response) {
-            if(response.status.code === 0) {
-                let brands = response.entity;
-                g_brands = brands;
-
-                fillBrandList(brands);
-
-                if(brands && brands.length > 0) {
-                    currentBrand = {
-                        id: brands[0].id,
-                        name: brands[0].name,
-                        name_en: brands[0].name_en,
-                        name_tw: brands[0].name_tw
-                    }
-                }
-            } else {
-                console.log('failed to get brands');
-            }
-        },
-        error: function() {
-            console.log('failed to get brands');
-        }
-    });
-}
 
 function initializeFilterCategories() {
     $.ajax({
-        url: '/irext/int/list_categories',
+        url: '/irext/code/list_categories',
         type: 'POST',
         dataType: 'JSON',
         data: {
@@ -578,9 +283,71 @@ function initializeFilterCategories() {
     });
 }
 
+///////////////////////////// Event handler /////////////////////////////
+
+function onFilterCategoryChange() {
+    currentFilterCategory = {
+        id: $('#filter_category_id').val(),
+        name: $('#filter_category_id option:selected').text()
+    };
+
+    switch(parseInt(currentFilterCategory.id)) {
+        case CATEGORY_AC:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_TV:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_STB:
+            showFilterCitySelector();
+            break;
+        case CATEGORY_NW:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_IPTV:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_DVD:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_FAN:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_PROJECTOR:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_STEREO:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_LIGHT_BULB:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_BSTB:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_CLEANING_ROBOT:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_AIR_CLEANER:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_DYSON:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_CAMERA:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_HEATER:
+            showFilterBrandSelector();
+            break;
+        default:
+            break;
+    }
+}
+
 function initializeFilterProvince() {
     $.ajax({
-        url: '/irext/int/list_provinces',
+        url: '/irext/code/list_provinces',
         type: 'POST',
         dataType: 'JSON',
         data: {
@@ -615,7 +382,7 @@ function initializeFilterProvince() {
 function initializeFilterCity() {
     let provincePrefix = currentFilterProvince.code.substring(0, 2);
     $.ajax({
-        url: '/irext/int/list_cities',
+        url: '/irext/code/list_cities',
         type: 'POST',
         dataType: 'JSON',
         data: {
@@ -651,7 +418,7 @@ function initializeFilterCity() {
 
 function initializeFilterBrands() {
     $.ajax({
-        url: '/irext/int/list_brands',
+        url: '/irext/code/list_brands',
         type: 'POST',
         dataType: 'JSON',
         data: {
@@ -688,22 +455,6 @@ function initializeFilterBrands() {
 }
 
 ///////////////////////////// Event handler /////////////////////////////
-
-function onProtocolChange() {
-    currentProtocol = {
-        id: $('#protocol_id').val(),
-        name: $('#protocol_id option:selected').text()
-    };
-}
-
-function onSubCateChange() {
-    currentSubCate = $('#sub_cate').val();
-}
-
-function onProtocolTypeChange() {
-    currentProtocolType = $('#protocol_type').val();
-}
-
 function onCategoryChange() {
     let currentCategoryID = $('#category_id').val();
     currentCategory = getCategoryByID(currentCategoryID);
@@ -768,61 +519,18 @@ function switchCategory() {
             showBrandSelector();
             showProtocolSelector(true);
             break;
+        case CATEGORY_CAMERA:
+            showBrandSelector();
+            showProtocolSelector(true);
+            break;
+        case CATEGORY_HEATER:
+            showBrandSelector();
+            showProtocolSelector(true);
+            break;
         default:
             console.log('Wrong category : ' + currentCategory.id);
             break;
     }
-}
-
-function onBrandChange() {
-    let currentBrandID = $('#brand_id').val();
-
-    currentBrand = getBrandByID(currentBrandID);
-}
-
-function onProvinceChange() {
-    currentProvince = {
-        code: $('#province_id').val(),
-        name: $('#province_id option:selected').text()
-    };
-
-    initializeCity();
-}
-
-function onCityChange() {
-    let currentCityCode = $('#city_code').val();
-
-    currentCity = getCityByCode(currentCityCode);
-
-    if (currentCity.code !== '000000') {
-        initializeOperator();
-    } else {
-        // if 'city not specified' is specified, empty operator list
-        let operators = [{
-            operator_id: '0',
-            operator_name: '--'
-        }];
-
-        fillOperatorList(operators);
-
-        if(operators && operators.length > 0) {
-            currentOperator = {
-                operator_id: operators[0].operator_id,
-                operator_name: operators[0].operator_name,
-                operator_name_tw: operators[0].operator_name_tw
-            }
-        }
-    }
-}
-
-function onOperatorChange() {
-    let currentOperatorID = $('#operator_id').val();
-
-    currentOperator = getStbOperatorByID(currentOperatorID);
-}
-
-function discoverCityCode() {
-    popUpHintDialog(currentCity.code);
 }
 
 function onFilterCategoryChange() {
@@ -874,6 +582,12 @@ function onFilterCategoryChange() {
         case CATEGORY_DYSON:
             showFilterBrandSelector();
             break;
+        case CATEGORY_CAMERA:
+            showFilterBrandSelector();
+            break;
+        case CATEGORY_HEATER:
+            showFilterBrandSelector();
+            break;
         default:
             break;
     }
@@ -902,10 +616,6 @@ function onFilterCityChange() {
         name: $('#filter_city_code option:selected').text()
     };
     loadRemoteList();
-}
-
-function onBleTestInfo() {
-    $('#create_ble_test_dialog').modal({backdrop: 'static', keyboard: false});
 }
 
 function onSelectRemote(data) {
@@ -1134,16 +844,6 @@ function popUpHintDialog(hint) {
 
 ///////////////////////////// Utilities /////////////////////////////
 
-function isBrandExists(newBrandName) {
-    let i = 0;
-    for(i = 0; i < g_brands.length; i++) {
-        if(g_brands[i].name === newBrandName) {
-            return true;
-        }
-    }
-    return false;
-}
-
 function getCategoryByID(categoryID) {
     let i = 0;
     for(i = 0; i < g_categories.length; i++) {
@@ -1186,19 +886,6 @@ function getStbOperatorByID(operatorID) {
         }
     }
     return null;
-}
-
-function translateToTC(textID, targetTextID) {
-    let val = $('#' + textID).val();
-    let tcVal = "";
-    Chinese.prototype.loaded.onkeep(function() {
-        let chinese = new Chinese();
-        tcVal = chinese.toTraditional(val);
-        if (null == tcVal) {
-            tcVal = val;
-        }
-        $('#' + targetTextID).val(tcVal);
-    });
 }
 
 function gotoIndex() {

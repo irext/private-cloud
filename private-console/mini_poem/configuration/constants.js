@@ -13,7 +13,9 @@ global.ENV = "dev";
 
 // generic server configuration
 global.LISTEN_PORT = "8080";
-global.SERVER_ADDRESS = "127.0.0.1";
+
+global.BACKEND_SERVER_ADDRESS = "127.0.0.1";
+global.BACKEND_SERVER_PORT = "8082";
 
 // local environment
 global.FILE_TEMP_PATH = "";
@@ -35,5 +37,8 @@ global.PYTHON_PATH = "";
 // HTTP request
 global.EXTERNAL_SERVER_ADDRESS = "127.0.0.1";
 global.EXTERNAL_SERVER_PORT = "80";
+
+global.DECODE_APP_ID = "0";
+global.DECODE_APP_TOKEN = "";
 
 global.TOKEN_TTL = 60;

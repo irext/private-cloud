@@ -8,15 +8,20 @@ require('../mini_poem/configuration/constants');
 let AdminAuth = require('../authentication/admin_auth.js');
 let RequestSender = require('../mini_poem/http/request.js');
 
+let Enums = require('../constants/enums.js');
 let ErrorCode = require('../constants/error_code.js');
+
 const {set} = require("express/lib/application");
 let logger = require('../mini_poem/logging/logger4js').helper;
 
+let enums = new Enums();
 let errorCode = new ErrorCode();
 
 let adminAuth = new AdminAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
-let SIGN_IN_SERVICE = "/irext-server/app/admin_login";
+let ADMIN_SIGN_IN_SERVICE = "/irext-server/app/admin_login";
+let APP_SIGN_IN_SERVICE = "/irext-server/app/web_console_login";
+
 
 exports.adminLoginWorkUnit = function (userName, password, callback) {
 
@@ -25,7 +30,7 @@ exports.adminLoginWorkUnit = function (userName, password, callback) {
     let requestSender =
         new RequestSender(EXTERNAL_SERVER_ADDRESS,
             EXTERNAL_SERVER_PORT,
-            SIGN_IN_SERVICE,
+            ADMIN_SIGN_IN_SERVICE,
             queryParams);
 
     let signinInfo = {
@@ -95,6 +100,36 @@ exports.verifyTokenWithPermissionWorkUnit = function (id, token, permissions, ca
         } else {
             logger.info("token validation failed");
             callback(validateAdminAuthErr);
+        }
+    });
+};
+
+exports.applicationSignInWorkUnit = function (appKey, appSecret, callback) {
+    let queryParams = new Map();
+    let userApp = {
+        adminID: 1,
+        appKey : appKey,
+        appSecret : appSecret,
+        appType : enums.APP_TYPE_PRIVATE_CLOUD
+    };
+    logger.info('app_server address = ' + BACKEND_SERVER_ADDRESS + ":" + BACKEND_SERVER_PORT);
+    let requestSender =
+        new RequestSender(
+            BACKEND_SERVER_ADDRESS,
+            BACKEND_SERVER_PORT,
+            APP_SIGN_IN_SERVICE,
+            queryParams);
+
+    requestSender.sendPostRequest(userApp, function (signInErr, signInResponse) {
+        if (errorCode.SUCCESS.code === signInErr &&
+            JSON.parse(signInResponse).status.code === errorCode.SUCCESS.code) {
+            let registeredApp = JSON.parse(signInResponse).entity;
+            let appId = registeredApp.id;
+
+            callback(errorCode.SUCCESS, registeredApp);
+        } else {
+            logger.error("IRext public site sign in to application server failed");
+            callback(errorCode.FAILED, null);
         }
     });
 };

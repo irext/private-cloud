@@ -10,7 +10,6 @@ function Enums() {
 
     this.SERVER_MAIN = 0;
 
-    // TODO: BAAS, share enums between backend and front end
     this.ITEM_INVALID = 0;
     this.ITEM_VALID = 1;
     this.ITEM_VERIFY = 2;
@@ -34,9 +33,11 @@ function Enums() {
     this.CATEGORY_STEREO = 9;
     this.CATEGORY_LIGHT_BULB = 10;
     this.CATEGORY_BSTB = 11;
-    this.CATEGORY_CLEANING_ROBOT = 12;
+    this.CATEGORY_CLEANING_ROBOT = 12;``
     this.CATEGORY_AIR_CLEANER = 13;
     this.CATEGORY_DYSON = 14;
+    this.CATEGORY_CAMERA = 15;
+    this.CATEGORY_HEATER = 16;
 
     this.PROTOCOL_TYPE_G1 = 0;
     this.PROTOCOL_TYPE_G2_QUATERNARY = 1;
@@ -44,6 +45,8 @@ function Enums() {
 
     this.ADMIN_TYPE_IREXT = 1;
     this.ADMIN_TYPE_EXTERNAL = 2;
+
+    this.APP_TYPE_PRIVATE_CLOUD = 8;
 
     this.COLLECT_REMOTE_STATUS_INIT = 0;
     this.COLLECT_REMOTE_STATUS_GENERATED = 1;

@@ -84,7 +84,7 @@ function changePassword() {
         return;
     }
     $.ajax({
-        url: "/irext/certificate/change_pw",
+        url: "/irext/authenticate/change_pw",
         type: "POST",
         data: {
             user_name : userName,
@@ -111,7 +111,7 @@ function doSignIn(userName, password) {
     let token = "";
     let adminID = "";
     $.ajax({
-        url: "/irext/certificate/admin_login",
+        url: "/irext/authenticate/admin_login",
         type: "POST",
         data: JSON.stringify({user_name: userName, password: password}),
         contentType: "application/json; charset=utf-8",

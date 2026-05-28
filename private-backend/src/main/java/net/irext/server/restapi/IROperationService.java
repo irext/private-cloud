@@ -41,7 +41,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/irext-server/operation")
-@Service("IRDecodeService")
+@Service("IROperationService")
 @SuppressWarnings("unused")
 public class IROperationService extends AbstractBaseService {
 
@@ -151,6 +151,8 @@ public class IROperationService extends AbstractBaseService {
             Integer directDecode = decodeRequest.getDirectDecode();
             Integer paraData = decodeRequest.getParaData();
             RemoteIndex remoteIndex = null;
+
+            LoggerUtil.getInstance().trace(TAG, "decodeIR entry, indexId = " + indexId);
 
             if (null == acStatus.getChangeWindDir() && null != changeWindDir) {
                 acStatus.setChangeWindDir(changeWindDir);

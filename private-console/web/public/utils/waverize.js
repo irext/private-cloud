@@ -26,16 +26,30 @@ function waverizeKeyValue(keyValue) {
         subtitle: {
             text: '',
         },
+        credits: {
+            enabled: false
+        },
         chart: {
             height: 100,
-            zoomType: 'x'
+            zoomType: 'x',
+            animation: false
         },
         tooltip: {
-            valueDecimals: 2
+            enabled: true,
+            valueDecimals: 0,
+            formatter: function() {
+                return 'Time: ' + this.x + ' μs<br/>Level: ' + this.y;
+            }
         },
         xAxis: {
             type: 'number',
             zoomEnabled: true,
+            labels: {
+                enabled: true
+            },
+            title: {
+                text: null
+            }
         },
         yAxis: {
             min: 0,
@@ -48,12 +62,32 @@ function waverizeKeyValue(keyValue) {
                 text: null
             }
         },
+        plotOptions: {
+            series: {
+                animation: false,
+                enableMouseTracking: true,
+                states: {
+                    hover: {
+                        lineWidthPlus: 0
+                    }
+                }
+            }
+        },
         series: [{
             data: data,
-            lineWidth: 0.01,
+            lineWidth: 1,
             name: 'Wave',
             color: '#FF0000',
             showInLegend: false,
+            marker: {
+                enabled: false,
+                states: {
+                    hover: {
+                        enabled: true,
+                        radius: 3
+                    }
+                }
+            }
         }]
     });
 }
@@ -85,22 +119,37 @@ function getWaveData(timeSeries, totalEnd) {
 
 function resetWave() {
     Highcharts.chart('wave_container', {
+        backgroundColor: '#FCFFC5',
         title: {
             text: '',
         },
         subtitle: {
             text: '',
         },
+        credits: {
+            enabled: false
+        },
         chart: {
             height: 100,
-            zoomType: 'x'
+            zoomType: 'x',
+            animation: false
         },
         tooltip: {
-            valueDecimals: 2
+            enabled: true,
+            valueDecimals: 0,
+            formatter: function() {
+                return 'Time: ' + this.x + ' μs<br/>Level: ' + this.y;
+            }
         },
         xAxis: {
             type: 'number',
             zoomEnabled: true,
+            labels: {
+                enabled: true
+            },
+            title: {
+                text: null
+            }
         },
         yAxis: {
             min: 0,
@@ -113,11 +162,32 @@ function resetWave() {
                 text: null
             }
         },
+        plotOptions: {
+            series: {
+                animation: false,
+                enableMouseTracking: true,
+                states: {
+                    hover: {
+                        lineWidthPlus: 0
+                    }
+                }
+            }
+        },
         series: [{
             data: [],
-            lineWidth: 0.01,
+            lineWidth: 1,
             name: 'Wave',
+            color: '#FF0000',
             showInLegend: false,
+            marker: {
+                enabled: false,
+                states: {
+                    hover: {
+                        enabled: true,
+                        radius: 3
+                    }
+                }
+            }
         }]
     });
 }

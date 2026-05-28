@@ -10,13 +10,15 @@
     <meta name="author" content="strawmanbobi">
     <title data-i18n="page_code.title">控制台</title>
 
-    <link rel="stylesheet" href="../public_js/bower_components/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../public_js/bower_components/toastr/toastr.min.css">
-    <link rel="stylesheet" href="../public_js/bower_components/select2/dist/css/select2.min.css">
-    <link rel="stylesheet" href="../public_js/bower_components/font-awesome/css/all.min.css">
-    <link rel="stylesheet" href="../public_js/bower_components/bootstrap-table/dist/bootstrap-table.min.css">
-    <link rel="stylesheet" href="../public_js/bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">
-    <link rel="stylesheet" href="css/code_index.css">
+    <link rel="stylesheet" href="../public/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../public/bower_components/toastr/toastr.min.css">
+    <link rel="stylesheet" href="../public/bower_components/select2/dist/css/select2.min.css">
+    <link rel="stylesheet" href="../public/bower_components/font-awesome/css/all.min.css">
+    <link rel="stylesheet" href="../public/bower_components/bootstrap-table/dist/bootstrap-table.min.css">
+    <link rel="stylesheet" href="../public/bower_components/bootstrap-multiselect/dist/css/bootstrap-multiselect.css">
+    <link rel="stylesheet" href="./css/code_index.css">
+
+    <link href="../images/ir_logo_favicon.png" rel="shortcut icon" type="image/png">
 </head>
 <body class="page_code">
     <div class="navbar container">
@@ -65,29 +67,22 @@
             <div>
                 <div class="btn-group" role="group" aria-label="...">
                     <button class="btn btn-normal btn-default" onclick="loadRemoteList();" style="font-size: 14px; margin-right: 2px;">
-                        <i class="fas fa-refresh"></i>
+                        <i class="fa-solid fa-refresh"></i>
                     </button>
                     <button id="search_bin_button" class="btn btn-normal btn-default" onclick="onSearchRemote();" style="font-size: 14px; margin-right: 2px;">
-                        <i class="fas fa-search"></i>
+                        <i class="fa-solid fa-magnifying-glass"></i>
                     </button>
 
                     <button class="btn btn-default pc-only btn-width" id="download_bin_button" onclick="downloadBin();"
                             style="font-size: 14px; margin-left: 2px; width: 120px;">
-                        <i class="fas fa-download" style="margin-right: 2px;"></i>
+                        <i class="fa-solid fa-download" style="margin-right: 2px;"></i>
                         <span data-i18n="page_code.download_code">下载</span>
                     </button>
-                    <!--
                     <button class="btn btn-default pc-only btn-width" id="decode_bin_button" onclick="onDecodeOnline();"
                             style="font-size: 14px; margin-left: 2px; width: 120px;">
-                        <i class="fas fa-rocket" style="margin-right: 2px;"></i>
+                        <i class="fa-solid fa-rocket" style="margin-right: 2px;"></i>
                         <span data-i18n="page_code.decode_online">在线解码</span>
                     </button>
-                    <button class="btn btn-default pc-only btn-width" id="transfer_bin_button" onclick="onTransferBin();"
-                            style="font-size: 14px; margin-left: 2px; width: 120px;">
-                        <i class="fas fa-broadcast-tower" style="margin-right: 2px;"></i>
-                        <span data-i18n="page_code.decode_on_board">发射编码</span>
-                    </button>
-                    -->
                 </div>
             </div>
             <div id = "remote_table_container" style="width: 100%">
@@ -137,25 +132,194 @@
             </div>
         </div>
     </div>
+
+    <!-- decode dialog -->
+    <div aria-hidden="true" aria-labelledby="myModalLabel" class="modal fade" id="decode_dialog" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button aria-hidden="true" class="close" data-dismiss="modal" type="button">&times;</button>
+                    <h4 id="decode_online_title" class="modal-title" data-i18n="page_code.d_try_index_title">在线解码</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="decode_panel">
+                        <div style="width: 100%;">
+                            <div class="row">
+                                <div class="col-lg-4" style="text-align: left; padding: 20px;">
+                                    <div id="key_press_d" style="height: 20px;"></div>
+                                    <hr>
+                                    <div id="ac_status_power_d" style="height: 20px;"></div>
+                                    <div id="ac_status_mode_d" style="height: 20px;"></div>
+                                    <div id="ac_status_temp_d" style="height: 20px;"></div>
+                                    <div id="ac_status_speed_d" style="height: 20px;"></div>
+                                    <div id="ac_status_swing_d" style="height: 20px;"></div>
+                                    <div id="ac_status_change_wind_dir_d" style="height: 20px;"></div>
+                                </div>
+                                <div class="col-lg-1">
+                                </div>
+                                <div class="col-lg-7" style="margin-left: 5px; text-align: left; border:1px solid #CFCFCF; padding: 20px;">
+                                    <div class="row" style="text-align: left;">
+                                        <div class="col-lg-2 col-md-offset-1" style="text-align: center;">
+                                            <button class="cbtn btn btn-danger glyphicon glyphicon-off" id="pos_power" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_custom_0" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_custom_1" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_custom_2" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-primary glyphicon" id="pos_plus" name=""></button>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="text-align: center; margin-top: 20px;">
+                                        <div class="col-lg-2 col-md-offset-1" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_up" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+
+                                        </div>
+                                    </div>
+                                    <div class="row" style="text-align: center; margin-top: 20px;">
+                                        <div class="col-lg-2 col-md-offset-1" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_left" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-primary glyphicon" id="pos_ok" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_right" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+
+                                        </div>
+                                    </div>
+                                    <div class="row" style="text-align: center; margin-top: 20px;">
+                                        <div class="col-lg-2 col-md-offset-1" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_down" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-primary glyphicon" id="pos_minus" name=""></button>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="text-align: center; margin-top: 20px;">
+                                        <div class="col-lg-2 col-md-offset-1" style="text-align: center;">
+
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_custom_3" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_custom_4" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn btn-default glyphicon" id="pos_custom_5" name=""></button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+
+                                        </div>
+                                    </div>
+                                    <div class="row stb_keys" style="text-align: center; margin-top: 20px;">
+                                        <div class="col-lg-2 col-md-offset-1" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_0" name="btn_14" style="width: 40px;">0</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_1" name="btn_15" style="width: 40px;">1</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_2" name="btn_16" style="width: 40px;">2</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_3" name="btn_17" style="width: 40px;">3</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_4" name="btn_18" style="width: 40px;">4</button>
+                                        </div>
+                                    </div>
+                                    <div class="row stb_keys" style="text-align: center; margin-top: 20px;">
+                                        <div class="col-lg-2 col-md-offset-1" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_5" name="btn_19" style="width: 40px;">5</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_6" name="btn_20" style="width: 40px;">6</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_7" name="btn_21" style="width: 40px;">7</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_8" name="btn_22" style="width: 40px;">8</button>
+                                        </div>
+                                        <div class="col-lg-2" style="text-align: center;">
+                                            <button class="cbtn btn" id="pos_num_9" name="btn_23" style="width: 40px;">9</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="width: 100%;">
+                                <div id="wave_container" style="height: 100px; margin-top: 10px; margin-bottom: 10px;"></div>
+                                <pre id="ir_wave_value" readonly style="width: 100%; white-space: nowrap; text-align: left; overflow-x: scroll; color: #000;" data-i18n="[html]page_code.d_invoke_hint">
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" style="font-size: 14px;"
+                            onclick="resetKeyPressInfo();" data-i18n="page_code.d_protocol_refresh">刷新
+                    </button>
+                    <button class="btn btn-default" data-i18n="page_code.d_try_index_quit"
+                            onclick="quitDecode();" type="button">关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 
-<script src="../public_js/bower_components/jquery/dist/jquery.min.js"></script>
-<script src="../public_js/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../public/bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../public/bower_components/toastr/toastr.min.js"></script>
+<script src="../public/bower_components/highcharts/highcharts.js"></script>
 
-<script src="../public_js/bower_components/bootstrap-spinner/dist/bootstrap-spinner.min.js"></script>
-<script src="../public_js/bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
-<script src="../public_js/bower_components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
-<script src="../public_js/bower_components/bootstrap-table/dist/locale/bootstrap-table-en-US.min.js"></script>
-<script src="../public_js/bower_components/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
-<script src="../public_js/bower_components/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
-<script src="../public_js/bower_components/select2/dist/js/select2.min.js"></script>
-<script src="../public_js/utils/date_utils.js"></script>
-<script src="../public_js/utils/url_parser.js"></script>
-<script src="../public_js/utils/view_utils.js"></script>
-<script src="../public_js/chinese/await.js"></script>
-<script src="../public_js/chinese/chinese.js"></script>
-<script src="../public_js/i18n/i18next-1.11.2.min.js"></script>
-<script type="text/javascript" src="js/constants.js"></script>
-<script type="text/javascript" src="js/manage.js"></script>
-<script type="text/javascript" src="js/operate.js"></script>
+<script src="../public/bower_components/bootstrap-spinner/dist/bootstrap-spinner.min.js"></script>
+<script src="../public/bower_components/bootstrap-table/dist/bootstrap-table.min.js"></script>
+<script src="../public/bower_components/bootstrap-table/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+<script src="../public/bower_components/bootstrap-table/dist/locale/bootstrap-table-en-US.min.js"></script>
+<script src="../public/bower_components/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+<script src="../public/bower_components/bootstrap-multiselect/dist/js/bootstrap-multiselect.js"></script>
+<script src="../public/bower_components/select2/dist/js/select2.min.js"></script>
+<script src="../public/utils/constants.js"></script>
+<script src="../public/utils/date_utils.js"></script>
+<script src="../public/utils/url_parser.js"></script>
+<script src="../public/utils/view_utils.js"></script>
+<script src="../public/utils/waverize.js"></script>
+<script src="../public/utils/key_mapping.js"></script>
+<script src="../public/chinese/await.js"></script>
+<script src="../public/chinese/chinese.js"></script>
+<script src="../public/i18n/i18next-1.11.2.min.js"></script>
+<script src="js/manage.js"></script>
+<script src="js/operate.js"></script>
 </html>

@@ -32,7 +32,8 @@ public class Constants {
     public static final int STATUS_INVALID = 0;
     public static final int STATUS_PARA_DATA = 15;
 
-    public static final String REMOTE_REF_URL = "http://srv.irext.net/irext-server/remote_ref/create_remote_ref";
+    public static final String REMOTE_REF_URL = "/irext-server/remote_ref/create_remote_ref";
+    public static final String APP_LOGIN_URL = "/irext-server/app/app_login";
 
     public enum CategoryID {
         AIR_CONDITIONER(1),
@@ -48,7 +49,9 @@ public class Constants {
         BSTB(11),
         CLEANING_ROBOT(12),
         AIR_CLEANER(13),
-        DYSON_SERIES(14);
+        DYSON_SERIES(14),
+        CAMERA(15),
+        HEATER(16);
 
         private final int id;
 
