@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#filepath=$(cd "$(dirname "$0")"; pwd)
-#cd $filepath
-#NODE_ENV=${1} nohup node irext_console.js &
-tmux -c "node irext_console.js &"
+
+export NODE_ENV="production"
+tmux new-session -d "APP_KEY='$APP_KEY' APP_SECRET='$APP_SECRET' NODE_ENV='production' node irext_console.js"
