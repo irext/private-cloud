@@ -1,10 +1,23 @@
 #!/bin/bash
 WORKSPACE=$(dirname "$(realpath '${0}')")
 source /etc/profile
-chown mysql:mysql /data/mysql -R
-chmod 755 /data/mysql -R
+
 service mysql restart
+
+echo ""
+sleep 5
+
+if [[ ! -f "/data/.data_inited" ]]; then
+  echo "Initializing data"
+  mysql < /data/irext/database/db/irext_db_20260519_mysql.sql -uroot -proot
+  touch /data/.data_inited
+  chmod 400 /data/.data_inited
+fi
+sleep 5
+
 service redis-server restart
+
+echo ""
 sleep 5
 
 echo "Stopping private-backend"
@@ -12,7 +25,9 @@ pkill java
 sleep 2
 
 echo "Starting private-backend"
-nohup java -Dirext.server.appkey="$APP_KEY" -Dirext.server.appsecret="$APP_SECRET" -jar /data/irext/private-cloud/private-backend/package/private-backend-1.5.0.jar > log.out 2>&1 &
+nohup java -Dirext.server.appkey="$APP_KEY" -Dirext.server.appsecret="$APP_SECRET" -jar /data/irext/private-cloud/private-backend/package/private-backend-1.5.2.jar > log.out 2>&1 &
+
+echo ""
 sleep 5
 
 echo "Stopping private-console"
@@ -21,7 +36,7 @@ pkill node
 
 echo "Starting private-console"
 sleep 2
-./startup.sh
+./startup.sh > log.out 2>&1 &
 
 cd ${WORKSPACE}
 
