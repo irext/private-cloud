@@ -64,7 +64,7 @@ authenticationLogic.applicationSignInWorkUnit(appKey, appSecret, function (signI
 });
 
 // kickstart the engine
-System.startupHttp(http, serverListenPort, "IRext Console V1.5.2");
+System.startupHttp(http, serverListenPort, "IRext Console V1.5.2_r2");
 
 ////////////////// authentication middleware //////////////////
 function tokenValidation (req, res, next) {

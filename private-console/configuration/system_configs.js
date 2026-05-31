@@ -14,6 +14,7 @@ let enums = new Enums();
 exports.setupEnvironment = function () {
     let env = process.env.NODE_ENV || 'development';
     if (undefined === typeof env || null === env || "" === env || enums.APP_PRODUCTION_MODE === env) {
+        ENV = enums.APP_PRODUCTION_MODE;
         MYSQL_DB_SERVER_ADDRESS = "127.0.0.1";
         MYSQL_DB_NAME = "irext";
         MYSQL_DB_USER = "root";
@@ -23,12 +24,13 @@ exports.setupEnvironment = function () {
         REDIS_PASSWORD = null;
         FILE_TEMP_PATH = "/data/irext/database/binaries/irext-binaries";
         PYTHON_PATH = "/usr/bin/python";
-        LISTEN_PORT = "8080";
+        LISTEN_PORT = "8301";
         BACKEND_SERVER_ADDRESS = "127.0.0.1";
         BACKEND_SERVER_PORT = "8081";
         EXTERNAL_SERVER_ADDRESS = "srv.irext.net";
         EXTERNAL_SERVER_PORT = "80";
     }  else if (enums.APP_DEVELOPMENT_MODE === env) {
+        ENV = enums.APP_DEVELOPMENT_MODE;
         MYSQL_DB_SERVER_ADDRESS = "127.0.0.1";
         MYSQL_DB_NAME = "irext";
         MYSQL_DB_USER = "root";
