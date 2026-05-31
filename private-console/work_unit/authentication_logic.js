@@ -107,7 +107,6 @@ exports.verifyTokenWithPermissionWorkUnit = function (id, token, permissions, ca
 exports.applicationSignInWorkUnit = function (appKey, appSecret, callback) {
     let queryParams = new Map();
     let userApp = {
-        adminID: 1,
         appKey : appKey,
         appSecret : appSecret,
         appType : enums.APP_TYPE_PRIVATE_CLOUD

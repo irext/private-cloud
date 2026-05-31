@@ -25,7 +25,7 @@ exports.setupEnvironment = function () {
         PYTHON_PATH = "/usr/bin/python";
         LISTEN_PORT = "8080";
         BACKEND_SERVER_ADDRESS = "127.0.0.1";
-        BACKEDN_SERVER_PORT = "8081";
+        BACKEND_SERVER_PORT = "8081";
         EXTERNAL_SERVER_ADDRESS = "srv.irext.net";
         EXTERNAL_SERVER_PORT = "80";
     }  else if (enums.APP_DEVELOPMENT_MODE === env) {
@@ -40,7 +40,7 @@ exports.setupEnvironment = function () {
         PYTHON_PATH = "/usr/bin/python";
         LISTEN_PORT = "8080";
         BACKEND_SERVER_ADDRESS = "127.0.0.1";
-        BACKEDN_SERVER_PORT = "8082";
+        BACKEND_SERVER_PORT = "8082";
         EXTERNAL_SERVER_ADDRESS = "127.0.0.1";
         EXTERNAL_SERVER_PORT = "8083";
     }
