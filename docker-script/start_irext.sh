@@ -32,7 +32,7 @@ pkill java
 sleep 2
 
 echo "Starting private-backend"
-nohup java -Dirext.server.appkey="$APP_KEY" -Dirext.server.appsecret="$APP_SECRET" -jar /data/irext/private-cloud/private-backend/package/private-backend-1.5.2.jar >> ${BACKEND_START_LOG} 2>&1 &
+nohup java -Dirext.server.appkey="$APP_KEY" -Dirext.server.appsecret="$APP_SECRET" -jar /data/irext/private-cloud/private-backend/package/private-backend-1.5.3.jar >> ${BACKEND_START_LOG} 2>&1 &
 
 echo ""
 sleep 5
