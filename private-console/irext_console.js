@@ -64,7 +64,7 @@ authenticationLogic.applicationSignInWorkUnit(appKey, appSecret, function (signI
 });
 
 // kickstart the engine
-System.startupHttp(http, serverListenPort, "IRext Console V1.5.2_r2");
+System.startupHttp(http, serverListenPort, "IRext Private Console V1.5.3_r1");
 
 ////////////////// authentication middleware //////////////////
 function tokenValidation (req, res, next) {
@@ -95,6 +95,11 @@ function tokenValidation (req, res, next) {
     }
     if (req.url.indexOf("/irext/decode/decode_online") !== -1) {
         // Skip authentication for online decode (read-only operation)
+        next();
+        return;
+    }
+    if (req.url.indexOf("/irext/code/update_status") !== -1) {
+        // Skip authentication for SSE endpoint (EventSource cannot send custom headers)
         next();
         return;
     }

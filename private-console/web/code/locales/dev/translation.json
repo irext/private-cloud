@@ -45,6 +45,9 @@
         "d_table_remote_cn": "控制码",
         "d_table_status_cn": "状态",
 
+        "d_update_data": "自动更新数据",
+        "d_update_data_offline": "离线更新数据",
+
         "d_status_published": "已发布",
         "d_status_to_verify": "待验证",
         "d_status_passed": "通过",
@@ -60,6 +63,31 @@
         "d_hint_province_placeholder": "选择省份",
         "d_hint_city_placeholder": "选择城市",
         "d_hint_sp_placeholder": "选择SP",
-        "d_hint_brand_placeholder": "选择品牌"
+        "d_hint_brand_placeholder": "选择品牌",
+
+        "d_offline_upload_warning": "请上传从公有云下载的加密数据包（.tar.gz.enc格式），上传后将覆盖现有数据",
+        "d_select_data_file": "选择数据文件",
+        "d_upload_and_update": "上传并更新",
+        "d_cancel": "取消",
+        "d_uploading": "上传中...",
+        "d_upload_success": "上传成功",
+        "d_upload_failed": "上传失败",
+        "d_select_file_first": "请先选择数据文件",
+        "d_invalid_file_format": "仅支持.tar.gz.enc格式文件",
+        "d_file_too_large": "文件大小不能超过200MB",
+
+        "d_updating": "更新中...",
+        "d_update_success": "数据更新成功",
+        "d_update_failed": "数据更新失败",
+
+        "d_step_preparing_data": "正在准备数据...",
+        "d_step_downloading": "正在下载加密文件...",
+        "d_step_decrypting": "正在解密文件...",
+        "d_step_extracting": "正在解压数据包...",
+        "d_step_backing_up": "正在备份数据库和二进制文件...",
+        "d_step_importing_sql": "正在导入数据库...",
+        "d_step_replacing_binaries": "正在替换二进制文件...",
+        "d_step_completed": "数据更新完成",
+        "d_step_failed": "更新失败"
     }
 }

@@ -44,6 +44,8 @@ let contributeProtocolService = "/irext-server/contribution/contribute_protocol"
 let contributeBrandsService = "/irext-server/contribution/contribute_brands";
 let contributeRemoteIndexesService = "/irext-server/contribution/contribute_remote_indexes";
 let createRemoteRefService = "/irext-server/remote_ref/create_remote_ref";
+let preparePrivateDataService = "/irext-server/publish/prepare_private_data";
+let offlineUpdateService = "/irext-server/publish/offline_update";
 
 exports.listCategoriesWorkUnit = function (lang, from, count, callback) {
     let conditions = {
@@ -389,7 +391,9 @@ exports.downloadRemoteBinCachedWorkUnit = function (adminId, token, remoteIndexI
                                                 };
                                                 requestSender.sendPostRequest(createRemoteRefRequest,
                                                     function (createRemoteRefErr, createRemoteRefResponse) {
-                                                        logger.info(createRemoteRefErr);
+                                                        if (createRemoteRefErr !== 0) {
+                                                            logger.error('failed to create remote ref: ' + createRemoteRefErr);
+                                                        }
                                                     });
                                             }
                                         });
@@ -422,7 +426,9 @@ exports.downloadRemoteBinCachedWorkUnit = function (adminId, token, remoteIndexI
                                         };
                                         requestSender.sendPostRequest(createRemoteRefRequest,
                                             function (createRemoteRefErr, createRemoteRefResponse) {
-                                                logger.info(createRemoteRefErr);
+                                                if (createRemoteRefErr !== 0) {
+                                                    logger.error('failed to create remote ref: ' + createRemoteRefErr);
+                                                }
                                             });
                                     }
                                 }
@@ -454,6 +460,56 @@ exports.listIRProtocolsWorkUnit = function (from, count, callback) {
 };
 
 
+
+exports.updatePrivateDataWorkUnit = function(appKey, appSecret, callback) {
+    let queryParams = new Map();
+    let prepareRequest = {
+        appKey: appKey,
+        appSecret: appSecret
+    };
+    let requestSender = new RequestSender(BACKEND_SERVER_ADDRESS, BACKEND_SERVER_PORT, preparePrivateDataService, queryParams);
+
+    requestSender.sendPostRequest(prepareRequest, function(prepareErr, prepareResponse) {
+        if (errorCode.SUCCESS.code === prepareErr && null !== prepareResponse) {
+            let responseObj = JSON.parse(prepareResponse);
+            if (responseObj.status.code === errorCode.SUCCESS.code) {
+                logger.info('update private data success');
+                callback(errorCode.SUCCESS, responseObj.entity);
+            } else {
+                logger.error('update private data failed, server error code: ' + responseObj.status.code);
+                callback(errorCode.FAILED, null);
+            }
+        } else {
+            logger.error('update private data request failed');
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
+
+exports.uploadOfflineDataWorkUnit = function(filePath, appSecret, callback) {
+    let queryParams = new Map();
+    let offlineRequest = {
+        filePath: filePath,
+        appSecret: appSecret
+    };
+    let requestSender = new RequestSender(BACKEND_SERVER_ADDRESS, BACKEND_SERVER_PORT, offlineUpdateService, queryParams);
+
+    requestSender.sendPostRequest(offlineRequest, function(processErr, processResponse) {
+        if (errorCode.SUCCESS.code === processErr && null !== processResponse) {
+            let responseObj = JSON.parse(processResponse);
+            if (responseObj.status.code === errorCode.SUCCESS.code) {
+                logger.info('offline data update success');
+                callback(errorCode.SUCCESS, responseObj.entity);
+            } else {
+                logger.error('offline data update failed, error: ' + responseObj.entity);
+                callback(errorCode.FAILED, responseObj.entity);
+            }
+        } else {
+            logger.error('offline data update request failed');
+            callback(errorCode.FAILED, null);
+        }
+    });
+};
 
 // Ultilities
 function checksum(str, algorithm, encoding) {

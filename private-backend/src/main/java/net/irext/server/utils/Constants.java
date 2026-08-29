@@ -34,6 +34,11 @@ public class Constants {
 
     public static final String REMOTE_REF_URL = "/irext-server/remote_ref/create_remote_ref";
     public static final String APP_LOGIN_URL = "/irext-server/app/app_login";
+    public static final String PREPARE_PRIVATE_DATA_URL = "/irext-server/publish/prepare_private_data";
+
+    public static final String TEMP_DATA_DIR = "/data/irext/temp_data/";
+
+    public static final String ENCRYPT_MAGIC_NUMBER = "IREX";
 
     public enum CategoryID {
         AIR_CONDITIONER(1),

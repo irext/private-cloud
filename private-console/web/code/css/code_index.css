@@ -221,3 +221,55 @@ body {
 #hint_dialog .modal-backdrop {
     z-index: 10059 !important;
 }
+
+/* offline upload area in dropdown menu */
+#offline_upload_area .custom-file {
+    position: relative;
+}
+
+#offline_upload_area .custom-file-input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+}
+
+#offline_upload_area .custom-file-label {
+    position: relative;
+    display: block;
+    padding: 6px 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#offline_upload_area .custom-file-label::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    display: block;
+    padding: 6px 12px;
+    line-height: 1.5;
+    color: #495057;
+    content: "浏览";
+    background-color: #e9ecef;
+    border-left: 1px solid #ced4da;
+}
+
+#offline_upload_area .btn {
+    font-size: 13px;
+    padding: 4px 12px;
+}
+
+#upload_status {
+    word-break: keep-all;
+}

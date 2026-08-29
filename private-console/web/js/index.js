@@ -38,73 +38,11 @@ function signIn() {
     doSignIn(userName, pwHash);
 }
 
-function onChangePassword() {
-    let userName = $("#user_name").val();
-    if (null == userName || "" === userName) {
-        toastr.error(i18n.t('page_index.d_signin_fill_email', { lng: userLang }));
-        return;
-    }
-    $("#changepw_confirm_dialog").modal();
-}
-
 function popUpHintDialog(hint) {
     let textHint = $("#text_hint");
     textHint.empty();
     textHint.append(hint);
     $("#hint_dialog").modal();
-}
-
-function navigateToPage(page, id, token) {
-    let form = $("<form method='post'></form>"),
-        input;
-    form.attr({"action" : "/irext/nav/nav_to_url"});
-
-    input = $("<input type='hidden'>");
-    input.attr({"name": "admin_id"});
-    input.val(id);
-    form.append(input);
-
-    input = $("<input type='hidden'>");
-    input.attr({"name": "token"});
-    input.val(token);
-    form.append(input);
-
-    input = $("<input type='hidden'>");
-    input.attr({"name": "page"});
-    input.val(page);
-    form.append(input);
-
-    form.submit();
-}
-
-function changePassword() {
-    let userName = $("#user_name").val();
-    if (null == userName || "" === userName) {
-        popUpHintDialog(i18n.t('page_index.d_signin_fill_email', { lng: userLang }));
-        return;
-    }
-    $.ajax({
-        url: "/irext/authenticate/change_pw",
-        type: "POST",
-        data: {
-            user_name : userName,
-            callback_url : window.location.hostname
-        },
-        timeout: 20000,
-        success: function (response) {
-            if(response.status.code === 0) {
-                $("#changepw_confirm_dialog").modal('hide');
-                popUpHintDialog(i18n.t('page_index.d_signup_email_sent', { lng: userLang }));
-            } else {
-                $("#changepw_confirm_dialog").modal('hide');
-                popUpHintDialog(i18n.t('page_index.d_signup_email_failed', { lng: userLang }));
-            }
-        },
-        error: function () {
-            $("#changepw_confirm_dialog").modal('hide');
-            popUpHintDialog(i18n.t('page_index.d_signup_email_failed', { lng: userLang }));
-        }
-    });
 }
 
 function doSignIn(userName, password) {

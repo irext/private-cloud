@@ -454,145 +454,6 @@ function initializeFilterBrands() {
     });
 }
 
-///////////////////////////// Event handler /////////////////////////////
-function onCategoryChange() {
-    let currentCategoryID = $('#category_id').val();
-    currentCategory = getCategoryByID(currentCategoryID);
-    switchCategory();
-}
-
-function switchCategory() {
-    switch(parseInt(currentCategory.id)) {
-        case CATEGORY_AC:
-            showBrandSelector();
-            showProtocolSelector(false);
-            break;
-        case CATEGORY_TV:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_STB:
-            showCitySelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_NW:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_IPTV:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_DVD:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_FAN:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_PROJECTOR:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_STEREO:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_LIGHT_BULB:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_BSTB:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_CLEANING_ROBOT:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_AIR_CLEANER:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_DYSON:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_CAMERA:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        case CATEGORY_HEATER:
-            showBrandSelector();
-            showProtocolSelector(true);
-            break;
-        default:
-            console.log('Wrong category : ' + currentCategory.id);
-            break;
-    }
-}
-
-function onFilterCategoryChange() {
-    currentFilterCategory = {
-        id: $('#filter_category_id').val(),
-        name: $('#filter_category_id option:selected').text()
-    };
-
-    switch(parseInt(currentFilterCategory.id)) {
-        case CATEGORY_AC:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_TV:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_STB:
-            showFilterCitySelector();
-            break;
-        case CATEGORY_NW:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_IPTV:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_DVD:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_FAN:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_PROJECTOR:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_STEREO:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_LIGHT_BULB:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_BSTB:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_CLEANING_ROBOT:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_AIR_CLEANER:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_DYSON:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_CAMERA:
-            showFilterBrandSelector();
-            break;
-        case CATEGORY_HEATER:
-            showFilterBrandSelector();
-            break;
-        default:
-            break;
-    }
-}
-
 function onFilterBrandChange() {
     currentFilterBrand = {
         id: $('#filter_brand_id').val(),
@@ -627,104 +488,6 @@ function onSearchRemote() {
 }
 
 ///////////////////////////// UI functions /////////////////////////////
-function fillProtocolList(protocols) {
-    let protocolId = $('#protocol_id')
-    protocolId.find('option')
-        .remove()
-        .end();
-
-    $.each(protocols, function (i, protocol) {
-        $('#protocol_id').append($('<option>', {
-            value: protocol.id,
-            text : protocol.name
-        }));
-    });
-
-    protocolId.select2({
-        placeholder: 'Select Protocol'
-    });
-}
-
-function fillCategoryList(categories) {
-    $.each(categories, function (i, category) {
-        $('#category_id').append($('<option>', {
-            value: category.id,
-            text : category.name
-        }));
-    });
-
-    $('#category_id').select2({
-        placeholder: i18n.t("page_code.d_hint_category_placeholder", { lng: userLang })
-    });
-}
-
-function fillProvinceList(provinces) {
-    $.each(provinces, function (i, province) {
-        $('#province_id').append($('<option>', {
-            value: province.code,
-            text : province.name
-        }));
-    });
-
-    $('#province_id').select2({
-        placeholder: i18n.t("page_code.d_hint_province_placeholder", { lng: userLang })
-    });
-}
-
-function fillCityList(cities) {
-    let cityCode = $('#city_code');
-    cityCode.find('option')
-        .remove()
-        .end();
-
-    $.each(cities, function (i, city) {
-        $('#city_code').append($('<option>', {
-            value: city.code,
-            text : city.name
-        }));
-    });
-
-    cityCode.select2({
-        placeholder: i18n.t("page_code.d_hint_city_placeholder", { lng: userLang })
-    });
-}
-
-function fillOperatorList(operators) {
-    let operatorId = $('#operator_id');
-    operatorId.find('option')
-        .remove()
-        .end();
-
-    $.each(operators, function (i, operator) {
-        $('#operator_id').append($('<option>', {
-            value: operator.operator_id,
-            text : operator.operator_name
-        }));
-    });
-
-    operatorId.select2({
-        placeholder: i18n.t("page_code.d_hint_sp_placeholder", { lng: userLang })
-    });
-}
-
-function fillBrandList(brands) {
-    let brandId = $('#brand_id');
-    brandId.find('option')
-        .remove()
-        .end();
-
-    $.each(brands, function (i, brand) {
-        $('#brand_id').append($('<option>', {
-            value: brand.id,
-            text : brand.name
-        }));
-    });
-
-    brandId.select2({
-        placeholder: i18n.t("page_code.d_hint_brand_placeholder", { lng: userLang })
-    });
-}
-
 function fillFilterCategoryList(categories) {
     let filterCategoryId = $('#filter_category_id');
     filterCategoryId.find('option')
@@ -797,22 +560,6 @@ function fillFilterBrandList(brands) {
     });
 }
 
-function showCitySelector() {
-    $('#brand_panel').hide();
-    $('#province_panel').show();
-    $('#city_panel').show();
-    $('#operator_panel').show();
-    initializeProvince();
-}
-
-function showBrandSelector() {
-    $('#brand_panel').show();
-    $('#province_panel').hide();
-    $('#city_panel').hide();
-    $('#operator_panel').hide();
-    initializeBrands();
-}
-
 function showFilterCitySelector() {
     $('#filter_brand_panel').hide();
     $('#filter_province_panel').show();
@@ -827,14 +574,6 @@ function showFilterBrandSelector() {
     initializeFilterBrands();
 }
 
-function showProtocolSelector(show) {
-    if (true === show) {
-        $('.protocol_panel').show();
-    } else {
-        $('.protocol_panel').hide();
-    }
-}
-
 function popUpHintDialog(hint) {
     let TextHint = $('#text_hint');
     TextHint.empty();
@@ -842,52 +581,265 @@ function popUpHintDialog(hint) {
     $('#hint_dialog').modal();
 }
 
+/////////////////////////////   Admin   /////////////////////////////
+function updateData() {
+    let $btn = $('#btn_auto_update');
+    if ($btn.prop('disabled')) {
+        return;
+    }
+    let originalText = $btn.text();
+    $btn.text(i18n.t('page_code.d_updating', {lng: userLang})).prop('disabled', true);
+    $('#btn_update_dropdown').prop('disabled', true);
+
+    // show status area and clear previous status
+    let $statusArea = $('#update_status_area');
+    let $statusText = $('#update_status_text');
+    $statusArea.css('display', 'inline-block');
+
+    // connect to SSE for real-time status
+    let eventSource = new EventSource('/irext/code/update_status');
+    let sseCompleted = false;
+
+    eventSource.onmessage = function(event) {
+        try {
+            let data = JSON.parse(event.data);
+            let stepKey = 'd_step_' + data.step;
+            let stepName = i18n.t('page_code.' + stepKey, {lng: userLang});
+            if (stepName === stepKey) {
+                stepName = data.message;
+            }
+
+            let icon, color;
+            if (data.status === 'success') {
+                icon = '<i class="fa fa-check" style="color: #5cb85c; margin-right: 5px;"></i>';
+                color = '#5cb85c';
+            } else if (data.status === 'error') {
+                icon = '<i class="fa fa-times" style="color: #d9534f; margin-right: 5px;"></i>';
+                color = '#d9534f';
+            } else {
+                icon = '<i class="fa fa-spinner fa-spin" style="color: #337ab7; margin-right: 5px;"></i>';
+                color = '#333';
+            }
+
+            // only show latest status
+            $statusText.html(icon + '<span style="color: ' + color + ';">' + stepName + '</span>');
+
+            // handle completion
+            if (data.step === 'completed' || data.step === 'failed') {
+                sseCompleted = true;
+                eventSource.close();
+                $btn.text(originalText).prop('disabled', false);
+                $('#btn_update_dropdown').prop('disabled', false);
+                if (data.step === 'completed') {
+                    // add dismiss button for success status
+                    let successHtml = icon + '<span style="color: ' + color + ';">' + stepName + '</span>';
+                    successHtml += ' <a href="#" onclick="dismissUpdateStatus(); return false;" style="color: #999; margin-left: 5px; text-decoration: none; font-size: 16px;" title="关闭">&times;</a>';
+                    $statusText.html(successHtml);
+                    toastr.success(i18n.t('page_code.d_update_success', {lng: userLang}));
+                } else {
+                    toastr.error(i18n.t('page_code.d_update_failed', {lng: userLang}));
+                }
+            }
+        } catch (e) {
+            // ignore parse errors
+        }
+    };
+
+    eventSource.onerror = function() {
+        if (!sseCompleted) {
+            eventSource.close();
+            $btn.text(originalText).prop('disabled', false);
+            $('#btn_update_dropdown').prop('disabled', false);
+            toastr.error(i18n.t('page_code.d_update_failed', {lng: userLang}));
+        }
+    };
+
+    // trigger the update after SSE is connected
+    setTimeout(function() {
+        $.ajax({
+            url: '/irext/code/update_private_data',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                admin_id: id,
+                token: token
+            },
+            timeout: 300000
+        });
+    }, 500);
+}
+
+function updateDataOffline() {
+
+}
+
+function dismissUpdateStatus() {
+    $('#update_status_area').hide();
+    $('#update_status_text').empty();
+}
+
+function toggleOfflineUploadArea() {
+    let $uploadArea = $('#offline_upload_area');
+    if ($uploadArea.is(':visible')) {
+        cancelOfflineUpload();
+    } else {
+        $uploadArea.show();
+        // initialize bs-custom-file-input for file input
+        let fileInput = document.getElementById('data_file');
+        if (fileInput && !fileInput.bsCustomFileInput) {
+            bsCustomFileInput.init('#data_file');
+        }
+    }
+}
+
+function cancelOfflineUpload() {
+    let $uploadArea = $('#offline_upload_area');
+    let $fileInput = $('#data_file');
+    let $status = $('#upload_status');
+    let $btnUpload = $('#btn_upload_data');
+
+    $fileInput.val('');
+    $('label[for="data_file"]').text(i18n.t('page_code.d_select_data_file', {lng: userLang}));
+    $status.hide().text('');
+    $btnUpload.prop('disabled', false);
+    $uploadArea.hide();
+}
+
+function uploadOfflineData() {
+    let fileInput = document.getElementById('data_file');
+    let file = fileInput.files[0];
+
+    if (!file) {
+        toastr.error(i18n.t('page_code.d_select_file_first', {lng: userLang}));
+        return;
+    }
+
+    if (!file.name.endsWith('.tar.gz.enc') && !file.name.endsWith('.enc')) {
+        toastr.error(i18n.t('page_code.d_invalid_file_format', {lng: userLang}));
+        return;
+    }
+
+    if (file.size > 200 * 1024 * 1024) {
+        toastr.error(i18n.t('page_code.d_file_too_large', {lng: userLang}));
+        return;
+    }
+
+    let $status = $('#upload_status');
+    let $btnUpload = $('#btn_upload_data');
+    let $btnAutoUpdate = $('#btn_auto_update');
+    let $btnDropdown = $('#btn_update_dropdown');
+
+    // disable buttons during upload
+    $btnUpload.prop('disabled', true);
+    $btnAutoUpdate.prop('disabled', true);
+    $btnDropdown.prop('disabled', true);
+
+    // hide the offline upload area, only show progress
+    $('#offline_upload_area').hide();
+
+    // show status area and connect to SSE
+    let $statusArea = $('#update_status_area');
+    let $statusText = $('#update_status_text');
+    $statusArea.css('display', 'inline-block');
+    $statusText.empty();
+
+    let eventSource = new EventSource('/irext/code/update_status');
+    let sseCompleted = false;
+
+    eventSource.onmessage = function(event) {
+        try {
+            let data = JSON.parse(event.data);
+            let stepKey = 'd_step_' + data.step;
+            let stepName = i18n.t('page_code.' + stepKey, {lng: userLang});
+            if (stepName === stepKey) {
+                stepName = data.message;
+            }
+
+            let icon, color;
+            if (data.status === 'success') {
+                icon = '<i class="fa fa-check" style="color: #5cb85c; margin-right: 5px;"></i>';
+                color = '#5cb85c';
+            } else if (data.status === 'error') {
+                icon = '<i class="fa fa-times" style="color: #d9534f; margin-right: 5px;"></i>';
+                color = '#d9534f';
+            } else {
+                icon = '<i class="fa fa-spinner fa-spin" style="color: #337ab7; margin-right: 5px;"></i>';
+                color = '#333';
+            }
+
+            $statusText.html(icon + '<span style="color: ' + color + ';">' + stepName + '</span>');
+
+            if (data.step === 'completed' || data.step === 'failed') {
+                sseCompleted = true;
+                eventSource.close();
+                $btnAutoUpdate.text(i18n.t('page_code.d_update_data', {lng: userLang})).prop('disabled', false);
+                $btnDropdown.prop('disabled', false);
+                $btnUpload.prop('disabled', false);
+                if (data.step === 'completed') {
+                    let successHtml = icon + '<span style="color: ' + color + ';">' + stepName + '</span>';
+                    successHtml += ' <a href="#" onclick="dismissUpdateStatus(); return false;" style="color: #999; margin-left: 5px; text-decoration: none; font-size: 16px;" title="关闭">&times;</a>';
+                    $statusText.html(successHtml);
+                    toastr.success(i18n.t('page_code.d_update_success', {lng: userLang}));
+                    cancelOfflineUpload();
+                } else {
+                    toastr.error(i18n.t('page_code.d_update_failed', {lng: userLang}));
+                    // clear file input and reset label, show upload area again on failure
+                    $('#data_file').val('');
+                    $('label[for="data_file"]').text(i18n.t('page_code.d_select_data_file', {lng: userLang}));
+                    $('#offline_upload_area').show();
+                }
+            }
+        } catch (e) {
+            // ignore parse errors
+        }
+    };
+
+    eventSource.onerror = function() {
+        if (!sseCompleted) {
+            eventSource.close();
+            $btnAutoUpdate.text(i18n.t('page_code.d_update_data', {lng: userLang})).prop('disabled', false);
+            $btnDropdown.prop('disabled', false);
+            $btnUpload.prop('disabled', false);
+            $('#offline_upload_area').show();
+            toastr.error(i18n.t('page_code.d_update_failed', {lng: userLang}));
+        }
+    };
+
+    // upload file after SSE is connected
+    setTimeout(function() {
+        let formData = new FormData();
+        formData.append('data_file', file);
+        formData.append('admin_id', id);
+        formData.append('token', token);
+
+        $.ajax({
+            url: '/irext/code/upload_offline_data',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            timeout: 300000,
+            success: function(response) {
+                if (response.status.code !== 0) {
+                    // AJAX returned but SSE not yet complete
+                    // SSE will handle the final status
+                }
+            },
+            error: function(xhr, status, error) {
+                if (!sseCompleted) {
+                    eventSource.close();
+                    $btnAutoUpdate.text(i18n.t('page_code.d_update_data', {lng: userLang})).prop('disabled', false);
+                    $btnDropdown.prop('disabled', false);
+                    $btnUpload.prop('disabled', false);
+                    $('#offline_upload_area').show();
+                    toastr.error(error || i18n.t('page_code.d_update_failed', {lng: userLang}));
+                }
+            }
+        });
+    }, 500);
+}
+
 ///////////////////////////// Utilities /////////////////////////////
-
-function getCategoryByID(categoryID) {
-    let i = 0;
-    for(i = 0; i < g_categories.length; i++) {
-        let category = g_categories[i];
-        if (parseInt(category.id) === parseInt(categoryID)) {
-            return category;
-        }
-    }
-    return null;
-}
-
-function getBrandByID(brandID) {
-    let i = 0;
-    for(i = 0; i < g_brands.length; i++) {
-        let brand = g_brands[i];
-        if (parseInt(brand.id) === parseInt(brandID)) {
-            return brand;
-        }
-    }
-    return null;
-}
-
-function getCityByCode(cityCode) {
-    let i = 0;
-    for(i = 0; i < g_cities.length; i++) {
-        let city = g_cities[i];
-        if (city.code === cityCode) {
-            return city;
-        }
-    }
-    return null;
-}
-
-function getStbOperatorByID(operatorID) {
-    let i = 0;
-    for(i = 0; i < g_stbOperators.length; i++) {
-        let operator = g_stbOperators[i];
-        if (operator.operator_id === operatorID) {
-            return operator;
-        }
-    }
-    return null;
-}
-
 function gotoIndex() {
     window.location = '../';
 }

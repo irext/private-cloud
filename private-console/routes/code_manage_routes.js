@@ -18,3 +18,9 @@ app.get('/irext/code/list_remote_indexes', intService.listRemoteIndexes);
 app.get('/irext/code/search_remote_indexes', intService.searchRemoteIndexes);
 
 app.get('/irext/code/download_remote_index', intService.downloadRemoteIndex);
+
+app.get('/irext/code/update_status', intService.updateStatus);
+
+app.post('/irext/code/update_private_data', intService.updatePrivateData);
+
+app.post('/irext/code/upload_offline_data', intService.uploadOfflineData);

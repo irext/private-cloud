@@ -24,9 +24,47 @@
     <div class="navbar container">
         <div class="header clearfix">
             <nav>
-                <ul class="nav nav-pills pull-right">
-                    <li role="presentation"><a href="#" data-i18n="page_code.d_try_index_quit" onclick="gotoIndex();">退出</a></li>
-                </ul>
+                <div class="nav nav-pills pull-right">
+                    <div id="update_status_area" style="display: none; margin-right: 15px; font-size: 14px; text-align: right; line-height: 34px; vertical-align: middle;">
+                        <span id="update_status_text"></span>
+                    </div>
+                    <div class="btn-group" style="display: inline-block;">
+                        <button type="button" id="btn_auto_update" class="btn btn-primary" data-i18n="page_code.d_update_data" onclick="updateData();" style="min-width: 140px;">自动更新数据</button>
+                        <button type="button" class="btn btn-primary dropdown-toggle" id="btn_update_dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                            <span class="sr-only"></span>
+                        </button>
+                        <ul class="dropdown-menu" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">
+                            <li><a href="#" onclick="toggleOfflineUploadArea(); return false;" data-i18n="page_code.d_update_data_offline">离线更新数据</a></li>
+                            <li id="offline_upload_area" style="display: none; padding: 10px; border-top: 1px solid #eee;" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()">
+                                <div style="min-width: 480px;">
+                                    <p style="font-size: 14px; color: #FF6F00; margin-bottom: 8px;">
+                                        <i class="fa fa-exclamation-triangle" style="margin-right: 5px;"></i>
+                                        <span data-i18n="page_code.d_offline_upload_warning">请上传从公有云下载的加密数据包（.tar.gz.enc格式），上传后将覆盖现有数据</span>
+                                    </p>
+                                    <div class="form-group">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="data_file" accept=".enc">
+                                            <label class="custom-file-label" for="data_file" data-i18n="page_code.d_select_data_file">选择数据文件</label>
+                                        </div>
+                                    </div>
+                                    <div style="text-align: left; margin-top: 8px;">
+                                        <button class="btn btn-primary" id="btn_upload_data" onclick="uploadOfflineData()" style="margin-right: 5px;">
+                                            <i class="fa fa-upload" style="margin-right: 5px;"></i>
+                                            <span data-i18n="page_code.d_upload_and_update">上传并更新</span>
+                                        </button>
+                                        <button class="btn btn-default" onclick="cancelOfflineUpload()" data-i18n="page_code.d_cancel">取消</button>
+                                    </div>
+                                    <div id="upload_status" style="display: none; margin-top: 8px; text-align: center; font-size: 14px; color: #666;"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-normal btn-warning" onclick="gotoIndex();" style="font-size: 14px; margin-right: 2px;">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span href="#" data-i18n="page_code.d_try_index_quit">退出</span>
+                    </button>
+                </div>
             </nav>
             <h3 data-i18n="page_code.title">控制台</h3>
         </div>
@@ -317,6 +355,7 @@
 <script src="../public/utils/view_utils.js"></script>
 <script src="../public/utils/waverize.js"></script>
 <script src="../public/utils/key_mapping.js"></script>
+<script src="../public/utils/bs-custom-file-input.js"></script>
 <script src="../public/chinese/await.js"></script>
 <script src="../public/chinese/chinese.js"></script>
 <script src="../public/i18n/i18next-1.11.2.min.js"></script>

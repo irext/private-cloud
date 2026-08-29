@@ -45,6 +45,9 @@
         "d_table_remote_cn": "Control code",
         "d_table_status_cn": "Status",
 
+        "d_update_data": "Update Data",
+        "d_update_data_offline": "Update Data Offline",
+
         "d_status_published": "Published",
         "d_status_to_verify": "To Verify",
         "d_status_passed": "Passed",
@@ -60,6 +63,31 @@
         "d_hint_province_placeholder": "Select states",
         "d_hint_city_placeholder": "Select city",
         "d_hint_sp_placeholder": "Select SP",
-        "d_hint_brand_placeholder": "Select brand"
+        "d_hint_brand_placeholder": "Select brand",
+
+        "d_offline_upload_warning": "Please upload the encrypted data package (.tar.gz.enc) downloaded from public cloud. Existing data will be overwritten.",
+        "d_select_data_file": "Select data file",
+        "d_upload_and_update": "Upload & Update",
+        "d_cancel": "Cancel",
+        "d_uploading": "Uploading...",
+        "d_upload_success": "Upload successful",
+        "d_upload_failed": "Upload failed",
+        "d_select_file_first": "Please select a data file first",
+        "d_invalid_file_format": "Only .tar.gz.enc format is supported",
+        "d_file_too_large": "File size must not exceed 200MB",
+
+        "d_updating": "Updating...",
+        "d_update_success": "Data updated successfully",
+        "d_update_failed": "Data update failed",
+
+        "d_step_preparing_data": "Preparing data...",
+        "d_step_downloading": "Downloading encrypted file...",
+        "d_step_decrypting": "Decrypting file...",
+        "d_step_extracting": "Extracting data package...",
+        "d_step_backing_up": "Backing up database and binaries...",
+        "d_step_importing_sql": "Importing database...",
+        "d_step_replacing_binaries": "Replacing binary files...",
+        "d_step_completed": "Data update completed",
+        "d_step_failed": "Update failed"
     }
 }

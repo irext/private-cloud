@@ -8,6 +8,7 @@ let logger = require('../mini_poem/logging/logger4js').helper;
 
 let formidable = require('formidable');
 let fs = require('fs');
+let http = require('http');
 
 // local inclusion
 let ServiceResponse = require('../response/service_response.js');
@@ -238,3 +239,118 @@ exports.downloadRemoteIndex = function (req, res) {
     });
 };
 
+exports.updatePrivateData = function (req, res) {
+    let appKey = process.env.APP_KEY;
+    let appSecret = process.env.APP_SECRET;
+
+    let serviceResponse = new ServiceResponse();
+    internalLogic.updatePrivateDataWorkUnit(appKey, appSecret, function(err, result) {
+        if (err.code !== errorCode.SUCCESS.code || null === result) {
+            logger.error('failed to update private data');
+            serviceResponse.status = errorCode.FAILED;
+            serviceResponse.entity = null;
+        } else {
+            logger.info('private data updated successfully');
+            serviceResponse.status = errorCode.SUCCESS;
+            serviceResponse.entity = result;
+        }
+        res.send(serviceResponse);
+        res.end();
+    });
+};
+
+exports.updateStatus = function (req, res) {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+
+    let options = {
+        host: BACKEND_SERVER_ADDRESS,
+        port: BACKEND_SERVER_PORT,
+        path: '/irext-server/publish/update_status',
+        method: 'GET',
+        headers: {
+            'Accept': 'text/event-stream'
+        }
+    };
+
+    let proxyReq = http.request(options, function(proxyRes) {
+        proxyRes.on('data', function(chunk) {
+            res.write(chunk);
+        });
+        proxyRes.on('end', function() {
+            res.end();
+        });
+    });
+
+    proxyReq.on('error', function(e) {
+        logger.error('SSE proxy error: ' + e.message);
+        res.end();
+    });
+
+    req.on('close', function() {
+        proxyReq.abort();
+    });
+
+    proxyReq.end();
+};
+
+exports.uploadOfflineData = function (req, res) {
+    let appSecret = process.env.APP_SECRET;
+
+    let form = new formidable.IncomingForm();
+    form.uploadDir = '/data/irext/temp_data';
+    form.keepExtensions = true;
+
+    // ensure upload directory exists
+    if (!fs.existsSync(form.uploadDir)) {
+        fs.mkdirSync(form.uploadDir, { recursive: true });
+    }
+
+    form.parse(req, function(err, fields, files) {
+        if (err) {
+            logger.error('failed to parse upload form: ' + err.message);
+            let serviceResponse = new ServiceResponse();
+            serviceResponse.status = errorCode.FAILED;
+            serviceResponse.entity = 'upload failed';
+            res.send(serviceResponse);
+            res.end();
+            return;
+        }
+
+        let uploadedFile = files.data_file;
+        if (!uploadedFile) {
+            logger.error('no file uploaded');
+            let serviceResponse = new ServiceResponse();
+            serviceResponse.status = errorCode.FAILED;
+            serviceResponse.entity = 'no file uploaded';
+            res.send(serviceResponse);
+            res.end();
+            return;
+        }
+
+        // rename file to have original name
+        let originalName = uploadedFile.name || 'uploaded.enc';
+        let newPath = form.uploadDir + '/' + originalName;
+        fs.renameSync(uploadedFile.path, newPath);
+
+        logger.info('file uploaded to: ' + newPath);
+
+        // call Java backend to process the uploaded file
+        internalLogic.uploadOfflineDataWorkUnit(newPath, appSecret, function(processErr, result) {
+            let serviceResponse = new ServiceResponse();
+            if (processErr.code !== errorCode.SUCCESS.code) {
+                logger.error('failed to process offline data');
+                serviceResponse.status = errorCode.FAILED;
+                serviceResponse.entity = result || 'processing failed';
+            } else {
+                logger.info('offline data processed successfully');
+                serviceResponse.status = errorCode.SUCCESS;
+                serviceResponse.entity = result;
+            }
+            res.send(serviceResponse);
+            res.end();
+        });
+    });
+};
