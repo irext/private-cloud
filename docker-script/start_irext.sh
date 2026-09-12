@@ -1,25 +1,26 @@
 #!/bin/bash
+
 WORKSPACE=$(dirname "$(realpath '${0}')")
-LOG_FILE="${WORKSPACE}/logs/start_irext.log"
-BACKEND_START_LOG="${WORKSPACE}/logs/backend_start.log"
-CONSOLE_START_LOG="${WORKSPACE}/logs/console_start.log"
+
+SRC_DIR="/opt/private-cloud"
+DATA_DIR="/data/irext"
+
+LOG_FILE="/data/irext/log/start_irext.log"
+BACKEND_START_LOG="/data/irext/log/backend_start.log"
+CONSOLE_START_LOG="/data/irext/log/console_start.log"
+
 source /etc/profile
 
-mkdir -p "${WORKSPACE}/logs"
+mkdir -p "${DATA_DIR}/config"
+mkdir -p "${DATA_DIR}/database"
+mkdir -p "${DATA_DIR}/log"
+mkdir -p "${DATA_DIR}/temp_data"
 
-exec > >(tee -a "$LOG_FILE") 2>&1
+exec > >(tee -a "${LOG_FILE}") 2>&1
 
 service mysql restart
 
 echo ""
-sleep 5
-
-if [[ ! -f "/data/.data_inited" ]]; then
-  echo "Initializing data"
-  mysql < /data/irext/database/db/irext_db_20260519_mysql.sql -uroot -proot
-  touch /data/.data_inited
-  chmod 400 /data/.data_inited
-fi
 sleep 5
 
 service redis-server restart
@@ -32,20 +33,21 @@ pkill java
 sleep 2
 
 echo "Starting private-backend"
-nohup java -Dirext.server.appkey="$APP_KEY" -Dirext.server.appsecret="$APP_SECRET" -jar /data/irext/private-cloud/private-backend/package/private-backend-1.5.3.jar >> ${BACKEND_START_LOG} 2>&1 &
+cp -f "${SRC_DIR}/private-backend/src/main/java/net/irext/decode/sdk/libs/libirdecode_jni.so" "${DATA_DIR}/"
+nohup java -Dirext.server.appkey="${APP_KEY}" -Dirext.server.appsecret="${APP_SECRET}" -jar "${SRC_DIR}/private-backend/package/private-backend.jar" >> "${BACKEND_START_LOG}" 2>&1 &
 
 echo ""
 sleep 5
 
 echo "Stopping private-console"
-cd /data/irext/private-cloud/private-console
+cd   "${SRC_DIR}/private-console"
 pkill node
 
 echo "Starting private-console"
 sleep 2
-./startup.sh >> ${CONSOLE_START_LOG} 2>&1 &
+./startup.sh >> "${CONSOLE_START_LOG}" 2>&1 &
 
-cd ${WORKSPACE}
+cd "${WORKSPACE}"
 
 echo "IRext private server started"
 
