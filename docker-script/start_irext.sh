@@ -34,7 +34,7 @@ sleep 2
 
 echo "Starting private-backend"
 cp -f "${SRC_DIR}/private-backend/src/main/java/net/irext/decode/sdk/libs/libirdecode_jni.so" "${DATA_DIR}/"
-nohup java -Dirext.server.appkey="${APP_KEY}" -Dirext.server.appsecret="${APP_SECRET}" -jar "${SRC_DIR}/private-backend/package/private-backend.jar" >> "${BACKEND_START_LOG}" 2>&1 &
+nohup java -Dirext.server.appkey="${APP_KEY}" -Dirext.server.appsecret="${APP_SECRET}" -Dirext.server.offline="${OFFLINE}" -jar "${SRC_DIR}/private-backend/package/private-backend.jar" >> "${BACKEND_START_LOG}" 2>&1 &
 
 echo ""
 sleep 5
