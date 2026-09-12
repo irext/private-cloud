@@ -73,6 +73,9 @@ public class IndexingLogic {
     @Value("${user.irext.server}")
     private String irextServerUrl;
 
+    @Value("${irext.server.offline:0}")
+    private String offlineMode;
+
     private static final String IR_BIN_FILE_PREFIX = "irda_";
     private static final String IR_BIN_FILE_SUFFIX = ".bin";
 
@@ -175,6 +178,9 @@ public class IndexingLogic {
     }
 
     public String statRemoteRef(RemoteIndex remoteIndex, int id, String token) {
+        if (Integer.parseInt(offlineMode) == Constants.DEPLOY_MODE_OFFLINE) {
+            return null;
+        }
         try {
             String url = irextServerUrl + Constants.REMOTE_REF_URL;
             MediaType JSON

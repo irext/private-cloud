@@ -93,13 +93,23 @@ function tokenValidation (req, res, next) {
         adminID = req.query.admin_id;
         token = req.query.token;
     }
+    if (req.url.indexOf("/irext/init_setup") !== -1) {
+        // skip authentication for init setup endpoints
+        next();
+        return;
+    }
     if (req.url.indexOf("/irext/decode/decode_online") !== -1) {
         // Skip authentication for online decode (read-only operation)
         next();
         return;
     }
     if (req.url.indexOf("/irext/code/update_status") !== -1) {
-        // Skip authentication for SSE endpoint (EventSource cannot send custom headers)
+        // skip authentication for SSE endpoint (EventSource cannot send custom headers)
+        next();
+        return;
+    }
+    if (req.url.indexOf("/irext/code/update_private_data") !== -1) {
+        // skip authentication for data update (uses server-side APP_KEY/APP_SECRET)
         next();
         return;
     }

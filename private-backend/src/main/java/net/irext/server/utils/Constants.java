@@ -23,6 +23,7 @@ public class Constants {
     public static final int ERROR_CODE_INVALID_CATEGORY = 2;
     public static final int ERROR_CODE_INVALID_BRAND = 3;
     public static final int ERROR_CODE_INVALID_PARAMETER = 4;
+    public static final int ERROR_CODE_OFFLINE_MODE = 5;
 
     public static final int LANG_ZH_CN = 0;
     public static final int LANG_EN = 1;
@@ -31,6 +32,9 @@ public class Constants {
     public static final int STATUS_VALID = 1;
     public static final int STATUS_INVALID = 0;
     public static final int STATUS_PARA_DATA = 15;
+
+    public static final int DEPLOY_MODE_HYBRID = 0;
+    public static final int DEPLOY_MODE_OFFLINE = 1;
 
     public static final String REMOTE_REF_URL = "/irext-server/remote_ref/create_remote_ref";
     public static final String APP_LOGIN_URL = "/irext-server/app/app_login";

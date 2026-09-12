@@ -87,6 +87,7 @@
         "d_step_backing_up": "Backing up database and binaries...",
         "d_step_importing_sql": "Importing database...",
         "d_step_replacing_binaries": "Replacing binary files...",
+        "d_step_copying_admin_info": "Copying admin credentials...",
         "d_step_completed": "Data update completed",
         "d_step_failed": "Update failed"
     }

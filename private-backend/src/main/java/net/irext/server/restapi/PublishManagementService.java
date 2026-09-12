@@ -9,6 +9,7 @@ import net.irext.server.restapi.base.AbstractBaseService;
 import net.irext.server.utils.Constants;
 import net.irext.server.utils.LoggerUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +41,9 @@ public class PublishManagementService extends AbstractBaseService {
     private PublishManagementBusinessLogic publishManageLogic;
     private UpdateStatusTracker statusTracker;
 
+    @Value("${irext.server.offline:0}")
+    private String offlineMode;
+
     @Autowired
     public void setPublishManageLogic(PublishManagementBusinessLogic publishManageLogic) {
         this.publishManageLogic = publishManageLogic;
@@ -63,6 +67,12 @@ public class PublishManagementService extends AbstractBaseService {
         try {
             StringResponse response = new StringResponse();
             response.setStatus(new Status());
+
+            if (Integer.parseInt(offlineMode) == Constants.DEPLOY_MODE_OFFLINE) {
+                response.getStatus().setCode(Constants.ERROR_CODE_OFFLINE_MODE);
+                response.setEntity("offline mode does not support cloud data update");
+                return response;
+            }
 
             String appKey = params.get("appKey");
             String appSecret = params.get("appSecret");
@@ -110,10 +120,18 @@ public class PublishManagementService extends AbstractBaseService {
                                 if (sqlImported) {
                                     boolean binariesReplaced = publishManageLogic.replaceBinaries(extractedDir);
                                     if (binariesReplaced) {
-                                        statusTracker.sendEvent("completed", "success", "data updated successfully");
-                                        statusTracker.complete();
-                                        response.getStatus().setCode(Constants.ERROR_CODE_SUCCESS);
-                                        response.setEntity("data updated successfully");
+                                        boolean adminInfoCopied = publishManageLogic.copyAdminInfo(extractedDir);
+                                        if (adminInfoCopied) {
+                                            statusTracker.sendEvent("completed", "success", "data updated successfully");
+                                            statusTracker.complete();
+                                            response.getStatus().setCode(Constants.ERROR_CODE_SUCCESS);
+                                            response.setEntity("data updated successfully");
+                                        } else {
+                                            statusTracker.sendEvent("failed", "error", "failed to copy admin info");
+                                            statusTracker.complete();
+                                            response.getStatus().setCode(Constants.ERROR_CODE_NETWORK_ERROR);
+                                            response.setEntity("failed to copy admin info");
+                                        }
                                     } else {
                                         statusTracker.sendEvent("failed", "error", "failed to replace binaries");
                                         statusTracker.complete();
@@ -233,10 +251,18 @@ public class PublishManagementService extends AbstractBaseService {
                         if (sqlImported) {
                             boolean binariesReplaced = publishManageLogic.replaceBinaries(extractedDir);
                             if (binariesReplaced) {
-                                statusTracker.sendEvent("completed", "success", "data updated successfully");
-                                statusTracker.complete();
-                                response.getStatus().setCode(Constants.ERROR_CODE_SUCCESS);
-                                response.setEntity("data updated successfully");
+                                boolean adminInfoCopied = publishManageLogic.copyAdminInfo(extractedDir);
+                                if (adminInfoCopied) {
+                                    statusTracker.sendEvent("completed", "success", "data updated successfully");
+                                    statusTracker.complete();
+                                    response.getStatus().setCode(Constants.ERROR_CODE_SUCCESS);
+                                    response.setEntity("data updated successfully");
+                                } else {
+                                    statusTracker.sendEvent("failed", "error", "failed to copy admin info");
+                                    statusTracker.complete();
+                                    response.getStatus().setCode(Constants.ERROR_CODE_NETWORK_ERROR);
+                                    response.setEntity("failed to copy admin info");
+                                }
                             } else {
                                 statusTracker.sendEvent("failed", "error", "failed to replace binaries");
                                 statusTracker.complete();

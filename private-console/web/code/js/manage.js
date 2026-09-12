@@ -62,6 +62,9 @@ $(document).ready(function() {
     initializeFilterCategories();
     initializeFilterBrands();
     initializeFilterProvince();
+
+    // check deployment mode and adjust UI
+    initOfflineMode();
 });
 
 function loadRemoteList(isSearch, remoteMap) {
@@ -631,7 +634,7 @@ function updateData() {
                 $btn.text(originalText).prop('disabled', false);
                 $('#btn_update_dropdown').prop('disabled', false);
                 if (data.step === 'completed') {
-                    // add dismiss button for success status
+                    // add dismiss button for success statusC
                     let successHtml = icon + '<span style="color: ' + color + ';">' + stepName + '</span>';
                     successHtml += ' <a href="#" onclick="dismissUpdateStatus(); return false;" style="color: #999; margin-left: 5px; text-decoration: none; font-size: 16px;" title="关闭">&times;</a>';
                     $statusText.html(successHtml);
@@ -678,11 +681,57 @@ function dismissUpdateStatus() {
     $('#update_status_text').empty();
 }
 
+function initOfflineMode() {
+    $.ajax({
+        url: '/irext/config',
+        type: 'GET',
+        dataType: 'json',
+        timeout: 5000,
+        success: function(response) {
+            if (response.entity && response.entity.offline) {
+                // offline mode: hide auto-update, show standalone offline button
+                $('#btn_update_group').hide();
+                $('#btn_offline_standalone').show();
+            }
+        },
+        error: function() {
+            // ignore config fetch errors, default to hybrid mode
+        }
+    });
+
+    // close upload area when clicking outside
+    $(document).on('click', function(e) {
+        let $uploadArea = $('#offline_upload_area');
+        if ($uploadArea.is(':visible') &&
+            !$(e.target).closest('#offline_upload_area').length &&
+            !$(e.target).closest('#btn_offline_standalone').length &&
+            !$(e.target).closest('#btn_update_group').length) {
+            cancelOfflineUpload();
+        }
+    });
+}
+
 function toggleOfflineUploadArea() {
     let $uploadArea = $('#offline_upload_area');
     if ($uploadArea.is(':visible')) {
         cancelOfflineUpload();
     } else {
+        // position the upload area below the active button
+        let rect;
+        if ($('#btn_update_group').is(':visible')) {
+            // hybrid mode: position below the dropdown menu
+            let $dropdownMenu = $('#btn_update_group .dropdown-menu');
+            let menuRect = $dropdownMenu[0].getBoundingClientRect();
+            rect = { bottom: menuRect.bottom, left: menuRect.left };
+        } else {
+            // offline mode: position below the standalone button
+            let btnRect = $('#btn_offline_standalone')[0].getBoundingClientRect();
+            rect = { bottom: btnRect.bottom, left: btnRect.left };
+        }
+        $uploadArea.css({
+            top: (rect.bottom + 5) + 'px',
+            left: rect.left + 'px'
+        });
         $uploadArea.show();
         // initialize bs-custom-file-input for file input
         let fileInput = document.getElementById('data_file');
@@ -728,11 +777,13 @@ function uploadOfflineData() {
     let $btnUpload = $('#btn_upload_data');
     let $btnAutoUpdate = $('#btn_auto_update');
     let $btnDropdown = $('#btn_update_dropdown');
+    let $btnOfflineStandalone = $('#btn_offline_standalone');
 
     // disable buttons during upload
     $btnUpload.prop('disabled', true);
     $btnAutoUpdate.prop('disabled', true);
     $btnDropdown.prop('disabled', true);
+    $btnOfflineStandalone.prop('disabled', true);
 
     // hide the offline upload area, only show progress
     $('#offline_upload_area').hide();
@@ -775,6 +826,7 @@ function uploadOfflineData() {
                 $btnAutoUpdate.text(i18n.t('page_code.d_update_data', {lng: userLang})).prop('disabled', false);
                 $btnDropdown.prop('disabled', false);
                 $btnUpload.prop('disabled', false);
+                $btnOfflineStandalone.prop('disabled', false);
                 if (data.step === 'completed') {
                     let successHtml = icon + '<span style="color: ' + color + ';">' + stepName + '</span>';
                     successHtml += ' <a href="#" onclick="dismissUpdateStatus(); return false;" style="color: #999; margin-left: 5px; text-decoration: none; font-size: 16px;" title="关闭">&times;</a>';
@@ -800,6 +852,7 @@ function uploadOfflineData() {
             $btnAutoUpdate.text(i18n.t('page_code.d_update_data', {lng: userLang})).prop('disabled', false);
             $btnDropdown.prop('disabled', false);
             $btnUpload.prop('disabled', false);
+            $btnOfflineStandalone.prop('disabled', false);
             $('#offline_upload_area').show();
             toastr.error(i18n.t('page_code.d_update_failed', {lng: userLang}));
         }
@@ -831,6 +884,7 @@ function uploadOfflineData() {
                     $btnAutoUpdate.text(i18n.t('page_code.d_update_data', {lng: userLang})).prop('disabled', false);
                     $btnDropdown.prop('disabled', false);
                     $btnUpload.prop('disabled', false);
+                    $btnOfflineStandalone.prop('disabled', false);
                     $('#offline_upload_area').show();
                     toastr.error(error || i18n.t('page_code.d_update_failed', {lng: userLang}));
                 }

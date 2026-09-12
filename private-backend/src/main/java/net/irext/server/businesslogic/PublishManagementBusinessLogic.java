@@ -337,6 +337,52 @@ public class PublishManagementBusinessLogic {
         }
     }
 
+    public boolean copyAdminInfo(String extractedDir) {
+        LoggerUtil.getInstance().trace(TAG, "copying admin info from: " + extractedDir);
+        statusTracker.sendEvent("copying_admin_info", "running", "copying admin info");
+
+        File extractedFolder = new File(extractedDir);
+        File adminInfoFile = null;
+        File[] children = extractedFolder.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                if ("admin_info.json".equals(child.getName())) {
+                    adminInfoFile = child;
+                    break;
+                }
+            }
+        }
+
+        if (adminInfoFile == null) {
+            LoggerUtil.getInstance().trace(TAG, "admin_info.json not found in extracted directory");
+            return false;
+        }
+
+        String targetDirPath = "/data/irext/database/admin/";
+        File targetDir = new File(targetDirPath);
+        if (!targetDir.exists()) {
+            if (!targetDir.mkdirs()) {
+                LoggerUtil.getInstance().trace(TAG, "failed to create admin directory: " + targetDirPath);
+                return false;
+            }
+        }
+
+        File targetFile = new File(targetDirPath + "admin_info.json");
+        try (InputStream in = new FileInputStream(adminInfoFile);
+             OutputStream out = new FileOutputStream(targetFile)) {
+            byte[] buffer = new byte[8192];
+            int len;
+            while ((len = in.read(buffer)) != -1) {
+                out.write(buffer, 0, len);
+            }
+            LoggerUtil.getInstance().trace(TAG, "admin_info.json copied successfully to: " + targetFile.getAbsolutePath());
+            return true;
+        } catch (Exception e) {
+            LoggerUtil.getInstance().trace(TAG, "copyAdminInfo exception: " + e.getMessage());
+            return false;
+        }
+    }
+
     public boolean replaceBinaries(String extractedDir) {
         LoggerUtil.getInstance().trace(TAG, "replacing binaries from: " + extractedDir);
         statusTracker.sendEvent("replacing_binaries", "running", "replacing binary files");

@@ -5,6 +5,8 @@
 
 require('../mini_poem/configuration/constants');
 
+let fs = require('fs');
+let crypto = require('crypto');
 let AdminAuth = require('../authentication/admin_auth.js');
 let RequestSender = require('../mini_poem/http/request.js');
 
@@ -19,11 +21,17 @@ let errorCode = new ErrorCode();
 
 let adminAuth = new AdminAuth(REDIS_HOST, REDIS_PORT, null, REDIS_PASSWORD);
 
-let ADMIN_SIGN_IN_SERVICE = "/irext-server/app/admin_login";
+let ADMIN_SIGN_IN_SERVICE = "/irext-server/app/private_cloud_admin_login";
 let APP_SIGN_IN_SERVICE = "/irext-server/app/web_console_login";
+let ADMIN_INFO_PATH = "/data/irext/database/admin/admin_info.json";
 
 
 exports.adminLoginWorkUnit = function (userName, password, callback) {
+    // check if running in offline mode
+    if (process.env.OFFLINE === '1') {
+        offlineAdminLogin(userName, password, callback);
+        return;
+    }
 
     let queryParams = new Map();
 
@@ -35,7 +43,9 @@ exports.adminLoginWorkUnit = function (userName, password, callback) {
 
     let signinInfo = {
         userName : userName,
-        password : password
+        password : password,
+        appKey : process.env.APP_KEY,
+        appSecret : process.env.APP_SECRET
     };
     requestSender.sendPostRequest(signinInfo,
         function(signInRequestErr, signInResponse) {
@@ -73,6 +83,65 @@ exports.adminLoginWorkUnit = function (userName, password, callback) {
             }
         });
 };
+
+/**
+ * Offline admin login - read credentials from local JSON file
+ */
+function offlineAdminLogin(userName, password, callback) {
+    try {
+        if (!fs.existsSync(ADMIN_INFO_PATH)) {
+            logger.error('admin info file not found: ' + ADMIN_INFO_PATH);
+            callback(errorCode.FAILED, null);
+            return;
+        }
+
+        let adminInfoRaw = fs.readFileSync(ADMIN_INFO_PATH, 'utf8');
+        let adminInfo = JSON.parse(adminInfoRaw);
+
+        // validate userName and password (password is already MD5 hashed from frontend)
+        if (adminInfo.userName !== userName || adminInfo.password.toLowerCase() !== password.toLowerCase()) {
+            logger.info('offline admin login failed: invalid credentials');
+            callback(errorCode.FAILED, null);
+            return;
+        }
+
+        logger.info('offline admin login success for: ' + userName);
+
+        // generate token in format: {md5_hash},{permissions}
+        let timeStamp = new Date().getTime();
+        let tokenSource = timeStamp + adminInfo.userName;
+        let tokenHash = crypto.createHash('md5').update(tokenSource).digest('hex');
+        let token = tokenHash + ',' + adminInfo.permissions;
+
+        let admin = {
+            id: adminInfo.id,
+            userName: adminInfo.userName,
+            token: token,
+            permissions: adminInfo.permissions,
+            adminType: adminInfo.adminType
+        };
+
+        // store token in Redis
+        let key = "admin_" + admin.id;
+        let ttl = 24 * 60 * 60 * 14;
+        adminAuth.setAuthInfo(key, token, ttl, function(setAdminAuthErr) {
+            if (errorCode.SUCCESS.code === setAdminAuthErr.code) {
+                let nameKey = "admin_name_" + admin.id;
+                adminAuth.setAuthInfo(nameKey, admin.userName, ttl, function(setAdminNameErr) {
+                    if (errorCode.SUCCESS.code === setAdminNameErr.code) {
+                        admin.token = token;
+                    }
+                    callback(setAdminNameErr, admin);
+                });
+            } else {
+                callback(errorCode.FAILED, null);
+            }
+        });
+    } catch (e) {
+        logger.error('offline admin login exception: ' + e.message);
+        callback(errorCode.FAILED, null);
+    }
+}
 
 exports.verifyTokenWorkUnit = function (id, token, callback) {
     let key = "admin_" + id;

@@ -9,7 +9,9 @@
     <title data-i18n="page_index.title">IRext</title>
     <link rel="stylesheet" href="public/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="public/bower_components/toastr/toastr.min.css">
+    <link rel="stylesheet" href="public/bower_components/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="css/cover.css">
+    <link rel="stylesheet" href="setup/css/setup.css">
 
     <link href="./images/ir_logo_favicon.png" rel="shortcut icon" type="image/png">
 </head>
@@ -20,7 +22,8 @@
             <h3 data-i18n="page_index.title">IRext 私有云 1.5.2-R2</h3>
         </div>
     </div>
-    <div class="container">
+    <!-- login area (hidden when setup is needed) -->
+    <div id="login_area" class="container" style="display: none;">
         <div class="container">
             <div class="form-signin" style="margin-top: 100px;">
                 <h4 class="text-muted" data-i18n="page_index.d_signin_title" style="color: #FFFFFF;">登录</h4>
@@ -36,6 +39,113 @@
             </div>
         </div>
     </div>
+
+    <!-- setup wizard area (hidden when already initialized) -->
+    <div id="setup_area" class="container" style="display: none;">
+        <div class="setup-wizard">
+            <div class="setup-header">
+                <h4 data-i18n="page_setup.wizard_title">初始化引导</h4>
+                <div class="setup-steps">
+                    <span class="setup-step active" id="step_indicator_1">1</span>
+                    <span class="setup-step" id="step_indicator_2">2</span>
+                    <span class="setup-step" id="step_indicator_3">3</span>
+                    <span class="setup-step" id="step_indicator_4">4</span>
+                </div>
+            </div>
+
+            <!-- step 1: deployment mode -->
+            <div class="setup-step-panel" id="setup_step_1">
+                <h5 data-i18n="page_setup.step1_title">选择部署模式</h5>
+                <p class="text-muted" data-i18n="page_setup.step1_desc">请选择您的 IRext 私有云部署方式</p>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="deploy_mode" value="hybrid" checked>
+                        <strong data-i18n="page_setup.mode_hybrid">混合云模式</strong>
+                        <span id="hybrid_default_hint" class="label label-info" style="display: none; margin-left: 5px;" data-i18n="page_setup.mode_default_hint">（默认模式）</span>
+                    </label>
+                    <p class="help-block" data-i18n="page_setup.mode_hybrid_desc">私有云与公有云协同工作，认证和数据更新通过公有云服务</p>
+                </div>
+                <div id="hybrid_unavailable_hint" class="alert alert-warning" style="display: none; margin-bottom: 10px;" data-i18n="page_setup.mode_hybrid_unavailable">当前后端配置为离线模式，不支持混合云</div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="deploy_mode" value="offline">
+                        <strong data-i18n="page_setup.mode_offline">纯离线模式</strong>
+                        <span id="offline_default_hint" class="label label-info" style="display: none; margin-left: 5px;" data-i18n="page_setup.mode_default_hint">（默认模式）</span>
+                    </label>
+                    <p class="help-block" data-i18n="page_setup.mode_offline_desc">完全离线运行，所有认证和数据均在本地管理</p>
+                </div>
+                <div class="setup-actions">
+                    <button class="btn btn-primary" onclick="goToStep(2)" data-i18n="page_setup.btn_next">下一步</button>
+                </div>
+            </div>
+
+            <!-- step 2: identity verification -->
+            <div class="setup-step-panel" id="setup_step_2" style="display: none;">
+                <h5 data-i18n="page_setup.step2_title">身份验证</h5>
+                <div id="hybrid_verify_panel" style="display: none;">
+                    <p class="text-muted" data-i18n="page_setup.step2_hybrid_desc">请输入您的公有云账号密码进行身份验证</p>
+                    <div class="form-group">
+                        <label data-i18n="page_setup.verify_email">邮箱地址</label>
+                        <input type="email" id="setup_cloud_email" class="form-control" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <label data-i18n="page_setup.verify_password">密码</label>
+                        <input type="password" id="setup_cloud_password" class="form-control" placeholder="Password">
+                    </div>
+                </div>
+                <div id="offline_verify_panel" style="display: none;">
+                    <p class="text-muted" data-i18n="page_setup.step2_offline_desc">请输入您在公有云应用管理中获取的 APP_SECRET</p>
+                    <div class="form-group">
+                        <label>APP SECRET</label>
+                        <input type="password" id="setup_app_secret" class="form-control" placeholder="APP_SECRET">
+                    </div>
+                </div>
+                <div class="setup-actions">
+                    <button class="btn btn-default" onclick="goToStep(1)" data-i18n="page_setup.btn_prev">上一步</button>
+                    <button class="btn btn-primary" id="btn_verify_identity" onclick="verifyIdentity()" data-i18n="page_setup.btn_verify">验证</button>
+                </div>
+            </div>
+
+            <!-- step 3: data import -->
+            <div class="setup-step-panel" id="setup_step_3" style="display: none;">
+                <h5 data-i18n="page_setup.step3_title">导入初始数据</h5>
+                <div id="hybrid_import_panel" style="display: none;">
+                    <p class="text-muted" data-i18n="page_setup.step3_hybrid_desc">将从公有云自动下载并导入初始数据</p>
+                    <div id="setup_hybrid_progress" style="display: none; margin-top: 10px;">
+                        <div id="setup_hybrid_status" style="font-size: 14px;"></div>
+                    </div>
+                </div>
+                <div id="offline_import_panel" style="display: none;">
+                    <p class="text-muted" data-i18n="page_setup.step3_offline_desc">请上传从公有云下载的加密数据包（.tar.gz.enc 格式）</p>
+                    <div class="form-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="setup_data_file" accept=".enc">
+                            <label class="custom-file-label" for="setup_data_file" data-i18n="page_setup.select_data_file">选择数据文件</label>
+                        </div>
+                    </div>
+                    <div id="setup_offline_progress" style="display: none; margin-top: 10px;">
+                        <div id="setup_offline_status" style="font-size: 14px;"></div>
+                    </div>
+                </div>
+                <div class="setup-actions">
+                    <button class="btn btn-default" id="btn_setup_back_step2" onclick="goToStep(2)" data-i18n="page_setup.btn_prev">上一步</button>
+                    <button class="btn btn-primary" id="btn_import_data" onclick="startDataImport()" data-i18n="page_setup.btn_import">开始导入</button>
+                </div>
+            </div>
+
+            <!-- step 4: complete -->
+            <div class="setup-step-panel" id="setup_step_4" style="display: none;">
+                <div style="text-align: center; padding: 30px 0;">
+                    <i class="fa fa-check-circle" style="font-size: 48px; color: #5cb85c;"></i>
+                    <h5 style="margin-top: 15px;" data-i18n="page_setup.step4_title">初始化完成</h5>
+                    <p class="text-muted" data-i18n="page_setup.step4_desc">恭喜！IRext 私有云已完成初始化配置，现在可以开始使用了。</p>
+                </div>
+                <div class="setup-actions" style="text-align: center;">
+                    <button class="btn btn-success" onclick="goToLogin()" data-i18n="page_setup.btn_goto_login">进入登录</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 <script src="public/bower_components/jquery/dist/jquery.min.js"></script>
 <script src="public/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -44,5 +154,7 @@
 <script src="public/i18n/i18next-1.11.2.min.js"></script>
 <script src="public/utils/url_parser.js"></script>
 <script src="public/utils/ciphering.js"></script>
+<script src="public/utils/bs-custom-file-input.js"></script>
+<script src="./js/setup.js"></script>
 <script src="./js/index.js"></script>
 </html>

@@ -87,6 +87,7 @@
         "d_step_backing_up": "正在备份数据库和二进制文件...",
         "d_step_importing_sql": "正在导入数据库...",
         "d_step_replacing_binaries": "正在替换二进制文件...",
+        "d_step_copying_admin_info": "正在复制管理员凭证...",
         "d_step_completed": "数据更新完成",
         "d_step_failed": "更新失败"
     }
