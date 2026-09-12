@@ -9,6 +9,7 @@
 let ErrorCode = require('../constants/error_code');
 let RequestSender = require('../mini_poem/http/request.js');
 let Map = require('../mini_poem/mem/map.js');
+let packageInfo = require('../package.json');
 
 let errorCode = new ErrorCode();
 
@@ -69,7 +70,8 @@ exports.getConfig = function(req, res) {
     let defaultMode = (process.env.OFFLINE === '1') ? 'offline' : 'hybrid';
     let config = {
         offline: backendOffline === true,
-        default_mode: defaultMode
+        default_mode: defaultMode,
+        version: packageInfo.version
     };
 
     res.send({

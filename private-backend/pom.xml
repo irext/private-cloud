@@ -5,7 +5,7 @@
 
     <groupId>net.irext.server</groupId>
     <artifactId>private-backend</artifactId>
-    <version>1.5.3</version>
+    <version>1.6.0</version>
     <packaging>jar</packaging>
 
     <name>IRext Private Server</name>

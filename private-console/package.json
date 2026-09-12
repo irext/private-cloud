@@ -1,7 +1,7 @@
 {
   "name": "irext",
-  "version": "1.5.0",
-  "description": "console of irext",
+  "version": "1.6.0",
+  "description": "Console of IRext",
   "scripts": {
     "dev": "supervisor -w . -i ./web irext_console.js",
     "server": "bash bin/script_run.sh",
@@ -9,10 +9,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/irext/irext-cli"
+    "url": "https://github.com/irext/private-cloud"
   },
   "keywords": [
-    "IRDA"
+    "IR Remote Control"
   ],
   "author": "strawmanbobi",
   "license": "MIT",

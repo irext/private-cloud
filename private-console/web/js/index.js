@@ -21,6 +21,23 @@ userLang = navigator.language || paramLang;
 
 i18n.init(function(err, t) {
     $(".page_index").i18n({ lng: userLang });
+    // append version from package.json to title
+    $.ajax({
+        url: '/irext/config',
+        type: 'GET',
+        dataType: 'json',
+        timeout: 5000,
+        success: function(response) {
+            if (response.status.code === 0 && response.entity && response.entity.version) {
+                let ver = response.entity.version;
+                let $title = $('h3[data-i18n="page_index.title"]');
+                if ($title.length > 0) {
+                    $title.text($title.text() + ' ' + ver);
+                }
+                document.title = document.title + ' ' + ver;
+            }
+        }
+    });
 });
 
 $("#document").ready(function() {
