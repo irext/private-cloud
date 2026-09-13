@@ -9,7 +9,13 @@ let setupDeployMode = "hybrid";
 let setupSseCompleted = false;
 
 $(document).ready(function() {
-    setupLang = localStorage.getItem('lang') || navigator.language || "zh-CN";
+    // reuse the language resolved by index.js so that static texts (data-i18n) and
+    // dynamic texts (i18n.t) are rendered in the very same language
+    if (typeof userLang !== "undefined" && userLang) {
+        setupLang = userLang;
+    } else {
+        setupLang = getParameter('lang') || navigator.language || "zh-CN";
+    }
 
     checkInitStatus();
 });
@@ -118,7 +124,7 @@ function goToStep(step) {
         }
         $('#setup_hybrid_progress').hide();
         $('#setup_offline_progress').hide();
-        $('#btn_import_data').prop('disabled', false).text(i18n.t('page_setup.btn_import', { lng: setupLang }));
+        $('#btn_import_data').prop('disabled', false).find('span').text(i18n.t('page_setup.btn_import', { lng: setupLang }));
         $('#btn_setup_back_step2').prop('disabled', false);
     }
 }
@@ -175,7 +181,7 @@ function verifyIdentity() {
 
 function startDataImport() {
     let $btn = $('#btn_import_data');
-    $btn.prop('disabled', true).text(i18n.t('page_setup.importing', { lng: setupLang }));
+    $btn.prop('disabled', true).find('span').text(i18n.t('page_setup.importing', { lng: setupLang }));
     $('#btn_setup_back_step2').prop('disabled', true);
 
     if (setupDeployMode === 'hybrid') {
@@ -250,21 +256,21 @@ function startOfflineImport() {
 
     if (!file) {
         toastr.error(i18n.t('page_setup.select_file_first', { lng: setupLang }));
-        $('#btn_import_data').prop('disabled', false).text(i18n.t('page_setup.btn_import', { lng: setupLang }));
+        $('#btn_import_data').prop('disabled', false).find('span').text(i18n.t('page_setup.btn_import', { lng: setupLang }));
         $('#btn_setup_back_step2').prop('disabled', false);
         return;
     }
 
     if (!file.name.endsWith('.tar.gz.enc') && !file.name.endsWith('.enc')) {
         toastr.error(i18n.t('page_setup.invalid_file_format', { lng: setupLang }));
-        $('#btn_import_data').prop('disabled', false).text(i18n.t('page_setup.btn_import', { lng: setupLang }));
+        $('#btn_import_data').prop('disabled', false).find('span').text(i18n.t('page_setup.btn_import', { lng: setupLang }));
         $('#btn_setup_back_step2').prop('disabled', false);
         return;
     }
 
     if (file.size > 200 * 1024 * 1024) {
         toastr.error(i18n.t('page_setup.file_too_large', { lng: setupLang }));
-        $('#btn_import_data').prop('disabled', false).text(i18n.t('page_setup.btn_import', { lng: setupLang }));
+        $('#btn_import_data').prop('disabled', false).find('span').text(i18n.t('page_setup.btn_import', { lng: setupLang }));
         $('#btn_setup_back_step2').prop('disabled', false);
         return;
     }
@@ -362,7 +368,7 @@ function onImportFinished(success) {
         completeSetup();
     } else {
         toastr.error(i18n.t('page_setup.import_failed', { lng: setupLang }));
-        $('#btn_import_data').prop('disabled', false).text(i18n.t('page_setup.btn_import', { lng: setupLang }));
+        $('#btn_import_data').prop('disabled', false).find('span').text(i18n.t('page_setup.btn_import', { lng: setupLang }));
         $('#btn_setup_back_step2').prop('disabled', false);
         $('#offline_import_panel .form-group').show();
     }

@@ -9,7 +9,7 @@
     <title data-i18n="page_index.title">IRext</title>
     <link rel="stylesheet" href="public/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="public/bower_components/toastr/toastr.min.css">
-    <link rel="stylesheet" href="public/bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="public/bower_components/font-awesome/css/all.min.css">
     <link rel="stylesheet" href="css/cover.css">
     <link rel="stylesheet" href="setup/css/setup.css">
 
@@ -110,17 +110,27 @@
             <div class="setup-step-panel" id="setup_step_3" style="display: none;">
                 <h5 data-i18n="page_setup.step3_title">导入初始数据</h5>
                 <div id="hybrid_import_panel" style="display: none;">
-                    <p class="text-muted" data-i18n="page_setup.step3_hybrid_desc">将从公有云自动下载并导入初始数据</p>
+                    <div style="background: #f0f7ff; border: 1px solid #d6e9f8; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
+                        <p style="font-size: 14px; color: #4a7da5; margin: 0;">
+                            <i class="fa fa-cloud-download" style="margin-right: 5px;"></i>
+                            <span data-i18n="page_setup.step3_hybrid_desc">将从公有云自动下载并导入初始数据</span>
+                        </p>
+                    </div>
                     <div id="setup_hybrid_progress" style="display: none; margin-top: 10px;">
                         <div id="setup_hybrid_status" style="font-size: 14px;"></div>
                     </div>
                 </div>
                 <div id="offline_import_panel" style="display: none;">
-                    <p class="text-muted" data-i18n="page_setup.step3_offline_desc">请上传从公有云下载的加密数据包（.tar.gz.enc 格式）</p>
-                    <div class="form-group">
-                        <div class="custom-file">
-                            <input type="file" class="custom-file-input" id="setup_data_file" accept=".enc">
-                            <label class="custom-file-label" for="setup_data_file" data-i18n="page_setup.select_data_file">选择数据文件</label>
+                    <div style="background: #f0f7ff; border: 1px solid #d6e9f8; border-radius: 4px; padding: 15px; margin-bottom: 15px;">
+                        <p style="font-size: 14px; color: #4a7da5; margin: 0 0 12px 0;">
+                            <i class="fa fa-info-circle" style="margin-right: 5px;"></i>
+                            <span data-i18n="page_setup.step3_offline_desc">请上传从公有云下载的加密数据包（.tar.gz.enc 格式）</span>
+                        </p>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="setup_data_file" accept=".enc">
+                                <label class="custom-file-label" for="setup_data_file" data-i18n="page_setup.select_data_file">选择数据文件</label>
+                            </div>
                         </div>
                     </div>
                     <div id="setup_offline_progress" style="display: none; margin-top: 10px;">
@@ -129,7 +139,10 @@
                 </div>
                 <div class="setup-actions">
                     <button class="btn btn-default" id="btn_setup_back_step2" onclick="goToStep(2)" data-i18n="page_setup.btn_prev">上一步</button>
-                    <button class="btn btn-primary" id="btn_import_data" onclick="startDataImport()" data-i18n="page_setup.btn_import">开始导入</button>
+                    <button class="btn btn-primary" id="btn_import_data" onclick="startDataImport()">
+                        <i class="fa fa-upload" style="margin-right: 5px;"></i>
+                        <span data-i18n="page_setup.btn_import">开始导入</span>
+                    </button>
                 </div>
             </div>
 

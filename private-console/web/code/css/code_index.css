@@ -260,9 +260,13 @@ body {
     padding: 6px 12px;
     line-height: 1.5;
     color: #495057;
-    content: "浏览";
+    content: "Browse";
     background-color: #e9ecef;
     border-left: 1px solid #ced4da;
+}
+
+#offline_upload_area html[lang="zh-cmn"] .custom-file-label::after {
+    content: "浏览";
 }
 
 #offline_upload_area .btn {

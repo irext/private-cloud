@@ -8,6 +8,7 @@ let logger = require('../mini_poem/logging/logger4js').helper;
 
 let formidable = require('formidable');
 let fs = require('fs');
+let path = require('path');
 let http = require('http');
 
 // local inclusion
@@ -331,7 +332,7 @@ exports.uploadOfflineData = function (req, res) {
         }
 
         // rename file to have original name
-        let originalName = uploadedFile.name || 'uploaded.enc';
+        let originalName = path.basename(uploadedFile.name || 'uploaded.enc');
         let newPath = form.uploadDir + '/' + originalName;
         fs.renameSync(uploadedFile.path, newPath);
 

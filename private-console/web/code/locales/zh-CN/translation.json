@@ -69,6 +69,7 @@
         "d_select_data_file": "选择数据文件",
         "d_upload_and_update": "上传并更新",
         "d_cancel": "取消",
+        "d_close": "关闭",
         "d_uploading": "上传中...",
         "d_upload_success": "上传成功",
         "d_upload_failed": "上传失败",
