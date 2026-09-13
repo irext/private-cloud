@@ -52,6 +52,8 @@ public class OperationLogic {
 
     private static final String BIN_CACHE_DIR = "/data/irext/bin_cache/";
 
+    private static final String OFFLINE_BINARIES_DIR = "/data/irext/database/binaries/irext-binaries/";
+
     private static OperationLogic operationLogic;
 
     public static OperationLogic getInstance() {
@@ -230,59 +232,61 @@ public class OperationLogic {
     // helper methods
     private FileInputStream getFile(File binFile, String downloadPath, String fileName, String checksum) {
         try {
+            // step 1: check bin_cache
             if (binFile.exists()) {
                 FileInputStream fileInputStream = new FileInputStream(binFile);
-                // validate binary content
                 byte[] binaries = IOUtils.toByteArray(fileInputStream);
+                fileInputStream.close();
                 String fileChecksum =
                         MD5Util.byteArrayToHexString(MessageDigest.getInstance("MD5").digest(binaries)).toUpperCase();
-
                 if (fileChecksum.equals(checksum)) {
+                    LoggerUtil.getInstance().trace(TAG, "binary found in bin_cache: " + binFile.getAbsolutePath());
                     return new FileInputStream(binFile);
                 }
             }
-            if (Integer.parseInt(offlineMode) == Constants.DEPLOY_MODE_OFFLINE) {
-                // try to read from pre-deployed binaries directory
-                String offlineBinPath = "/data/irext/database/binaries/irext-binaries/" + fileName;
-                File offlineBinFile = new File(offlineBinPath);
-                if (offlineBinFile.exists()) {
-                    FileInputStream fileInputStream = new FileInputStream(offlineBinFile);
-                    byte[] binaries = IOUtils.toByteArray(fileInputStream);
-                    String fileChecksum =
-                            MD5Util.byteArrayToHexString(MessageDigest.getInstance("MD5").digest(binaries)).toUpperCase();
-                    if (fileChecksum.equals(checksum)) {
-                        LoggerUtil.getInstance().trace(TAG, "loaded binary from offline path: " + offlineBinPath);
-                        return new FileInputStream(offlineBinFile);
-                    }
-                }
-                LoggerUtil.getInstance().trace(TAG, "binary not found in offline path: " + offlineBinPath);
-                return null;
-            }
-            InputStream inputStream = getBinInputStream(fileName);
-            // validate binary content
-            if (null != inputStream) {
-                byte[] binaries = IOUtils.toByteArray(inputStream);
-                inputStream.close();
-                String ossChecksum =
+
+            // step 2: check pre-deployed binaries directory
+            String offlineBinPath = OFFLINE_BINARIES_DIR + fileName;
+            File offlineBinFile = new File(offlineBinPath);
+            if (offlineBinFile.exists()) {
+                FileInputStream fileInputStream = new FileInputStream(offlineBinFile);
+                byte[] binaries = IOUtils.toByteArray(fileInputStream);
+                fileInputStream.close();
+                String fileChecksum =
                         MD5Util.byteArrayToHexString(MessageDigest.getInstance("MD5").digest(binaries)).toUpperCase();
-                if (ossChecksum.equals(checksum)) {
+                if (fileChecksum.equals(checksum)) {
+                    // copy to bin_cache for future use
                     FileUtil.createDirs(downloadPath);
                     if (FileUtil.write(binFile, binaries)) {
-                        LoggerUtil.getInstance().trace(TAG,"download file successfully");
+                        LoggerUtil.getInstance().trace(TAG, "binary found in offline path, copied to bin_cache: " + binFile.getAbsolutePath());
                         return new FileInputStream(binFile);
-                    } else {
-                        LoggerUtil.getInstance().trace(TAG,"fatal : write file to local path failed");
-                        return null;
                     }
-                } else {
-                    LoggerUtil.getInstance().trace(TAG,"fatal : checksum does not match even downloaded from OSS, " +
-                            " please contact the admin");
-                    return null;
                 }
-            } else{
-                LoggerUtil.getInstance().trace(TAG,"fatal : download file failed");
-                return null;
             }
+
+            // step 3: hybrid mode only - download from OSS
+            if (Integer.parseInt(offlineMode) != Constants.DEPLOY_MODE_OFFLINE) {
+                InputStream inputStream = getBinInputStream(fileName);
+                if (null != inputStream) {
+                    byte[] binaries = IOUtils.toByteArray(inputStream);
+                    inputStream.close();
+                    String ossChecksum =
+                            MD5Util.byteArrayToHexString(MessageDigest.getInstance("MD5").digest(binaries)).toUpperCase();
+                    if (ossChecksum.equals(checksum)) {
+                        FileUtil.createDirs(downloadPath);
+                        if (FileUtil.write(binFile, binaries)) {
+                            LoggerUtil.getInstance().trace(TAG, "binary downloaded from OSS: " + binFile.getAbsolutePath());
+                            return new FileInputStream(binFile);
+                        }
+                    }
+                    LoggerUtil.getInstance().trace(TAG, "OSS checksum does not match");
+                } else {
+                    LoggerUtil.getInstance().trace(TAG, "failed to download from OSS");
+                }
+            }
+
+            LoggerUtil.getInstance().trace(TAG, "binary not found: " + fileName);
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -324,7 +328,11 @@ public class OperationLogic {
             String fileName = IR_BIN_FILE_PREFIX + remoteIndex.getRemoteMap() + IR_BIN_FILE_SUFFIX;
             String localFilePath = downloadPath + fileName;
             File binFile = new File(localFilePath);
-            getFile(binFile, downloadPath, fileName, remoteIndex.getBinaryMd5().toUpperCase());
+            FileInputStream fin = getFile(binFile, downloadPath, fileName, remoteIndex.getBinaryMd5().toUpperCase());
+            if (null == fin) {
+                return null;
+            }
+            fin.close();
             return binFile;
         } catch (Exception e) {
             e.printStackTrace();
