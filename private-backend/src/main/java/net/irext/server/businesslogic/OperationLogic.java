@@ -10,6 +10,7 @@ import net.irext.server.model.ACParameters;
 import net.irext.server.model.CollectKey;
 import net.irext.server.model.DecodeRemote;
 import net.irext.server.model.RemoteIndex;
+import net.irext.server.utils.Constants;
 import net.irext.server.utils.FileUtil;
 import net.irext.server.utils.LoggerUtil;
 import net.irext.server.utils.MD5Util;
@@ -17,6 +18,7 @@ import net.irext.decode.sdk.IRDecode;
 import net.irext.decode.sdk.bean.ACStatus;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 import java.io.File;
@@ -48,6 +50,8 @@ public class OperationLogic {
 
     private static final String IR_BIN_DOWNLOAD_PREFIX = "https://irext-release.oss-cn-hangzhou.aliyuncs.com/";
 
+    private static final String BIN_CACHE_DIR = "/data/irext/bin_cache/";
+
     private static OperationLogic operationLogic;
 
     public static OperationLogic getInstance() {
@@ -78,6 +82,9 @@ public class OperationLogic {
         this.collectKeyMapper = collectKeyMapper;
     }
 
+    @Value("${irext.server.offline:0}")
+    private String offlineMode;
+
     public RemoteIndex prepareBinary(int remoteIndexId) {
         RemoteIndex remoteIndex = null;
         try {
@@ -91,21 +98,16 @@ public class OperationLogic {
                         remoteIndex.getId() + " = " + checksum);
 
                 // read from file or OSS
-                String projectPath = System.getProperty("user.dir");
-                if (null != projectPath) {
-                    String downloadPath = projectPath + File.separator + "bin_cache" + File.separator;
-                    String fileName = IR_BIN_FILE_PREFIX + remoteMap + IR_BIN_FILE_SUFFIX;
-                    String localFilePath = downloadPath + fileName;
+                String downloadPath = BIN_CACHE_DIR;
+                String fileName = IR_BIN_FILE_PREFIX + remoteMap + IR_BIN_FILE_SUFFIX;
+                String localFilePath = downloadPath + fileName;
 
-                    File binFile = new File(localFilePath);
-                    FileInputStream fin = getFile(binFile, downloadPath, fileName, checksum);
-                    if (null != fin) {
-                        byte[] newBinaries = IOUtils.toByteArray(fin);
-                        LoggerUtil.getInstance().trace(TAG, "binary content get, save it to redis");
-                        remoteIndex.setBinaries(newBinaries);
-                    }
-                } else {
-                    LoggerUtil.getInstance().trace(TAG, "project root is null");
+                File binFile = new File(localFilePath);
+                FileInputStream fin = getFile(binFile, downloadPath, fileName, checksum);
+                if (null != fin) {
+                    byte[] newBinaries = IOUtils.toByteArray(fin);
+                    LoggerUtil.getInstance().trace(TAG, "binary content get, save it to redis");
+                    remoteIndex.setBinaries(newBinaries);
                 }
             }
         } catch (Exception ex) {
@@ -239,6 +241,23 @@ public class OperationLogic {
                     return new FileInputStream(binFile);
                 }
             }
+            if (Integer.parseInt(offlineMode) == Constants.DEPLOY_MODE_OFFLINE) {
+                // try to read from pre-deployed binaries directory
+                String offlineBinPath = "/data/irext/database/binaries/irext-binaries/" + fileName;
+                File offlineBinFile = new File(offlineBinPath);
+                if (offlineBinFile.exists()) {
+                    FileInputStream fileInputStream = new FileInputStream(offlineBinFile);
+                    byte[] binaries = IOUtils.toByteArray(fileInputStream);
+                    String fileChecksum =
+                            MD5Util.byteArrayToHexString(MessageDigest.getInstance("MD5").digest(binaries)).toUpperCase();
+                    if (fileChecksum.equals(checksum)) {
+                        LoggerUtil.getInstance().trace(TAG, "loaded binary from offline path: " + offlineBinPath);
+                        return new FileInputStream(offlineBinFile);
+                    }
+                }
+                LoggerUtil.getInstance().trace(TAG, "binary not found in offline path: " + offlineBinPath);
+                return null;
+            }
             InputStream inputStream = getBinInputStream(fileName);
             // validate binary content
             if (null != inputStream) {
@@ -301,7 +320,7 @@ public class OperationLogic {
                 return null;
             }
             RemoteIndex remoteIndex = remoteIndexList.get(0);
-            String downloadPath = context.getRealPath("") + "bin_cache" + File.separator;
+            String downloadPath = BIN_CACHE_DIR;
             String fileName = IR_BIN_FILE_PREFIX + remoteIndex.getRemoteMap() + IR_BIN_FILE_SUFFIX;
             String localFilePath = downloadPath + fileName;
             File binFile = new File(localFilePath);
