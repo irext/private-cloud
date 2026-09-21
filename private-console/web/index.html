@@ -27,7 +27,7 @@
         <div class="container">
             <div class="form-signin" style="margin-top: 100px;">
                 <h4 class="text-muted" data-i18n="page_index.d_signin_title" style="color: #FFFFFF;">登录</h4>
-                <label for="user_name" class="sr-only" data-i18n="page_index.d_signin_email">邮件地址</label>
+                <label for="user_name" class="sr-only" data-i18n="page_index.d_signin_email">邮箱地址</label>
                 <input type="email" id="user_name" class="form-control" placeholder="Email" required autofocus>
                 <label for="password" class="sr-only" data-i18n="page_index.d_signin_password">密码</label>
                 <input type="password" id="password" class="form-control" placeholder="Password" required>
@@ -56,7 +56,7 @@
             <!-- step 1: deployment mode -->
             <div class="setup-step-panel" id="setup_step_1">
                 <h5 data-i18n="page_setup.step1_title">选择部署模式</h5>
-                <p class="text-muted" data-i18n="page_setup.step1_desc">请选择您的 IRext 私有云部署方式</p>
+                <p class="text-muted" data-i18n="page_setup.step1_desc">请选择你的 IRext 私有云部署方式</p>
                 <div class="radio">
                     <label>
                         <input type="radio" name="deploy_mode" value="hybrid" checked>
@@ -83,7 +83,7 @@
             <div class="setup-step-panel" id="setup_step_2" style="display: none;">
                 <h5 data-i18n="page_setup.step2_title">身份验证</h5>
                 <div id="hybrid_verify_panel" style="display: none;">
-                    <p class="text-muted" data-i18n="page_setup.step2_hybrid_desc">请输入您的公有云账号密码进行身份验证</p>
+                    <p class="text-muted" data-i18n="page_setup.step2_hybrid_desc">请输入你的公有云账号密码进行身份验证</p>
                     <div class="form-group">
                         <label data-i18n="page_setup.verify_email">邮箱地址</label>
                         <input type="email" id="setup_cloud_email" class="form-control" placeholder="Email">
@@ -94,7 +94,7 @@
                     </div>
                 </div>
                 <div id="offline_verify_panel" style="display: none;">
-                    <p class="text-muted" data-i18n="page_setup.step2_offline_desc">请输入您在公有云应用管理中获取的 APP_SECRET</p>
+                    <p class="text-muted" data-i18n="page_setup.step2_offline_desc">请输入你在公有云应用管理中获取的 APP_SECRET</p>
                     <div class="form-group">
                         <label>APP SECRET</label>
                         <input type="password" id="setup_app_secret" class="form-control" placeholder="APP_SECRET">

@@ -43,7 +43,7 @@
                         <div style="min-width: 480px;">
                             <p style="font-size: 14px; color: #FF6F00; margin-bottom: 8px;">
                                 <i class="fa fa-exclamation-triangle" style="margin-right: 5px;"></i>
-                                <span data-i18n="page_code.d_offline_upload_warning">请上传从公有云下载的加密数据包（.tar.gz.enc格式），上传后将覆盖现有数据</span>
+                                <span data-i18n="page_code.d_offline_upload_warning">请上传从公有云下载的加密数据包（.tar.gz.enc 格式），上传后将覆盖现有数据</span>
                             </p>
                             <div class="form-group">
                                 <div class="custom-file">
@@ -63,7 +63,7 @@
                     </div>
                     <button class="btn btn-normal btn-warning" onclick="gotoIndex();" style="font-size: 14px; margin-right: 2px;">
                         <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                        <span href="#" data-i18n="page_code.d_try_index_quit">退出</span>
+                        <span href="#" data-i18n="page_code.d_try_index_quit">关闭</span>
                     </button>
                 </div>
             </nav>
@@ -75,27 +75,27 @@
             <div class="row">
                 <div class="col-lg-6">
                     <div class="input-group" style="max-height: 25px;">
-                        <span class="input-group-addon" data-i18n="page_code.panel_category">类型</span>
+                        <span class="input-group-addon" data-i18n="page_code.panel_category">家电类型</span>
                         <select id="filter_category_id" name="filter_category_id" class="input-group-addon" onchange="onFilterCategoryChange();" style="width: 100%;">
                         </select>
                     </div>
                     <br>
                     <div class="input-group" id="filter_brand_panel" style="max-height: 25px;">
-                        <span class="input-group-addon" data-i18n="page_code.panel_brand">品牌</span>
+                        <span class="input-group-addon" data-i18n="page_code.panel_brand">家电品牌</span>
                         <select id="filter_brand_id" name="filter_brand_id" class="input-group-addon" onchange="onFilterBrandChange();" style="width: 100%;">
                         </select>
                     </div>
                 </div>
                 <div class="col-lg-6">
                     <div class="input-group" id="filter_province_panel" style="max-height: 25px; display: none;">
-                        <span class="input-group-addon" data-i18n="page_code.panel_select_province">选择省份</span>
+                        <span class="input-group-addon" data-i18n="page_code.panel_select_province">机顶盒省份</span>
                         <select id="filter_province_id" name="filter_province_id" onchange="onFilterProvinceChange();" style="width: 100%;">
                         </select>
                         <!-- <span class="input-group-addon pointer">+</span> -->
                     </div>
                     <br>
                     <div class="input-group" id="filter_city_panel" style="max-height: 25px; display: none;">
-                        <span class="input-group-addon" data-i18n="page_code.panel_select_city">选择城市</span>
+                        <span class="input-group-addon" data-i18n="page_code.panel_select_city">机顶盒城市</span>
                         <select id="filter_city_code" name="filter_city_code" onchange="onFilterCityChange();" style="width: 100%;">
                         </select>
                         <!-- <span class="input-group-addon pointer">+</span> -->
@@ -120,7 +120,7 @@
                     <button class="btn btn-default pc-only btn-width" id="decode_bin_button" onclick="onDecodeOnline();"
                             style="font-size: 14px; margin-left: 2px; width: 120px;">
                         <i class="fa-solid fa-rocket" style="margin-right: 2px;"></i>
-                        <span data-i18n="page_code.decode_online">在线解码</span>
+                        <span data-i18n="page_code.decode_online">解码</span>
                     </button>
                 </div>
             </div>
@@ -166,7 +166,7 @@
                     <div id="text_hint"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal" data-i18n="page_code.d_hint_ok">确定</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal" data-i18n="page_code.d_hint_ok">确认</button>
                 </div>
             </div>
         </div>
@@ -320,8 +320,7 @@
                             </div>
                             <div style="width: 100%;">
                                 <div id="wave_container" style="height: 100px; margin-top: 10px; margin-bottom: 10px;"></div>
-                                <pre id="ir_wave_value" readonly style="width: 100%; white-space: nowrap; text-align: left; overflow-x: scroll; color: #000;" data-i18n="[html]page_code.d_invoke_hint">
-                                </pre>
+                                <pre id="ir_wave_value" readonly style="width: 100%; white-space: nowrap; text-align: left; overflow-x: scroll; color: #000;" data-i18n="[html]page_code.d_invoke_hint">请点击上方的按键进行在线解码，波形图将显示在下方区域。</pre>
                             </div>
                         </div>
                     </div>
