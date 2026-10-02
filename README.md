@@ -107,8 +107,9 @@ android:value="your android app_key for hybrid mode OR your private cloud app_ke
 <meta-data
 android:name="irext_app_secret"
 android:value="your android app_secret for hybrid mode OR your private cloud app_secret for offline mode" />
-Configure the private service IP address in network_security_config.xml to allow http access.
 ```
+
+Configure the private service IP address in network_security_config.xml to allow http access.
 
 ### Configure and use Java SDK
 
