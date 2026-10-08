@@ -73,7 +73,7 @@ Request.prototype.sendGetRequest = function(options, callback) {
             }
         )
     } else {
-        http.get(url, function(res) {
+        let req = http.get(url, function(res) {
             res.on('data', function (chunk) {
                 data += chunk;
             });
@@ -89,6 +89,10 @@ Request.prototype.sendGetRequest = function(options, callback) {
                 console.error('error occurred when handling response : ' + e);
                 callback(errorCode.FAILED, null);
             });
+        });
+        req.on('error', function(e) {
+            console.error('error occurred when sending request : ' + e);
+            callback(errorCode.FAILED, null);
         });
     }
 };
@@ -120,6 +124,10 @@ Request.prototype.sendPostRequest = function(bodyData, callback) {
                 callback(errorCode.FAILED, null);
             }
         });
+    });
+    req.on('error', function(e) {
+        console.error('error occurred when sending request : ' + e);
+        callback(errorCode.FAILED, null);
     });
     try {
         req.write(requestData);

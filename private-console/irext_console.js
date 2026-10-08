@@ -48,20 +48,35 @@ let authenticationLogic = require('./work_unit/authentication_logic.js');
 let appKey = process.env.APP_KEY;
 let appSecret = process.env.APP_SECRET;
 
-authenticationLogic.applicationSignInWorkUnit(appKey, appSecret, function (signInErr, userApp) {
-    if (errorCode.SUCCESS.code === signInErr.code) {
-        let id = "ticket_" + userApp.id;
-        let token = userApp.token;
-        let ttl = 24 * 60 * 60 * 14;
-        ticketPair.setTicketPair(id, token, ttl, function (setTicketPairErr) {
-            DECODE_APP_ID = userApp.id;
-            DECODE_APP_TOKEN = token;
-            console.log("application server detected");
-        });
-    } else {
-        console.log("sign in to application server failed");
-    }
-});
+const SIGN_IN_MAX_RETRY = 30;
+const SIGN_IN_RETRY_INTERVAL = 5000;
+
+function signInWithRetry(retryLeft) {
+    authenticationLogic.applicationSignInWorkUnit(appKey, appSecret, function (signInErr, userApp) {
+        if (errorCode.SUCCESS.code === signInErr.code) {
+            let id = "ticket_" + userApp.id;
+            let token = userApp.token;
+            let ttl = 24 * 60 * 60 * 14;
+            ticketPair.setTicketPair(id, token, ttl, function (setTicketPairErr) {
+                DECODE_APP_ID = userApp.id;
+                DECODE_APP_TOKEN = token;
+                console.log("application server detected");
+            });
+        } else {
+            if (retryLeft > 0) {
+                console.log("sign in to application server failed, retrying in " +
+                    (SIGN_IN_RETRY_INTERVAL / 1000) + "s, " + retryLeft + " attempt(s) left");
+                setTimeout(function () {
+                    signInWithRetry(retryLeft - 1);
+                }, SIGN_IN_RETRY_INTERVAL);
+            } else {
+                console.log("sign in to application server failed after all retries");
+            }
+        }
+    });
+}
+
+signInWithRetry(SIGN_IN_MAX_RETRY);
 
 // kickstart the engine
 System.startupHttp(http, serverListenPort, "IRext Private Console V1.6.0");
